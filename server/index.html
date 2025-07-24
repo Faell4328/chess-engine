@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" crossorigin="anonymous"></script>
+<div style="width: 800px" id="tabuleiro"></div><br />
+<button onclick="start()">Posição inicial</button>
+<script>
+  
+  function start(){
+    board.start();
+  };
+  
+  async function onDrop (source, target, piece, newPos, oldPos, orientation) {
+    // console.log('Source: ' + source)
+    // console.log('Target: ' + target)
+    // console.log('Piece: ' + piece)
+    // console.log('New position: ' + Chessboard.objToFen(newPos))
+    // console.log('Old position: ' + Chessboard.objToFen(oldPos))
+    // console.log('Orientation: ' + orientation)
+    // console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+
+    const retorno = await fetch('http://localhost:5000/mover', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "de": source,
+        "para": target
+      })
+    })
+    
+    const retornoTexto = await retorno.text();
+    if(retornoTexto == "invalido"){
+      console.log("Movimento invalido");
+      console.log("Jogo reiniciado");
+      board.start();
+    }
+
+  }
+
+  const board = Chessboard("tabuleiro", {
+    position: "start",
+    draggable: true,
+    onDrop: onDrop
+  });
+  
+</script>
