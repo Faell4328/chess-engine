@@ -49,6 +49,10 @@ function descobrirPeca(de, para, promocao){
     }
     else if(estado.bitboard_bispo_branco & de){
       console.log("A peça é bispo brancas");
+      // Retorna os possiveis movimentos e já verifica se é um lance válido
+      const possiveis_movimentos = Bispo.calcularCasas(de, para)
+      const movimento_captura = Bispo.verificarCaptura(de, para);
+      Bispo.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else if(estado.bitboard_torre_branco & de){
@@ -88,6 +92,10 @@ function descobrirPeca(de, para, promocao){
     }
     else if(estado.bitboard_bispo_preto & de){
       console.log("A peça é bispo pretas");
+      // Retorna os possiveis movimentos e já verifica se é um lance válido
+      const possiveis_movimentos = Bispo.calcularCasas(de, para)
+      const movimento_captura = Bispo.verificarCaptura(de, para);
+      Bispo.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else if(estado.bitboard_torre_preto & de){
@@ -320,156 +328,147 @@ class Cavalo{
     // Calculando os lances
     let movimentos_possiveis_cavalo = [];
 
-    // Verificando se o cavalo está no canto na linha e colunha
-    if((de & estado.bitboard_casas_coluna_canto) != 0n && (de & estado.bitboard_casas_linha_canto) != 0n){
-      console.log("O cavalo está em um canto na linha e na coluna do tabuleiro");
+    // Verificando se o cavalo está na casa A1
+    if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+      console.log("Cavalo está na casa A1");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+    }
 
-      // Verificando se o cavalo está na casa A1
-      if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
-        console.log("Cavalo está na casa A1");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa A2
+    else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+      console.log("Cavalo está na casa A2");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
 
-      // Verificando se o cavalo está na casa A2
-      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
-        console.log("Cavalo está na casa A2");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-      }
+    // Verificando se o cavalo está na casa A7
+    else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+      console.log("Cavalo está na casa A7");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
 
-      // Verificando se o cavalo está na casa A7
-      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
-        console.log("Cavalo está na casa A7");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa A8
+    else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+      console.log("Cavalo está na casa A8");
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+    }
 
-      // Verificando se o cavalo está na casa A8
-      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
-        console.log("Cavalo está na casa A8");
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa B1
+    else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+      console.log("Cavalo está na casa B1");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
 
-      // Verificando se o cavalo está na casa B1
-      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
-        console.log("Cavalo está na casa B1");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
-      }
+    // Verificando se o cavalo está na casa B2
+    else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+      console.log("Cavalo está na casa B2");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
 
-      // Verificando se o cavalo está na casa B2
-      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
-        console.log("Cavalo está na casa B2");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+    }
 
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-      }
+    // Verificando se o cavalo está na casa B7
+    else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+      console.log("Cavalo está na casa B7");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
 
-      // Verificando se o cavalo está na casa B7
-      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
-        console.log("Cavalo está na casa B7");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
-      }
+    // Verificando se o cavalo está na casa B8
+    else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+      console.log("Cavalo está na casa B8");
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
 
-      // Verificando se o cavalo está na casa B8
-      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
-        console.log("Cavalo está na casa B8");
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
-      }
+    // Verificando se o cavalo está na casa G1
+    else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+      console.log("Cavalo está na casa G1");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
 
-      // Verificando se o cavalo está na casa G1
-      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
-        console.log("Cavalo está na casa G1");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa G2
+    else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+      console.log("Cavalo está na casa G2");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
 
-      // Verificando se o cavalo está na casa G2
-      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
-        console.log("Cavalo está na casa G2");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+    }
 
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-      }
+    // Verificando se o cavalo está na casa G7
+    else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+      console.log("Cavalo está na casa G7");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
 
-      // Verificando se o cavalo está na casa G7
-      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
-        console.log("Cavalo está na casa G7");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa G8
+    else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+      console.log("Cavalo está na casa G8");
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
 
-      // Verificando se o cavalo está na casa G8
-      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
-        console.log("Cavalo está na casa G8");
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-      }
+    // Verificando se o cavalo está na casa H1
+    else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+      console.log("Cavalo está na casa H1");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+    }
 
-      // Verificando se o cavalo está na casa H1
-      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
-        console.log("Cavalo está na casa H1");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
-      }
+    // Verificando se o cavalo está na casa H2
+    else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+      console.log("Cavalo está na casa H2");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
 
-      // Verificando se o cavalo está na casa H2
-      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
-        console.log("Cavalo está na casa H2");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-      }
+    // Verificando se o cavalo está na casa H7
+    else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+      console.log("Cavalo está na casa H7");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
 
-      // Verificando se o cavalo está na casa H7
-      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
-        console.log("Cavalo está na casa H7");
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+    }
 
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
-      }
-
-      // Verificando se o cavalo está na casa H8
-      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
-        console.log("Cavalo está na casa H8");
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-      }
-
-      else{
-        console.log("Erro, cavalo não está em nenhum canto");
-        process.exit(0);
-      }
+    // Verificando se o cavalo está na casa H8
+    else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+      console.log("Cavalo está na casa H8");
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
     }
 
     // Verificando se o cavalo está apenas no canto da coluna
@@ -482,21 +481,22 @@ class Cavalo{
 
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
       }
 
       // Verificando se o cavalo está na linha B
       else if(de & estado.bitboard_casas_coluna_B){
         console.log("O cavalo está na coluna B");
 
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
-
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
         movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
       }
 
       // Verificando se o cavalo está na linha G
@@ -505,11 +505,11 @@ class Cavalo{
 
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
-
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+        
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
         movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
       }
 
       // Verificando se o cavalo está na linha H
@@ -518,8 +518,8 @@ class Cavalo{
 
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
       }
     }
     
@@ -555,9 +555,12 @@ class Cavalo{
         console.log("O cavalo está na linha 7");
 
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
-        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
       }
 
       // Verificando se o cavalo está na linha 8
@@ -568,9 +571,6 @@ class Cavalo{
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
         movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
-
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
-        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
       }
     }
 
@@ -592,6 +592,11 @@ class Cavalo{
     if(estado.turno == 1){
       if(movimentos_possiveis_cavalo.indexOf(para) == -1){
         console.log("Foi feito um movimento inválido com o cavalo");
+
+        movimentos_possiveis_cavalo.map((movimento) => {
+          console.log(visualizadeiro(movimento));
+        })
+
         throw new Error();
       }
       else if((para & estado.bitboard_brancas) != 0n){
@@ -702,6 +707,478 @@ class Cavalo{
 }
 
 class Bispo{
+  static calcularCasas(de, para){
+    console.log("-- Iniciando a etapa de calculos de movimento --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+
+      // Calculando os lances
+      let movimentos_possiveis_bispo = [];
+
+      // Verificando na diagonal da direita superior
+      console.log("Iniciando verificação das peças na diagonal da direita superior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_direita.length; cont++){
+        const movimento = de << estado.movimento_bispo_direita[cont];
+        
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_H) || (de & estado.bitboard_casas_linha_8)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_H) || (movimento & estado.bitboard_casas_linha_8)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_pretas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      // Verificando na diagonal da direita inferior
+      console.log("Iniciando verificação das peças na diagonal da direita inferior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_esquerda.length; cont++){
+        const movimento = de >> estado.movimento_bispo_esquerda[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_H) || (de & estado.bitboard_casas_linha_1)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_H) || (movimento & estado.bitboard_casas_linha_1)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_pretas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      // Verificando na diagonal da esquerda superior
+      console.log("Iniciando verificação das peças na diagonal da esquerda superior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_esquerda.length; cont++){
+        const movimento = de << estado.movimento_bispo_esquerda[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_A) || (de & estado.bitboard_casas_linha_8)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_A) || (movimento & estado.bitboard_casas_linha_8)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_pretas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+     }
+
+
+      // Verificando na diagonal da esquerda inferior
+      console.log("Iniciando verificação das peças na diagonal da esquerda inferior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_direita.length; cont++){
+        const movimento = de >> estado.movimento_bispo_direita[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_A) || (de & estado.bitboard_casas_linha_1)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_A) || (movimento & estado.bitboard_casas_linha_1)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_pretas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      console.log("Movimentos possíveis: ");
+      console.log(movimentos_possiveis_bispo);
+
+      if(movimentos_possiveis_bispo.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o bispo");
+        throw new Error();
+      }
+    }
+
+    // Pregas jogam
+    else{
+      // Calculando os lances
+      let movimentos_possiveis_bispo = [];
+
+      // Verificando na diagonal da direita superior
+      console.log("Iniciando verificação das peças na diagonal da direita superior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_direita.length; cont++){
+        const movimento = de << estado.movimento_bispo_direita[cont];
+        
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_H) || (de & estado.bitboard_casas_linha_8)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_H) || (movimento & estado.bitboard_casas_linha_8)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_brancas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      // Verificando na diagonal da direita inferior
+      console.log("Iniciando verificação das peças na diagonal da direita inferior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_esquerda.length; cont++){
+        const movimento = de >> estado.movimento_bispo_esquerda[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_H) || (de & estado.bitboard_casas_linha_1)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_H) || (movimento & estado.bitboard_casas_linha_1)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_brancas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      // Verificando na diagonal da esquerda superior
+      console.log("Iniciando verificação das peças na diagonal da esquerda superior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_esquerda.length; cont++){
+        const movimento = de << estado.movimento_bispo_esquerda[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_A) || (de & estado.bitboard_casas_linha_8)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_A) || (movimento & estado.bitboard_casas_linha_8)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_brancas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+     }
+
+
+      // Verificando na diagonal da esquerda inferior
+      console.log("Iniciando verificação das peças na diagonal da esquerda inferior");
+
+      for(var cont = 0; cont < estado.movimento_bispo_direita.length; cont++){
+        const movimento = de >> estado.movimento_bispo_direita[cont];
+
+        // Verificando se o bispo está no canto
+        if((de & estado.bitboard_casas_coluna_A) || (de & estado.bitboard_casas_linha_1)){
+          break;
+        }
+        // Verificando se o proximo movimento vai para algum canto
+        else if((movimento & estado.bitboard_casas_coluna_A) || (movimento & estado.bitboard_casas_linha_1)){
+          console.log("Está no canto")
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+          break;
+        }
+
+        // Verificando se tem alguma peça na casa
+        if(movimento & estado.bitboard_tabuleiro){
+          // Verificando se é uma peça inimiga
+          if(movimento & estado.bitboard_brancas){
+            console.log("Possivel captura: ");
+            console.log(visualizadeiro(movimento));
+
+            movimentos_possiveis_bispo.push(movimento);
+            break;
+          }
+          // É uma peça alida
+          else{
+            console.log("Peça aliada");
+            console.log(visualizadeiro(movimento));
+
+            break;
+          }
+        }
+        else{
+          console.log("Caminho livre");
+          console.log(visualizadeiro(movimento));
+
+          movimentos_possiveis_bispo.push(movimento);
+        }
+      }
+
+      console.log("Movimentos possíveis: ");
+      console.log(movimentos_possiveis_bispo);
+
+      if(movimentos_possiveis_bispo.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o bispo");
+        throw new Error();
+      }
+    }
+  }
+
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(para & estado.bitboard_pretas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(para & estado.bitboard_brancas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+  }
+
+  static efetuarMovimento(de, para, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_bispo_branco ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_bispo_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+
+    // Pretas jogam
+    else{
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_bispo_preto ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_bispo_preto) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+  }
 }
 
 class Torre{

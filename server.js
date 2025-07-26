@@ -18,8 +18,6 @@ app.get("/", (req, res) => {
 
 app.post('/mover', (req, res) => {
   try{
-    console.time("Timer");
-
     const de = traducao.converter(req.body.de.toUpperCase());
     const para = traducao.converter(req.body.para.toUpperCase());
 
@@ -27,8 +25,6 @@ app.post('/mover', (req, res) => {
     console.log("A peça vai de: \n" + visualizadeiro(de) + '\n');
     console.log("Para: \n" + visualizadeiro(para) + '\n');
     movimentacao.mover(BigInt(de), BigInt(para), 0b111);
-
-    console.timeEnd("Timer");
 
     res.send("ok");
   }
