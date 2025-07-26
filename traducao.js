@@ -25,8 +25,8 @@ export function converter(valor){
 // Recebe o binário e converte para coordenada normal
 export function desconverter(valor){
   console.log("\n-- Está convertendo de binário para coordenadas --\n");
-  let letra = String.fromCharCode(Number(Math.log2(valor) / 8) + Number("A".charCodeAt(0)));
-  let numero = Number(Math.log2(valor) % 8) + 1;
+  let letra = String.fromCharCode((Math.floor((valor.toString(2).length) / 8)) + Number("A".charCodeAt(0)));
+  let numero = Number((valor.toString(2).length) % 8);
 
   return letra + numero;
 }

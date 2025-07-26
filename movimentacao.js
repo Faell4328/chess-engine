@@ -1,368 +1,734 @@
+import { converter, desconverter } from './traducao.js';
 import { estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
-export function mover(de, para, promocao){
-  console.log("\n\n-- Iniciado a etapa de movimentação --\n\n");
-  let peca = descobrirPeca(de);
-  verificarMovimento(peca, de, para);
-  estado.turno = !estado.turno;
-}
+/**
+ * 1° Identificar a peça e também verifica se foi movido a peça da cor certo, correspondente ao turno.
+ * 2° Chamar a classe da peça.
+ * 2.1° Verificações (ex: pião, verificar se é um movimento válido, movimento duplo, captura e etc).
+ * 2.2° Efeturar o movimento, caso passe na verificação.
+ * 3° Atualizar tabuleiro.
+ */
 
-function descobrirPeca(posicao){
+// Função orquestradora e que fica exporta (única).
+export function mover(de, para, promocao){
+  console.log("-- Iniciado a etapa de movimentação --");
+
+  // Dentro da função já chama a classe para fazer a verificação e realizar o movimento.
+  descobrirPeca(de, para, promocao);
+
+  estado.turno = !estado.turno;
+
   if(estado.turno == 1){
-    if(estado.bitboard_piao_branco & posicao){
-      console.log("A peça é piao")
-      return estado.piao;
-    }
-    else if(estado.bitboard_cavalo_branco & posicao){
-      console.log("A peça é cavalo")
-      return estado.cavalo;
-    }
-    else if(estado.bitboard_bispo_branco & posicao){
-      console.log("A peça é bispo")
-      return estado.bispo;
-    }
-    else if(estado.bitboard_torre_branco & posicao){
-      console.log("A peça é torre")
-      return estado.torre;
-    }
-    else if(estado.bitboard_rainha_branco & posicao){
-      console.log("A peça é rainha")
-      return estado.rainha;
-    }
-    else if(estado.bitboard_rei_branco & posicao){
-      console.log("A peça é rei")
-      return estado.rei;
-    }
-    else{
-      console.log("Movimento invalido - não existe peça onde foi solicitado o movimento");
-      throw new Error()
-    }
+    console.log("Brancas jogam");
   }
   else{
-    if(estado.bitboard_piao_preto& posicao){
-      console.log("A peça é piao")
-      return estado.piao;
+    console.log("Pretas jogam");
+  }
+}
+
+function descobrirPeca(de, para, promocao){
+  console.log("\n\n-- Iniciado a etapa de verificação: peça movida --\n\n");
+
+  // Brancas jogam
+  if(estado.turno == 1){
+    if(estado.bitboard_piao_branco & de){
+      console.log("A peça é piao brancas");
+      const movimento_duplo = Piao.verificarMovimentoDuplo(de, para);
+      const movimento_captura = Piao.verificarCaptura(de, para);
+      Piao.efetuarMovimento(de, para, movimento_duplo, movimento_captura);
+      return;
     }
-    else if(estado.bitboard_cavalo_preto & posicao){
-      console.log("A peça é cavalo")
-      return estado.cavalo;
+    else if(estado.bitboard_cavalo_branco & de){
+      console.log("A peça é cavalo brancas");
+      // Retorna os possiveis movimentos e já verifica se é um lance válido
+      const possiveis_movimentos = Cavalo.calcularCasas(de, para)
+      const movimento_captura = Cavalo.verificarCaptura(de, para);
+      Cavalo.efetuarMovimento(de, para, movimento_captura);
+      return;
     }
-    else if(estado.bitboard_bispo_preto & posicao){
-      console.log("A peça é bispo")
-      return estado.bispo;
+    else if(estado.bitboard_bispo_branco & de){
+      console.log("A peça é bispo brancas");
+      return;
     }
-    else if(estado.bitboard_torre_preto & posicao){
-      console.log("A peça é torre")
-      return estado.torre;
+    else if(estado.bitboard_torre_branco & de){
+      console.log("A peça é torre brancas");
+      return;
     }
-    else if(estado.bitboard_rainha_preto & posicao){
-      console.log("A peça é rainha")
-      return estado.rainha;
+    else if(estado.bitboard_rainha_branco & de){
+      console.log("A peça é rainha brancas");
+      return;
     }
-    else if(estado.bitboard_rei_preto & posicao){
-      console.log("A peça é rei")
-      return estado.rei;
+    else if(estado.bitboard_rei_branco & de){
+      console.log("A peça é rei brancas");
+      return;
     }
     else{
-      console.log("Movimento invalido - não existe peça onde foi solicitado o movimento");
-      throw new Error()
+      console.log("Movimento invalido - tentou mover a peça adversária (vez das brancas e não pretas)");
+      throw new Error();
+    }
+  }
+
+  // Pretas jogam
+  else{
+    if(estado.bitboard_piao_preto & de){
+      console.log("A peça é piao pretas");
+      const movimento_duplo = Piao.verificarMovimentoDuplo(de, para);
+      const movimento_captura = Piao.verificarCaptura(de, para);
+      Piao.efetuarMovimento(de, para, movimento_duplo, movimento_captura);
+      return;
+    }
+    else if(estado.bitboard_cavalo_preto & de){
+      console.log("A peça é cavalo pretas");
+      // Retorna os possiveis movimentos e já verifica se é um lance válido
+      const possiveis_movimentos = Cavalo.calcularCasas(de, para)
+      const movimento_captura = Cavalo.verificarCaptura(de, para);
+      Cavalo.efetuarMovimento(de, para, movimento_captura);
+      return;
+    }
+    else if(estado.bitboard_bispo_preto & de){
+      console.log("A peça é bispo pretas");
+      return;
+    }
+    else if(estado.bitboard_torre_preto & de){
+      console.log("A peça é torre");
+      return;
+    }
+    else if(estado.bitboard_rainha_preto & de){
+      console.log("A peça é rainha pretas");
+      return;
+    }
+    else if(estado.bitboard_rei_preto & de){
+      console.log("A peça é rei pretas");
+      return;
+    }
+    else{
+      console.log("Movimento invalido - tentou mover a peça adversária (vez das pretas e não brancas)");
+      throw new Error();
     }
   }
 }
 
-class EfetuarMovimento{
-  
-  static tabuleiro(){
+class Piao{
+  static verificarMovimentoDuplo(de, para){
+    console.log("-- Iniciando a etapa de verificação de movimento duplo --");
+    // Brancas jogam
     if(estado.turno == 1){
-      // Atualizando o bitboard de todas as peças brancas
-      estado.bitboard_brancas = estado.bitboard_piao_branco | estado.bitboard_cavalo_branco | estado.bitboard_bispo_branco | estado.bitboard_torre_branco | estado.bitboard_rainha_branco | estado.bitboard_rei_branco;
-      console.log("Bitboard das brancas (um todo): \n" + visualizadeiro(estado.bitboard_brancas) + '\n');
-    }
-    else{
-      // Atualizando o bitboard de todas as peças pretas
-      estado.bitboard_pretas= estado.bitboard_piao_preto | estado.bitboard_cavalo_preto | estado.bitboard_bispo_preto | estado.bitboard_torre_preto | estado.bitboard_rainha_preto | estado.bitboard_rei_preto;
-      console.log("Bitboard das brancas (um todo): \n" + visualizadeiro(estado.bitboard_pretas) + '\n');
-    }
-    
-    // Atualizando o bitboard com o tabuleiro todo
-    estado.bitboard_tabuleiro = estado.bitboard_brancas | estado.bitboard_pretas;
-    console.log("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(estado.bitboard_tabuleiro) + '\n');
+      // Verificando se foi feito um movimento duplo de pião
+      if(((de << estado.movimento_piao[1]) === para)){
+        console.log("Foi feito um movimento duplo de pião");
 
+        // Verificando se foi feito um movimento duplo válido (se a peça já não foi movida e se não tem peça inimiga a frente, bloqueando o caminho)
+        if((estado.movimento_duplo_piao_branco & de) != 0n && (estado.bitboard_pretas & para) == 0n){
+          console.log("Foi retornado true para movimento duplo de pião")
+          return true;
+        }
+        else{
+          console.log("Movimento duplo inválido - o movimento duplo foi feito por uma peça que já foi mexida ou movida para uma casa á ocupada por uma peça inimiga");
+          throw new Error()
+        }
+      }
+      else{
+        console.log("Não foi feito um movimento duplo de pião");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      // Verificando se foi feito um movimento duplo de pião
+      if(((de >> 16n) === para)){
+        console.log("Foi feito um movimento duplo de pião");
+
+        // Verificando se foi feito um movimento duplo válido (se a peça já não foi movida e se não tem peça inimiga a frente, bloqueando o caminho)
+        if((estado.movimento_duplo_piao_preto & de) != 0n && (estado.bitboard_brancas & para) == 0n){
+          return true;
+        }
+        else{
+          console.log("Movimento duplo inválido - o movimento duplo foi feito por uma peça que já foi mexida ou movida para uma casa á ocupada por uma peça inimiga");
+          throw new Error()
+        }
+      }
+      else{
+        console.log("Não foi feito um movimento duplo de pião");
+        return false;
+      }
+    }
   }
 
-  static piao(de, para, movimento_duplo, capitura){
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+    // Brancas jogam
+    if(estado.turno == 1){
+      let captura1 = 0n;
+      let captura2 = 0n;
+      captura1 = (de << estado.movimento_captura_piao[0]);
+      captura2 = (de << estado.movimento_captura_piao[1]);
+      console.log("-- Casas de captura --")
+      console.log("Captura 1");
+      console.log(visualizadeiro(captura1));
+      console.log("Captura 2");
+      console.log(visualizadeiro(captura2));
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(captura1 & estado.bitboard_pretas || captura2 & estado.bitboard_pretas){
+        if(para == captura1 || para == captura2){
+          console.log("Foi retornado true para captura");
+          return true;
+        }
+        else{
+          console.log("Foi retornado false para captura #2");
+          return false;
+        }
+      }
+      else{
+        console.log("Foi retornado false para captura #1");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      let captura1 = 0n;
+      let captura2 = 0n;
+      captura1 = (de >> estado.movimento_captura_piao[0]);
+      captura2 = (de >> estado.movimento_captura_piao[1]);
+      console.log("-- Status captura --")
+      console.log("Captura 1");
+      console.log(visualizadeiro(captura1));
+      console.log("Captura 2");
+      console.log(visualizadeiro(captura2));
+      console.log("Bitboard Brancas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(captura1 & estado.bitboard_brancas || captura2 & estado.bitboard_brancas){
+        if(para == captura1 || para == captura2){
+          console.log("Foi retornado true para captura");
+          return true;
+        }
+        else{
+          console.log("Foi retornado false para captura #2");
+          return false;
+        }
+      }
+      else{
+          console.log("Foi retornado false para captura #1");
+        return false;
+      }
+    }
+  }
+
+  static efetuarMovimento(de, para, movimento_duplo, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento duplo
       if(movimento_duplo){
-        if(estado.turno == 1){
-          // Atualizando o bitboard que movimento duplo de pião das brancas
+        // Atualizando o bitboard que movimento duplo de pião das brancas
+        estado.movimento_duplo_piao_branco = estado.movimento_duplo_piao_branco ^ de;
+        console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_branco) + '\n');
+      }
+      // Verifica se foi feito um movimento de captura
+      else if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+      }
+      // Se foi feito um movimento normal (andou uma casa)
+      else{
+        const movimento_esperado = de << estado.movimento_piao[0];
+        if(para !== movimento_esperado){
+          console.log("Movimento inválido - não foi feito nenhum movimento esperado");
+          throw new Error()
+        }
+
+        // Verifica se precisa atualizar o bitboard de movimento duplo de piao (porque mesmo não fazendo movimento duplo, é necessário atualizar, de o pião saiu da cada inicial)
+        if(estado.movimento_duplo_piao_branco & de){
+          // Atualizando o bitboard que movimento duplo do piao
           estado.movimento_duplo_piao_branco = estado.movimento_duplo_piao_branco ^ de;
           console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_branco) + '\n');
         }
         else{
-          // Atualizando o bitboard que movimento duplo de pião das pretas
-          estado.movimento_duplo_piao_preto= estado.movimento_duplo_piao_preto ^ de;
+          console.log("O bitboard do controlado de movimento duplo não foi atualizado");
+        }
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_piao_branco ^= movimentacao;
+      console.log("Bitboard do piao: \n" + visualizadeiro(estado.bitboard_piao_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+
+    // Pretas jogam
+    else{
+      // Verifica se foi feito um movimento duplo
+      if(movimento_duplo){
+        // Atualizando o bitboard que movimento duplo de pião das pretas
+        estado.movimento_duplo_piao_preto = estado.movimento_duplo_piao_preto ^ de;
+        console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_preto) + '\n');
+      }
+      // Verifica se foi feito um movimento de captura
+      else if(movimento_captura){
+        //  Atualizando o bitboard das brancas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+      }
+      // Se foi feito um movimento normal (andou uma casa)
+      else{
+        const movimento_esperado = de >> estado.movimento_piao[0];
+        if(para !== movimento_esperado){
+          console.log("Movimento inválido - não foi feito nenhum movimento esperado");
+          throw new Error()
+        }
+
+        // Verifica se precisa atualizar o bitboard de movimento duplo de piao (porque mesmo não fazendo movimento duplo, é necessário atualizar, de o pião saiu da cada inicial)
+        if(estado.movimento_duplo_piao_preto & de){
+          // Atualizando o bitboard que movimento duplo de piao
+          estado.movimento_duplo_piao_preto = estado.movimento_duplo_piao_preto ^ de;
           console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_preto) + '\n');
         }
-      }
-      else if(capitura){
-        if(estado.turno == 1){
-          //  Atualizando o bitboard das pretas (capturando a peça)
-          estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
-          estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
-          estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
-          estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
-          estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
-        }
         else{
-          //  Atualizando o bitboard das brancas (capturando a peça)
-          estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
-          estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
-          estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
-          estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
-          estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
-        }
-      }
-      else{
-        if(estado.turno == 1){
-          const movimento_esperado = de << 8n;
-          if(para !== movimento_esperado){
-            console.log("Movimento inválido - não foi feito nenhum movimento esperado");
-            throw new Error()
-          }
-
-          // Verifica se precisa atualizar o bitboard de movimento duplo de piao
-          if(estado.movimento_duplo_piao_branco & de){
-            // Atualizando o bitboard que movimento duplo de piao
-            estado.movimento_duplo_piao_branco = estado.movimento_duplo_piao_branco ^ de;
-            console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_branco) + '\n');
-          }
-          else{
-            console.log("O bitboard do controlado de movimento duplo não foi atualizado");
-          }
-        }
-        else{
-          const movimento_esperado = de >> 8n;
-          if(para !== movimento_esperado){
-            console.log("Movimento inválido - não foi feito nenhum movimento esperado");
-            throw new Error()
-          }
-
-          // verifica se precisa atualizar o bitboard de movimento duplo de piao
-          if(estado.movimento_duplo_piao_preto & de){
-            // Atualizando o bitboard que movimento duplo de piao
-            estado.movimento_duplo_piao_preto = estado.movimento_duplo_piao_preto ^ de;
-            console.log("O bitboard do controlado de movimento duplo está em: \n" + visualizadeiro(estado.movimento_duplo_piao_preto) + '\n');
-          }
-          else{
-            console.log("O bitboard do controlado de movimento duplo não foi atualizado");
-          }
+          console.log("O bitboard do controlado de movimento duplo não foi atualizado");
         }
       }
 
-      if(estado.turno == 1){
-        // Realizando movimento
-        const movimentacao = de | para;
-        estado.bitboard_piao_branco ^= movimentacao;
-        console.log("Bitboard do piao: \n" + visualizadeiro(estado.bitboard_piao_branco) + '\n');
-      }
-      else{
-        // Realizando movimento
-        const movimentacao = de | para;
-        estado.bitboard_piao_preto ^= movimentacao;
-        console.log("Bitboard do piao: \n" + visualizadeiro(estado.bitboard_piao_preto) + '\n');
-      }
 
-      this.tabuleiro();
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_piao_preto ^= movimentacao;
+      console.log("Bitboard do piao: \n" + visualizadeiro(estado.bitboard_piao_preto) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
   }
 }
 
-function verificarMovimentoDuploPiao(de, para){
-  if(estado.turno == 1){
-    // Verificando se foi feito um movimento duplo de pião
-    if(((de << 16n) === para)){
-      console.log("Foi feito um movimento duplo de pião");
+class Cavalo{
+  static calcularCasas(de, para){
+    console.log("-- Iniciando a etapa de calculos de movimento --");
 
-      // Verificando se foi feito um movimento duplo válido
-      if((estado.movimento_duplo_piao_branco & de)){
+    // Calculando os lances
+    let movimentos_possiveis_cavalo = [];
+
+    // Verificando se o cavalo está no canto na linha e colunha
+    if((de & estado.bitboard_casas_coluna_canto) != 0n && (de & estado.bitboard_casas_linha_canto) != 0n){
+      console.log("O cavalo está em um canto na linha e na coluna do tabuleiro");
+
+      // Verificando se o cavalo está na casa A1
+      if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+        console.log("Cavalo está na casa A1");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa A2
+      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+        console.log("Cavalo está na casa A2");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      }
+
+      // Verificando se o cavalo está na casa A7
+      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+        console.log("Cavalo está na casa A7");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa A8
+      else if((de & estado.bitboard_casas_coluna_A) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+        console.log("Cavalo está na casa A8");
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa B1
+      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+        console.log("Cavalo está na casa B1");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na casa B2
+      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+        console.log("Cavalo está na casa B2");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      }
+
+      // Verificando se o cavalo está na casa B7
+      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+        console.log("Cavalo está na casa B7");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na casa B8
+      else if((de & estado.bitboard_casas_coluna_B) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+        console.log("Cavalo está na casa B8");
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na casa G1
+      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+        console.log("Cavalo está na casa G1");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa G2
+      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+        console.log("Cavalo está na casa G2");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      }
+
+      // Verificando se o cavalo está na casa G7
+      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+        console.log("Cavalo está na casa G7");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa G8
+      else if((de & estado.bitboard_casas_coluna_G) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+        console.log("Cavalo está na casa G8");
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na casa H1
+      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_1) != 0n){
+        console.log("Cavalo está na casa H1");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na casa H2
+      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_2) != 0n){
+        console.log("Cavalo está na casa H2");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      }
+
+      // Verificando se o cavalo está na casa H7
+      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_7) != 0n){
+        console.log("Cavalo está na casa H7");
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na casa H8
+      else if((de & estado.bitboard_casas_coluna_H) != 0n && (de & estado.bitboard_casas_linha_8) != 0n){
+        console.log("Cavalo está na casa H8");
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      else{
+        console.log("Erro, cavalo não está em nenhum canto");
+        process.exit(0);
+      }
+    }
+
+    // Verificando se o cavalo está apenas no canto da coluna
+    else if((de & estado.bitboard_casas_coluna_canto) != 0n){
+      console.log("O cavalo está em um canto na coluna do tabuleiro");
+
+      // Verificando se o cavalo está na linha A
+      if(de & estado.bitboard_casas_coluna_A){
+        console.log("O cavalo está na coluna A");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na linha B
+      else if(de & estado.bitboard_casas_coluna_B){
+        console.log("O cavalo está na coluna B");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      }
+
+      // Verificando se o cavalo está na linha G
+      else if(de & estado.bitboard_casas_coluna_G){
+        console.log("O cavalo está na coluna G");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na linha H
+      else if(de & estado.bitboard_casas_coluna_H){
+        console.log("O cavalo está na coluna H");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      }
+    }
+    
+    // Verificando se o cavalo está apenas no canto da linha
+    else if((de & estado.bitboard_casas_linha_canto) != 0n){
+      console.log("O cavalo está em um canto na linha do tabuleiro");
+
+      // Verificando se o cavalo está na linha 1
+      if(de & estado.bitboard_casas_linha_1){
+        console.log("O cavalo está na linha 1");
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na linha 2
+      else if(de & estado.bitboard_casas_linha_2){
+        console.log("O cavalo está na linha 2");
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      }
+
+      // Verificando se o cavalo está na linha 7
+      else if(de & estado.bitboard_casas_linha_7){
+        console.log("O cavalo está na linha 7");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+      }
+
+      // Verificando se o cavalo está na linha 8
+      else if(de & estado.bitboard_casas_linha_8){
+        console.log("O cavalo está na linha 8");
+
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+        movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+        movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      }
+    }
+
+    // Caso o cavalo não esteja perto de nenhuma coluna
+    else{
+      console.log("O cavalo não está em um canto do tabuleiro");
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de << estado.movimento_cavalo_direita[1]);
+
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_esquerda[1]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[0]);
+      movimentos_possiveis_cavalo.push(de >> estado.movimento_cavalo_direita[1]);
+    }
+    
+    // Brancas jogam
+    if(estado.turno == 1){
+      if(movimentos_possiveis_cavalo.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o cavalo");
+        throw new Error();
+      }
+      else if((para & estado.bitboard_brancas) != 0n){
+        console.log("Foi feito um movimento inválido com o cavalo - já tem uma peça da mesma cor na casa de destino");
+        throw new Error();
+      }
+      else{
+        console.log("O cavalo foi movido para: " + desconverter(para) + ", um movimento válido");
+        return;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      if(movimentos_possiveis_cavalo.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o cavalo");
+        throw new Error();
+      }
+      else if((para & estado.bitboard_pretas) != 0n){
+        console.log("Foi feito um movimento inválido com o cavalo - já tem uma peça da mesma cor na casa de destino");
+        throw new Error();
+      }
+      else{
+        console.log("O cavalo foi movido para: " + desconverter(para) + ", um movimento válido");
+        return;
+      }
+    }
+  }
+
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(para & estado.bitboard_pretas){
+        console.log("Foi retornado true para captura");
         return true;
       }
       else{
-        console.log("Movimento duplo inválido");
-        throw new Error()
+        console.log("Foi retornado false para captura");
+        return false;
       }
     }
-    else{
-      console.log("Não foi feito um movimento duplo de pião");
-      return false;
-    }
-  }
-  else{
-    // Verificando se foi feito um movimento duplo de pião
-    if(((de >> 16n) === para)){
-      console.log("Foi feito um movimento duplo de pião");
 
-      // Verificando se foi feito um movimento duplo válido
-      if((estado.movimento_duplo_piao_preto & de)){
+    // Pretas jogam
+    else{
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(para & estado.bitboard_brancas){
+        console.log("Foi retornado true para captura");
         return true;
       }
       else{
-        console.log("Movimento duplo inválido");
-        throw new Error()
+        console.log("Foi retornado false para captura");
+        return false;
       }
     }
-    else{
-      console.log("Não foi feito um movimento duplo de pião");
-      return false;
-    }
   }
-}
 
-function verificarCapitura(peca, de, para){
-  if(estado.turno == 1){
-    // piao
-    if(peca == 0b1){
-      let captura1 = 0n;
-      let captura2 = 0n;
-      captura1 = (de << 7n);
-      captura2 = (de << 9n);
-      console.log("-- Status captura --")
-      console.log(visualizadeiro(captura1));
-      console.log(visualizadeiro(captura2))
-      if(captura1 & estado.bitboard_pretas || captura2 & estado.bitboard_pretas){
-        if(para == captura1 || para == captura2){
-          return true;
-        }
-        else{
-          return false;
-        }
+  static efetuarMovimento(de, para, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
       }
-      else{
-        return false;
-      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_cavalo_branco ^= movimentacao;
+      console.log("Bitboard do cavalo: \n" + visualizadeiro(estado.bitboard_cavalo_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
     }
-    // cavalo
-    else if(peca == 0b10){
-    }
-    // bispo
-    else if(peca == 0b11){
-    }
-    // torre
-    else if(peca == 0b110){
-    }
-    // rainha
-    else if(peca == 0b111){
-    }
-    // rei
+
+    // Pretas jogam
     else{
-    }
-  }
-  else{
-    // piao
-    if(peca == 0b1){
-      let captura1 = 0n;
-      let captura2 = 0n;
-      captura1 = (de >> 7n);
-      captura2 = (de >> 9n);
-      console.log("-- Status captura --")
-      console.log(visualizadeiro(captura1));
-      console.log(visualizadeiro(captura2))
-      if(captura1 & estado.bitboard_brancas || captura2 & estado.bitboard_brancas){
-        if(para == captura1 || para == captura2){
-          return true;
-        }
-        else{
-          return false;
-        }
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
       }
-      else{
-        return false;
-      }
-    }
-    // cavalo
-    else if(peca == 0b10){
-    }
-    // bispo
-    else if(peca == 0b11){
-    }
-    // torre
-    else if(peca == 0b110){
-    }
-    // rainha
-    else if(peca == 0b111){
-    }
-    // rei
-    else{
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_cavalo_preto^= movimentacao;
+      console.log("Bitboard do cavalo: \n" + visualizadeiro(estado.bitboard_cavalo_preto) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
     }
 
   }
 }
 
-function verificarMovimento(peca, de, para){
+class Bispo{
+}
+
+class Torre{
+}
+
+class Dama{
+}
+
+class Rei{
+}
+
+function atualizarTabuleiro(){
+  // Brancas jogam
   if(estado.turno == 1){
-    // Verificar se a casa da frente está ocupada
-
-    if((de << 8n == para || de << 16n == para) && (((estado.bitboard_brancas & para) != 0n) || ((estado.bitboard_pretas & para) != 0n))){
-      console.log("Movimento inválido - a casa de destino está ocupada");
-      throw new Error()
-    }
-
-    // piao
-    if(peca == 0b1){
-      
-      // Vai verificar se é um movimento duplo e se é valido
-      const movimento_duplo = verificarMovimentoDuploPiao(de, para);
-      const capitura = verificarCapitura(peca, de, para);
-
-      // Realizar movimento
-      EfetuarMovimento.piao(de, para, movimento_duplo, capitura);
-    }
-    // cavalo
-    else if(peca == 0b10){
-    }
-    // bispo
-    else if(peca == 0b11){
-    }
-    // torre
-    else if(peca == 0b110){
-    }
-    // rainha
-    else if(peca == 0b111){
-    }
-    // rei
-    else{
-    }
+    // Atualizando o bitboard de todas as peças brancas
+    estado.bitboard_brancas = estado.bitboard_piao_branco | estado.bitboard_cavalo_branco | estado.bitboard_bispo_branco | estado.bitboard_torre_branco | estado.bitboard_rainha_branco | estado.bitboard_rei_branco;
+    console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(estado.bitboard_brancas) + '\n');
   }
+
+  // Pretas jogam
   else{
-    // Verificar se a casa está ocupada por alguma outra peça da mesma cor.
-    if((de << 8n == para || de << 16n == para) && (((estado.bitboard_pretas & para) != 0n) || ((estado.bitboard_brancas & para) != 0n))){
-      console.log("Movimento inválido - a casa de destino está ocupada");
-      throw new Error()
-    }
-
-    // piao
-    if(peca == 0b1){
-      
-      // Vai verificar se é um movimento duplo e se é valido
-      const movimento_duplo = verificarMovimentoDuploPiao(de, para);
-      const capitura = verificarCapitura(peca, de, para);
-
-      // Realizar movimento
-      EfetuarMovimento.piao(de, para, movimento_duplo, capitura);
-    }
-    // cavalo
-    else if(peca == 0b10){
-    }
-    // bispo
-    else if(peca == 0b11){
-    }
-    // torre
-    else if(peca == 0b110){
-    }
-    // rainha
-    else if(peca == 0b111){
-    }
-    // rei
-    else{
-    }
+    // Atualizando o bitboard de todas as peças pretas
+    estado.bitboard_pretas= estado.bitboard_piao_preto | estado.bitboard_cavalo_preto | estado.bitboard_bispo_preto | estado.bitboard_torre_preto | estado.bitboard_rainha_preto | estado.bitboard_rei_preto;
+    console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(estado.bitboard_pretas) + '\n');
   }
+  
+  // Atualizando o bitboard com todas as casas ocupadas
+  estado.bitboard_tabuleiro = estado.bitboard_brancas | estado.bitboard_pretas;
+  console.log("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(estado.bitboard_tabuleiro) + '\n');
 }

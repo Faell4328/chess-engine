@@ -33,6 +33,44 @@ export const estado = {
   bitboard_brancas: 0x000000000000FFFFn,
   // 11111111 11111111 00000000 00000000 00000000 00000000 00000000 00000000
   bitboard_pretas: 0xFFFF000000000000n,
+
+  // bitboard para as casas do canto
+  
+  // 11000011 11000011 11000011 11000011 11000011 11000011 11000011 11000011
+  bitboard_casas_coluna_canto: 0xC3C3C3C3C3C3C3C3n,
+  // 10000000 10000000 10000000 10000000 10000000 10000000 10000000 10000000
+  bitboard_casas_coluna_A: 0x8080808080808080n,
+  // 00000010 00000010 00000010 00000010 00000010 00000010 00000010 00000010
+  bitboard_casas_coluna_B: 0x202020202020202n,
+  // 01000000 01000000 01000000 01000000 01000000 01000000 01000000 01000000
+  bitboard_casas_coluna_G: 0x4040404040404040n,
+  // 00000001 00000001 00000001 00000001 00000001 00000001 00000001 00000001
+  bitboard_casas_coluna_H: 0x101010101010101n,
+
+  // 11111111 11111111 00000000 00000000 00000000 00000000 11111111 11111111
+  bitboard_casas_linha_canto: 0xC3C3C3C3C3C3C3C3n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 11111111 
+  bitboard_casas_linha_1: 0x00000000000000FFn,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 00000000
+  bitboard_casas_linha_2: 0x000000000000FF00n,
+  // 00000000 11111111 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_casas_linha_7: 0x00FF000000000000n,
+  // 11111111 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_casas_linha_8: 0xFF00000000000000n,
+
+  // Pré-calculo - TEM NÚMERO NEGATIVO TAMBÉM NO CAVALO E BISPO (os mesmos)
+  movimento_piao: [8n, 16n],
+  movimento_captura_piao: [7n, 9n],
+  movimento_cavalo_direita: [10n, 17n],
+  movimento_cavalo_esquerda: [6n, 15n],
+  movimento_bispo_esquerda: [7n, 14n, 21n, 28n, 35n, 42n, 49n],
+  movimento_bipo_direita: [9n, 18n, 27n, 36n, 45n, 54n, 63n],
+  movimento_torre_direita: [1n, 2n, 3n, 4n, 5n, 6n, 7n],
+  movimento_torre_frente: [8n, 16n, 24n, 32n, 40n, 48n, 56n],
+
+  // FAZER
+  casas_atacadas_pelas_pretas: null,
+  casas_atacadas_pelas_brancas: null,
   
   // 0 é pretas e 1 é brancas
   turno: 1,
@@ -43,7 +81,7 @@ export const estado = {
   piao: 0b1,
   cavalo: 0b10,
   bispo: 0b11,
-  torre: 0b110,
-  dama: 0b111,
-  rei: 0b1110
+  torre: 0b100,
+  dama: 0b101,
+  rei: 0b111
 }
