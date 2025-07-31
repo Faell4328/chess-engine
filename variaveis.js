@@ -63,6 +63,7 @@ export const estado = {
   movimento_captura_piao: [7n, 9n],
   movimento_cavalo_direita: [10n, 17n],
   movimento_cavalo_esquerda: [6n, 15n],
+  movimento_cavalo: [6n, 10n, 15n, 17n],
   movimento_bispo_esquerda: [7n, 14n, 21n, 28n, 35n, 42n, 49n],
   movimento_bispo_direita: [9n, 18n, 27n, 36n, 45n, 54n, 63n],
   movimento_torre_direita: [1n, 2n, 3n, 4n, 5n, 6n, 7n],
