@@ -60,7 +60,8 @@ export const estado = {
 
   // Pré-calculo - TEM NÚMERO NEGATIVO TAMBÉM NO CAVALO E BISPO (os mesmos)
   movimento_piao: [8n, 16n],
-  movimento_captura_piao: [7n, 9n],
+  movimento_captura_piao_esquerda: [7n],
+  movimento_captura_piao_direita: [9n],
   movimento_cavalo_direita: [10n, 17n],
   movimento_cavalo_esquerda: [6n, 15n],
   movimento_cavalo: [6n, 10n, 15n, 17n],
@@ -70,14 +71,15 @@ export const estado = {
   movimento_torre_frente: [8n, 16n, 24n, 32n, 40n, 48n, 56n],
 
   // FAZER
-  casas_atacadas_pelas_pretas: null,
-  casas_atacadas_pelas_brancas: null,
+  casas_atacadas_pelas_pretas: 0n,
+  casas_atacadas_pelas_brancas: 0n,
   
   // 0 é pretas e 1 é brancas
   turno: 1,
   movimento_duplo_piao_branco: 0x000000000000FF00n,
   movimento_duplo_piao_preto: 0x00FF000000000000n,
-  en_passant: false,
+  en_passant_brancas: 0n,
+  en_passant_pretas: 0n,
   
   piao: 0b1,
   cavalo: 0b10,
