@@ -57,6 +57,10 @@ function descobrirPeca(de, para, promocao){
     }
     else if(estado.bitboard_torre_branco & de){
       console.log("A peça é torre brancas");
+      // Retorna os possiveis movimentos e já verifica se é um lance válido
+      const possiveis_movimentos = Torre.calcularCasas(de, para)
+      const movimento_captura = Torre.verificarCaptura(de, para);
+      Torre.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else if(estado.bitboard_rainha_branco & de){
@@ -99,7 +103,7 @@ function descobrirPeca(de, para, promocao){
       return;
     }
     else if(estado.bitboard_torre_preto & de){
-      console.log("A peça é torre");
+      console.log("A peça é torre pretas");
       // Retorna os possiveis movimentos e já verifica se é um lance válido
       const possiveis_movimentos = Torre.calcularCasas(de, para)
       const movimento_captura = Torre.verificarCaptura(de, para);
@@ -569,78 +573,49 @@ class Bispo{
       console.log("Calculando possibilidades")
 
       for(let cont = 0; cont < deslocamento.length; cont ++){
-        // Verificando se o bispo estara na diagonal
-        if(((de << deslocamento[cont]) & borda) !== 0n){
-          console.log("Bispo está na diagonal\n");
-          movimentos_possiveis.push(operador == "<<" ? de << deslocamento[cont] : de >> deslocamento[cont]);
-          break;
-        }
-        // Verificiando se a casa está ocupada por um inimigo
-        else if(((de << deslocamento[cont]) & peca_inimiga) !== 0n){
-          console.log("Casa ocupada por inimigo\n");
-          movimentos_possiveis.push(operador == "<<" ? de << deslocamento[cont] : de >> deslocamento[cont]);
-          break;
-        }
+        const destino = ((operador == "<<") ? de << deslocamento[cont] : de >> deslocamento[cont]);
+
         // Verificando se a casa está ocupada por um aliado
-        else if(((de << deslocamento[cont]) & peca_aliada) !== 0n){
+        if((destino & peca_aliada) !== 0n){
           console.log("Casa ocupada por alidado\n");
           break;
         }
-
-        movimentos_possiveis.push(operador == "<<" ? de << deslocamento[cont] : de >> deslocamento[cont]);
+        // Verificando se o bispo estara no canto
+        else if((destino & borda) !== 0n){
+          console.log("Bispo está no canto\n");
+          movimentos_possiveis.push(destino);
+          break;
+        }
+        // Verificiando se a casa está ocupada por um inimigo
+        else if((destino & peca_inimiga) !== 0n){
+          console.log("Casa ocupada por inimigo\n");
+          movimentos_possiveis.push(destino);
+          break;
+        }
+        
+        movimentos_possiveis.push(destino);
       }
 
       return movimentos_possiveis;
     }
     
-    // Verificando se o bispo está em algum canto (A1, A8, H1, H8). Onde se tem apenas movimento em uma direção
-    if(de & (estado.bitboard_casas_coluna_A & estado.bitboard_casas_coluna_H & estado.bitboard_casas_linha_1 & estado.bitboard_casas_linha_8)){
-      console.log("O bispo está canto do tabuleiro, ex: A1, A8, H1 ou H8");
 
-      // Verifica se está na coluna A
-      if(de & (estado.bitboard_casas_coluna_A)){
-        console.log("Bispo está na coluna A");
+    movimentos_possiveis_bispo = [
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, "<<", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, ">>", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, "<<", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, ">>", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1))
+    ]
 
-        // Verifica se está na linha 1
-        if(de & (estado.bitboard_casas_linha_1)){
-          console.log("Bispo está na casa A1");
-          movimentos_possiveis_bispo.push(calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, "<<", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8)));
-        }
-        // Verifica se está na linha 8
-        else{
-          console.log("Bispo está na casa A8");
-          movimentos_possiveis_bispo.push(calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, ">>", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1)));
-        }
-      }
-      // Está na colunha H
-      else{
-        console.log("Bispo está na coluna H");
+    movimentos_possiveis_bispo = movimentos_possiveis_bispo.filter((lances) => {
+      return lances !== 0n;
+    })
 
-        // Verifica se está na linha 1
-        if(de & (estado.bitboard_casas_linha_1)){
-          console.log("Bispo está na casa H1");
-          movimentos_possiveis_bispo.push(calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, "<<", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8)));
-        }
-        // Verifica se está na linha 8
-        else{
-          console.log("Bispo está na casa H8");
-          movimentos_possiveis_bispo.push(calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, ">>", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1)));
-        }
-      }
-    }
-    else{
-      console.log("Não está em um canto")
-
-      movimentos_possiveis_bispo = [
-        ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, "<<", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8)),
-        ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, ">>", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1)),
-        ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, "<<", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8)),
-        ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, ">>", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1))
-      ]
-    }
-
-    console.log("movimentos possíveis");
-    console.log(movimentos_possiveis_bispo);
+    console.log("movimentos possíveis:");
+    console.log(movimentos_possiveis_bispo)
+    // movimentos_possiveis_bispo.map((lance) => {
+    //   console.log(visualizadeiro(lance));
+    // })
 
     // Brancas jogam
     if(estado.turno == 1){
@@ -747,6 +722,186 @@ class Bispo{
 }
 
 class Torre{
+  static calcularCasas(de, para){
+    console.log("-- Iniciando a etapa de calculos de movimento --");
+
+    // Calculando os lances
+    let movimentos_possiveis_torre= [];
+
+    const calcularPossibilidadeMovimento = (de, deslocamento, operador, borda) => {
+      let movimentos_possiveis = [];
+      let peca_aliada = null;
+      let peca_inimiga = null;
+
+      if(estado.turno == 1){
+        peca_aliada = estado.bitboard_brancas;
+        peca_inimiga = estado.bitboard_pretas;
+      }
+      else{
+        peca_aliada = estado.bitboard_pretas;
+        peca_inimiga = estado.bitboard_brancas;
+      }
+
+      console.log("Peças aliadas:")
+      console.log(visualizadeiro(peca_aliada));
+      console.log("Peças inimigas:")
+      console.log(visualizadeiro(peca_inimiga));
+
+      if(de & borda){
+        console.log("A torre está na borda e não é possível fazer o movimento");
+        return [];
+      }
+
+      console.log("Calculando possibilidades");
+
+      for(let cont = 0; cont < deslocamento.length; cont ++){
+        const destino = ((operador == "<<") ? de << deslocamento[cont] : de >> deslocamento[cont]);
+
+        // Verificando se a casa está ocupada por um aliado
+        if((destino & peca_aliada) !== 0n){
+          console.log("Casa ocupada por alidado\n");
+          break;
+        }
+        // Verificando se a torre estara no canto
+        else if((destino & borda) !== 0n){
+          console.log("Torre está no canto\n");
+          movimentos_possiveis.push(destino);
+          break;
+        }
+        // Verificiando se a casa está ocupada por um inimigo
+        else if((destino & peca_inimiga) !== 0n){
+          console.log("Casa ocupada por inimigo\n");
+          movimentos_possiveis.push(destino);
+          break;
+        }
+        
+        movimentos_possiveis.push(destino);
+      }
+
+      return movimentos_possiveis;
+    }
+    
+
+    movimentos_possiveis_torre = [
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_frente, "<<", estado.bitboard_casas_linha_8),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_frente, ">>", estado.bitboard_casas_linha_1),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_direita, "<<", estado.bitboard_casas_coluna_H),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_direita, ">>", estado.bitboard_casas_coluna_A),
+    ]
+
+    movimentos_possiveis_torre = movimentos_possiveis_torre.filter((lances) => {
+      return lances !== 0n;
+    })
+
+    console.log("movimentos possíveis:");
+    console.log(movimentos_possiveis_torre);
+    // movimentos_possiveis_torre.map((lance) => {
+    //   console.log(visualizadeiro(lance));
+    // })
+
+    // Brancas jogam
+    if(estado.turno == 1){
+
+      if(movimentos_possiveis_torre.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o torre");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de torre válido")
+      }
+    }
+
+    // Pretas jogam
+    else{
+
+      if(movimentos_possiveis_torre.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com o torre");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de torre válido")
+      }
+    }
+  }
+
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(para & estado.bitboard_pretas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(para & estado.bitboard_brancas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+  }
+
+  static efetuarMovimento(de, para, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_torre_branco ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_torre_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+
+    // Pretas jogam
+    else{
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_torre_preto ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_torre_preto) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+  }
+
 }
 
 class Dama{
