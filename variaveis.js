@@ -69,6 +69,9 @@ export const estado = {
   movimento_bispo_direita: [9n, 18n, 27n, 36n, 45n, 54n, 63n],
   movimento_torre_direita: [1n, 2n, 3n, 4n, 5n, 6n, 7n],
   movimento_torre_frente: [8n, 16n, 24n, 32n, 40n, 48n, 56n],
+  movimento_rei_frente: [8n],
+  movimento_rei_direita: [7n],
+  movimento_rei_esquerda: [9n],
 
   // FAZER
   casas_atacadas_pelas_pretas: 0n,

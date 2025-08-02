@@ -130,10 +130,16 @@ function descobrirPeca(de, para, promocao){
     }
     else if(estado.bitboard_rainha_branco & de){
       console.log("A peça é rainha brancas");
+      Dama.calcularCasas(de, para)
+      const movimento_captura = Dama.verificarCaptura(de, para);
+      Dama.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else if(estado.bitboard_rei_branco & de){
       console.log("A peça é rei brancas");
+      Rei.calcularCasas(de, para)
+      const movimento_captura = Rei.verificarCaptura(de, para);
+      Rei.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else{
@@ -180,10 +186,16 @@ function descobrirPeca(de, para, promocao){
     }
     else if(estado.bitboard_rainha_preto & de){
       console.log("A peça é rainha pretas");
+      Dama.calcularCasas(de, para)
+      const movimento_captura = Dama.verificarCaptura(de, para);
+      Dama.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else if(estado.bitboard_rei_preto & de){
       console.log("A peça é rei pretas");
+      Rei.calcularCasas(de, para)
+      const movimento_captura = Rei.verificarCaptura(de, para);
+      Rei.efetuarMovimento(de, para, movimento_captura);
       return;
     }
     else{
@@ -864,9 +876,266 @@ class Torre{
 }
 
 class Dama{
+  static calcularCasas(de, para){
+    console.log("-- Iniciando a etapa de calculos de movimento --");
+
+    // Calculando os lances
+    let movimentos_possiveis_dama= [];    
+
+    movimentos_possiveis_dama = [
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_frente, "<<", false, estado.bitboard_casas_linha_8),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_frente, ">>", false, estado.bitboard_casas_linha_1),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_direita, "<<", false, estado.bitboard_casas_coluna_H),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_torre_direita, ">>", false, estado.bitboard_casas_coluna_A),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, "<<", false, (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_direita, ">>", false, (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, "<<", false, (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_bispo_esquerda, ">>", false, (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1))
+    ]
+
+    movimentos_possiveis_dama = movimentos_possiveis_dama.filter((lances) => {
+      return lances !== 0n;
+    })
+
+    console.log("movimentos possíveis:");
+    console.log(movimentos_possiveis_dama);
+    // movimentos_possiveis_torre.map((lance) => {
+    //   console.log(visualizadeiro(lance));
+    // })
+
+    // Brancas jogam
+    if(estado.turno == 1){
+
+      if(movimentos_possiveis_dama.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com a dama");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de dama válido")
+      }
+    }
+
+    // Pretas jogam
+    else{
+
+      if(movimentos_possiveis_dama.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com a dama");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de dama válido")
+      }
+    }
+  }
+
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(para & estado.bitboard_pretas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(para & estado.bitboard_brancas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+  }
+
+  static efetuarMovimento(de, para, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_rainha_branco ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rainha_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+
+    // Pretas jogam
+    else{
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_rainha_preto ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rainha_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+  }
 }
 
 class Rei{
+  static calcularCasas(de, para){
+    console.log("-- Iniciando a etapa de calculos de movimento --");
+
+    // Calculando os lances
+    let movimentos_possiveis_rei= [];    
+
+    movimentos_possiveis_rei = [
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente, "<<", false, (estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_esquerda, "<<", false, (estado.bitboard_casas_coluna_A)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_direita, "<<", false, (estado.bitboard_casas_coluna_H)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente, ">>", false, (estado.bitboard_casas_linha_1)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_esquerda, ">>", false, (estado.bitboard_casas_coluna_H)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_direita, ">>", false, (estado.bitboard_casas_coluna_A))
+]
+
+    movimentos_possiveis_rei = movimentos_possiveis_rei.filter((lances) => {
+      return lances !== 0n;
+    })
+
+    console.log("movimentos possíveis:");
+    console.log(movimentos_possiveis_rei);
+    // movimentos_possiveis_torre.map((lance) => {
+    //   console.log(visualizadeiro(lance));
+    // })
+
+    // Brancas jogam
+    if(estado.turno == 1){
+
+      if(movimentos_possiveis_rei.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com a dama");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de dama válido")
+      }
+    }
+
+    // Pretas jogam
+    else{
+
+      if(movimentos_possiveis_rei.indexOf(para) == -1){
+        console.log("Foi feito um movimento inválido com a dama");
+        throw new Error();
+      }
+      else{
+        console.log("Movimento de dama válido")
+      }
+    }
+  }
+
+  static verificarCaptura(de, para){
+    console.log("-- Iniciando a etapa de verificação de captura --");
+
+    // Brancas jogam
+    if(estado.turno == 1){
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_pretas));
+      if(para & estado.bitboard_pretas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+
+    // Pretas jogam
+    else{
+      console.log("Bitboard Pretas");
+      console.log(visualizadeiro(estado.bitboard_brancas));
+      if(para & estado.bitboard_brancas){
+        console.log("Foi retornado true para captura");
+        return true;
+      }
+      else{
+        console.log("Foi retornado false para captura");
+        return false;
+      }
+    }
+  }
+
+  static efetuarMovimento(de, para, movimento_captura){
+    // Brancas jogam
+    if(estado.turno == 1){
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
+        estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & para);
+        estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
+        estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
+        estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_rei_branco ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rei_branco) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+
+    // Pretas jogam
+    else{
+      // Verifica se foi feito um movimento de captura
+      if(movimento_captura){
+        //  Atualizando o bitboard das pretas (capturando a peça)
+        estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & para);
+        estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & para);
+        estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
+        estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
+        estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+      }
+
+      // Realizando movimento
+      const movimentacao = de | para;
+      estado.bitboard_rei_preto ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rei_preto) + '\n');
+
+      // Atualiza todos os bitboards restantes
+      atualizarTabuleiro();
+      return;
+    }
+  }
+
 }
 
 function atualizarTabuleiro(){
