@@ -81,15 +81,109 @@ export const estado = {
   turno: 1,
   numero_lances_brancas: 0,
   numero_lances_pretas: 0,
+  
   movimento_duplo_piao_branco: 0x000000000000FF00n,
   movimento_duplo_piao_preto: 0x00FF000000000000n,
+
   en_passant_brancas: 0n,
   en_passant_pretas: 0n,
   
+  roque_esquerda_branco: true,
+  roque_direita_branco: true,
+
+  roque_esquerda_preto: true,
+  roque_direita_preto: true,
+  
+  // bitboard informando a posição de cada peça no roque (roque é um movimento de rei)
+
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000000
+  casa_rei_roque_direita_branco: 0x0000000000000040n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100000
+  casa_torre_roque_direita_branco: 0x0000000000000020n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000100
+  casa_rei_roque_esquerda_branco: 0x0000000000000004n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001000
+  casa_torre_roque_esquerda_branco: 0x0000000000000008n,
+
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01100000
+  casas_roque_direita_branco: 0x0000000000000060n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001110
+  casas_roque_esquerda_branco: 0x000000000000000En,
+
+  
+  // 01000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_rei_roque_direita_preto: 0x4000000000000000n,
+  // 00100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_torre_roque_direita_preto: 0x2000000000000000n,
+  // 00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_rei_roque_esquerda_preto: 0x0400000000000000n,
+  // 00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_torre_roque_esquerda_preto: 0x0800000000000000n,
+  
+  // 00001110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_roque_esquerda_preto: 0x0E00000000000000n,
+  // 01100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_roque_direita_preto: 0x6000000000000000n,
+
   piao: 0b1,
   cavalo: 0b10,
   bispo: 0b11,
   torre: 0b100,
   dama: 0b101,
   rei: 0b111
+}
+
+export function zerar(){
+  estado.bitboard_piao_branco = 0x000000000000FF00n;
+  estado.bitboard_cavalo_branco = 0x0000000000000042n;
+  estado.bitboard_bispo_branco = 0x0000000000000024n;
+  estado.bitboard_torre_branco = 0x0000000000000081n;
+  estado.bitboard_rainha_branco = 0x0000000000000008n;
+  estado.bitboard_rei_branco = 0x0000000000000010n;
+  
+  estado.bitboard_piao_preto = 0x00FF000000000000n;
+  estado.bitboard_cavalo_preto = 0x4200000000000000n;
+  estado.bitboard_bispo_preto = 0x2400000000000000n;
+  estado.bitboard_torre_preto = 0x8100000000000000n;
+  estado.bitboard_rainha_preto = 0x0800000000000000n;
+  estado.bitboard_rei_preto = 0x1000000000000000n;
+  
+  estado.bitboard_tabuleiro = 0xFFFF00000000FFFFn;
+  estado.bitboard_brancas = 0x000000000000FFFFn;
+  estado.bitboard_pretas = 0xFFFF000000000000n;
+
+  estado.casas_atacadas_pelas_pretas = 0n;
+  estado.casas_atacadas_pelas_brancas = 0n;
+  
+  estado.turno = 1;
+  estado.numero_lances_brancas = 0;
+  estado.numero_lances_pretas = 0;
+  
+  estado.movimento_duplo_piao_branco = 0x000000000000FF00n;
+  estado.movimento_duplo_piao_preto = 0x00FF000000000000n;
+
+  estado.en_passant_brancas = 0n;
+  estado.en_passant_pretas = 0n;
+  
+  estado.roque_esquerda_branco = true;
+  estado.roque_direita_branco = true;
+
+  estado.roque_esquerda_preto = true;
+  estado.roque_direita_preto = true;
+  
+  estado.casa_rei_roque_direita_branco = 0x0000000000000040n;
+  estado.casa_torre_roque_direita_branco = 0x0000000000000020n;
+  estado.casa_rei_roque_esquerda_branco = 0x0000000000000004n;
+  estado.casa_torre_roque_esquerda_branco = 0x0000000000000008n;
+
+  estado.casas_roque_direita_branco = 0x0000000000000060n;
+  estado.casas_roque_esquerda_branco = 0x000000000000000En;
+
+  estado.casas_roque_direita_preto = 0x0E00000000000000n;
+  estado.casas_roque_esquerda_preto = 0x6000000000000000n;
+
+  estado.casa_rei_roque_direita_preto = 0x4000000000000000n;
+  estado.casa_torre_roque_direita_preto = 0x2000000000000000n;
+  estado.casa_rei_roque_esquerda_preto = 0x0400000000000000n;
+  estado.casa_torre_roque_esquerda_preto = 0x0800000000000000n;
 }
