@@ -26,7 +26,7 @@ app.post('/mover', (req, res) => {
     console.log("Para: \n" + visualizadeiro(para) + '\n');
     movimentacao.mover(BigInt(de), BigInt(para), 0b111);
 
-    res.send("ok");
+    res.send(traducao.converterFEN());
   }
   catch(error){
     console.log("Jogo resetado");
@@ -59,6 +59,6 @@ app.post('/mover', (req, res) => {
   return;
 });
 
-app.listen(4000, () => {
+app.listen(4001, () => {
   console.log("Rodando servidor");
 });

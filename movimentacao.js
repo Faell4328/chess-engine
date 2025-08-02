@@ -1,4 +1,4 @@
-import { converter, desconverter } from './traducao.js';
+import { converter, converterFEN, desconverter } from './traducao.js';
 import { estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
@@ -870,19 +870,13 @@ class Rei{
 }
 
 function atualizarTabuleiro(){
-  // Brancas jogam
-  if(estado.turno == 1){
-    // Atualizando o bitboard de todas as peças brancas
-    estado.bitboard_brancas = estado.bitboard_piao_branco | estado.bitboard_cavalo_branco | estado.bitboard_bispo_branco | estado.bitboard_torre_branco | estado.bitboard_rainha_branco | estado.bitboard_rei_branco;
-    console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(estado.bitboard_brancas) + '\n');
-  }
+  // Atualizando o bitboard de todas as peças brancas
+  estado.bitboard_brancas = estado.bitboard_piao_branco | estado.bitboard_cavalo_branco | estado.bitboard_bispo_branco | estado.bitboard_torre_branco | estado.bitboard_rainha_branco | estado.bitboard_rei_branco;
+  console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(estado.bitboard_brancas) + '\n');
 
-  // Pretas jogam
-  else{
-    // Atualizando o bitboard de todas as peças pretas
-    estado.bitboard_pretas= estado.bitboard_piao_preto | estado.bitboard_cavalo_preto | estado.bitboard_bispo_preto | estado.bitboard_torre_preto | estado.bitboard_rainha_preto | estado.bitboard_rei_preto;
-    console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(estado.bitboard_pretas) + '\n');
-  }
+  // Atualizando o bitboard de todas as peças pretas
+  estado.bitboard_pretas = estado.bitboard_piao_preto | estado.bitboard_cavalo_preto | estado.bitboard_bispo_preto | estado.bitboard_torre_preto | estado.bitboard_rainha_preto | estado.bitboard_rei_preto;
+  console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(estado.bitboard_pretas) + '\n');
   
   // Atualizando o bitboard com todas as casas ocupadas
   estado.bitboard_tabuleiro = estado.bitboard_brancas | estado.bitboard_pretas;

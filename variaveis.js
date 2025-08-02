@@ -76,6 +76,8 @@ export const estado = {
   
   // 0 é pretas e 1 é brancas
   turno: 1,
+  numero_lances_brancas: 0,
+  numero_lances_pretas: 0,
   movimento_duplo_piao_branco: 0x000000000000FF00n,
   movimento_duplo_piao_preto: 0x00FF000000000000n,
   en_passant_brancas: 0n,
