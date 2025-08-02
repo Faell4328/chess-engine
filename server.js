@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import * as movimentacao from './movimentacao.js';
 import * as traducao from './traducao.js';
 import { visualizadeiro } from './visualizador.js';
-import { estado, zerar } from './variaveis.js';
+import { zerar } from './variaveis.js';
 
 const app = express();
 

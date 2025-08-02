@@ -74,7 +74,12 @@ export const estado = {
   movimento_rei_esquerda: [9n],
 
   // FAZER
+  rei_preto_em_ataque: false,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casas_atacadas_pelas_pretas: 0n,
+
+  rei_branco_em_ataque: false,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casas_atacadas_pelas_brancas: 0n,
   
   // 0 é pretas e 1 é brancas

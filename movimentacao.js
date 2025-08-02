@@ -1,15 +1,6 @@
-import { converter, converterFEN, desconverter } from './traducao.js';
+import { desconverter } from './traducao.js';
 import { estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
-
-/**
- * 1° Identificar a peça e também verifica se foi movido a peça da cor certo, correspondente ao turno.
- * 2° Chamar a classe da peça.
- * 2.1° Verificações (ex: pião, verificar se é um movimento válido, movimento duplo, captura e etc).
- * 2.2° Efeturar o movimento, caso passe na verificação.
- * 3° Atualizar tabuleiro.
- */
-
 
 function calcularPossibilidadeMovimento (de, deslocamento, operador, isPiao, borda) {
   let movimentos_possiveis = [];
@@ -1057,6 +1048,7 @@ class Rei{
         return false;
       }
     }
+    
     // Pretas jogam
     else{
 
@@ -1190,13 +1182,13 @@ class Rei{
         estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
       }
       else if(roque == 'd'){
-        estado.bitboard_torre_branco = estado.casa_torre_roque_direita_branco;
+        estado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000080n) | estado.casa_torre_roque_direita_branco);
         estado.bitboard_rei_branco = estado.casa_rei_roque_direita_branco;
         atualizarTabuleiro();
         return;
       }
       else if(roque == 'e'){
-        estado.bitboard_torre_branco = estado.casa_torre_roque_esquerda_branco;
+        estado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000001n) | estado.casa_torre_roque_esquerda_branco);
         estado.bitboard_rei_branco = estado.casa_rei_roque_esquerda_branco;
         atualizarTabuleiro();
         return;
@@ -1223,13 +1215,13 @@ class Rei{
         estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
       }
       else if(roque == 'd'){
-        estado.bitboard_torre_preto= estado.casa_torre_roque_direita_preto;
+        estado.bitboard_torre_preto = ((estado.bitboard_torre_preto ^ 0x8000000000000000n) | estado.casa_torre_roque_direita_preto);
         estado.bitboard_rei_preto = estado.casa_rei_roque_direita_preto;
         atualizarTabuleiro();
         return;
       }
       else if(roque == 'e'){
-        estado.bitboard_torre_preto = estado.casa_torre_roque_esquerda_preto;
+        estado.bitboard_torre_preto= ((estado.bitboard_torre_preto ^ 0x0100000000000000n) | estado.casa_torre_roque_esquerda_preto);
         estado.bitboard_rei_preto = estado.casa_rei_roque_esquerda_preto;
         atualizarTabuleiro();
         return;
