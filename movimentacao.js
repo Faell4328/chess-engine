@@ -1,8 +1,9 @@
+import { calcularCasasAtacadas } from './calcularCasasAtacadas.js';
 import { desconverter } from './traducao.js';
 import { estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
-function calcularPossibilidadeMovimento (de, deslocamento, operador, isPiao, borda) {
+export function calcularPossibilidadeMovimento (de, deslocamento, operador, isPiao, borda, contar_aliados = false) {
   let movimentos_possiveis = [];
   let peca_aliada = null;
   let peca_inimiga = null;
@@ -29,6 +30,9 @@ function calcularPossibilidadeMovimento (de, deslocamento, operador, isPiao, bor
     // Verificando se a casa está ocupada por um aliado
     if((destino & peca_aliada) !== 0n){
       console.log("Casa ocupada por alidado\n");
+      if(contar_aliados == true){
+        movimentos_possiveis.push(destino);
+      }
       break;
     }
     // Verificando se a peça estara no canto
@@ -52,6 +56,36 @@ function calcularPossibilidadeMovimento (de, deslocamento, operador, isPiao, bor
   return movimentos_possiveis;
 }
 
+function verificarReiEmAtaque(){
+  // Brancas jogam
+  if(estado.turno == 1){
+
+    console.log(visualizadeiro(estado.bitboard_rei_branco));
+    console.log(visualizadeiro(estado.casas_atacadas_pelas_pretas));
+    console.log(estado.bitboard_rei_branco & estado.casas_atacadas_pelas_pretas);
+
+    if((estado.bitboard_rei_branco & estado.casas_atacadas_pelas_pretas) !== 0n){
+      console.log("O rei das brancas está sendo atacado");
+      estado.rei_branco_em_ataque = true;
+    }
+    else{
+      console.log("O rei das brancas não está sendo atacado");
+      estado.rei_branco_em_ataque = false;
+    }
+  }
+  
+  // Pretas jogam
+  else{
+    if((estado.bitboard_rei_preto & estado.casas_atacadas_pelas_brancas) !== 0n){
+      console.log("O rei das pretas está sendo atacado");
+      estado.rei_preto_em_ataque = true;
+    }
+    else{
+      console.log("O rei das pretas não está sendo atacado");
+      estado.rei_preto_em_ataque= false;
+    }
+  }
+}
 
 // Função orquestradora e que fica exporta (única).
 export function mover(de, para, promocao){
@@ -67,8 +101,56 @@ export function mover(de, para, promocao){
     estado.en_passant_brancas = 0n;
   }
 
+  // Verificando se o rei está sobe ataque
+  if(estado.turno == 1){
+    if(estado.rei_branco_em_ataque == true){
+      const movimentacao = de | para;
+      estado.bitboard_brancas ^= movimentacao;
+      verificarReiEmAtaque();
+      if(estado.rei_branco_em_ataque == true){
+        console.log("\n\nVocê não defendeu o rei\n\n");
+        throw new Error();
+      }
+      else{
+        console.log("\n\nRei defendido\n\n");
+      }
+    }
+  }
+  else{
+    if(estado.rei_preto_em_ataque == true){
+      const movimentacao = de | para;
+      estado.bitboard_pretas ^= movimentacao;
+      verificarReiEmAtaque();
+      if(estado.rei_preto_em_ataque == true){
+        console.log("\n\nVocê não defendeu o rei\n\n");
+        throw new Error();
+      }
+      else{
+        console.log("\n\nRei defendido\n\n");
+      }
+    }
+  }
+
   // Dentro da função já chama a classe para fazer a verificação e realizar o movimento.
   descobrirPeca(de, para, promocao);
+
+  calcularCasasAtacadas();
+  
+  // Verificando se o rei está sobe ataque
+  if(estado.turno == 1){
+    verificarReiEmAtaque();
+    if(estado.rei_branco_em_ataque == true){
+      console.log("\n\nEsse movimeneto colocou o rei em xeque\n\n");
+      throw new Error();
+    }
+  }
+  else{
+    verificarReiEmAtaque();
+    if(estado.rei_preto_em_ataque == true){
+      console.log("\n\nEsse movimeneto colocou o rei em xeque\n\n");
+      throw new Error();
+    }
+  }
 
   estado.turno = !estado.turno;
 
@@ -452,6 +534,10 @@ class Cavalo{
         else if((((de & estado.bitboard_casas_linha_7) !== 0n) || (de & estado.bitboard_casas_linha_8) !== 0n) && ((movimento & ( estado.bitboard_casas_linha_1 | estado.bitboard_casas_linha_2 )) !== 0n)){
           return false;
         }
+        // Não deixando passar do limite
+        else if(movimento > 18446744073709551615n){
+          return false;
+        }
         else if(movimento == 0n){
           return false;
         }
@@ -507,6 +593,10 @@ class Cavalo{
         }
         // Verificando se o cavalo pulou da linha 7 ou 8 para 1 ou 2
         else if((((de & estado.bitboard_casas_linha_7) !== 0n) || (de & estado.bitboard_casas_linha_8) !== 0n) && ((movimento & ( estado.bitboard_casas_linha_1 | estado.bitboard_casas_linha_2 )) !== 0n)){
+          return false;
+        }
+        // Não deixando passar do limite
+        else if(movimento > 18446744073709551615n){
           return false;
         }
         else if(movimento == 0n){
@@ -1011,24 +1101,24 @@ class Dama{
 class Rei{
   static verificarRoque(de, para){
 
-  console.log("\n\n-- Iniciado a etapa de verificação: verificação de roque --\n\n")
+    console.log("\n\n-- Iniciado a etapa de verificação: verificação de roque --\n\n")
 
-  // Brancas jogam
-  if(estado.turno == 1){
+    // Brancas jogam
+    if(estado.turno == 1){
 
-      // Verificando se foi feito o roque para a direita
-      if((para & estado.casa_rei_roque_direita_branco) !== 0n){
-        // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
-        if((estado.roque_direita_branco == true) && (((estado.bitboard_brancas & estado.casas_roque_direita_branco) == 0n))){
-          estado.roque_direita_branco = false;
-          console.log("Foi feito um movimento de roque válido (roque para direita)");
-          return 'd';
-        }
-        else{
-          console.log("Foi feito um movimento de roque inválido");
-          throw new Error();
-        }
+    // Verificando se foi feito o roque para a direita
+    if((para & estado.casa_rei_roque_direita_branco) !== 0n){
+      // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
+      if((estado.roque_direita_branco == true) && (((estado.bitboard_brancas & estado.casas_roque_direita_branco) == 0n))){
+        estado.roque_direita_branco = false;
+        console.log("Foi feito um movimento de roque válido (roque para direita)");
+        return 'd';
       }
+      else{
+        console.log("Foi feito um movimento de roque inválido");
+        throw new Error();
+      }
+    }
 
       // Verificando se foi feito o roque para a esquerda
       else if((para & (estado.casa_rei_roque_esquerda_branco >> 1n )) !== 0n){
@@ -1053,7 +1143,7 @@ class Rei{
     else{
 
       // Verificando se foi feito o roque para a direita
-      if((para & estado.casa_rei_roque_direita_preto) !== 0n){
+      if((para & estado.casa_rei_roque_direita_preto) !== 0n){https://pt.convertbinary.com/binario-para-hexadecimal/
         // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
         if((estado.roque_direita_preto == true) && (((estado.bitboard_pretas & estado.casas_roque_direita_preto) == 0n))){
           estado.roque_direita_preto = false;
@@ -1095,12 +1185,15 @@ class Rei{
 
     movimentos_possiveis_rei = [
       ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente, "<<", false, (estado.bitboard_casas_linha_8)),
-      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_esquerda, "<<", false, (estado.bitboard_casas_coluna_A)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente_esquerda, "<<", false, (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente_direita, "<<", false, (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8)),
       ...calcularPossibilidadeMovimento(de, estado.movimento_rei_direita, "<<", false, (estado.bitboard_casas_coluna_H)),
+
       ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente, ">>", false, (estado.bitboard_casas_linha_1)),
-      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_esquerda, ">>", false, (estado.bitboard_casas_coluna_H)),
-      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_direita, ">>", false, (estado.bitboard_casas_coluna_A))
-]
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente_esquerda, ">>", false, (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_frente_direita, ">>", false, (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1)),
+      ...calcularPossibilidadeMovimento(de, estado.movimento_rei_direita, ">>", false, (estado.bitboard_casas_coluna_A)),
+    ]
 
     movimentos_possiveis_rei = movimentos_possiveis_rei.filter((lances) => {
       return lances !== 0n;

@@ -70,8 +70,9 @@ export const estado = {
   movimento_torre_direita: [1n, 2n, 3n, 4n, 5n, 6n, 7n],
   movimento_torre_frente: [8n, 16n, 24n, 32n, 40n, 48n, 56n],
   movimento_rei_frente: [8n],
-  movimento_rei_direita: [7n],
-  movimento_rei_esquerda: [9n],
+  movimento_rei_frente_direita: [7n],
+  movimento_rei_frente_esquerda: [9n],
+  movimento_rei_direita: [1n],
 
   // FAZER
   rei_preto_em_ataque: false,
