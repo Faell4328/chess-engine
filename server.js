@@ -37,6 +37,8 @@ app.post('/mover', (req, res) => {
   }
   catch(error){
 
+    console.log(error);
+
     const response = {
       status: "invalido",
       fen: traducao.converterFEN()

@@ -469,7 +469,7 @@ class Piao{
       }
       // Verifica se foi feito um movimento de captura (en passant)
       else if(movimento_captura == 2){
-        estado.bitboard_piao_branco^= (estado.en_passant_brancas >> estado.movimento_piao[0]) 
+        estado.bitboard_piao_branco ^= (estado.en_passant_brancas << estado.movimento_piao[0]) 
         estado.en_passant_brancas= 0n;
       }
 
