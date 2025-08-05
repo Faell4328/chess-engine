@@ -17,6 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.post('/mover', (req, res) => {
+
   try{
     const de = traducao.converter(req.body.de.toUpperCase());
     const para = traducao.converter(req.body.para.toUpperCase());
@@ -26,14 +27,32 @@ app.post('/mover', (req, res) => {
     console.log("Para: \n" + visualizadeiro(para) + '\n');
     movimentacao.mover(BigInt(de), BigInt(para), 0b111);
 
-    res.send(traducao.converterFEN());
+    const response = {
+      status: "ok",
+      fen: traducao.converterFEN()
+    }
+
+    res.json(response);
+    return;
   }
   catch(error){
-    zerar();
-    res.send("invalido");
+
+    const response = {
+      status: "invalido",
+      fen: traducao.converterFEN()
+    }
+
+    res.json(response);
+    return;
   }
-  return;
 });
+
+app.get("/resetar", (req, res) => {
+  console.log("Jogo resetado");
+  zerar();
+  res.end();
+  return;
+})
 
 app.listen(4000 , () => {
   console.log("Rodando servidor");

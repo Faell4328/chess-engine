@@ -102,10 +102,14 @@ export const estado = {
   
   // bitboard informando a posição de cada peça no roque (roque é um movimento de rei)
 
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 10000000
+  casa_torre_direita_branco: 0x0000000000000080n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000000
   casa_rei_roque_direita_branco: 0x0000000000000040n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100000
   casa_torre_roque_direita_branco: 0x0000000000000020n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001
+  casa_torre_esquerda_branco: 0x0000000000000001n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000100
   casa_rei_roque_esquerda_branco: 0x0000000000000004n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001000
@@ -117,10 +121,14 @@ export const estado = {
   casas_roque_esquerda_branco: 0x000000000000000En,
 
   
+  // 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_torre_direita_preto: 0x8000000000000000n,
   // 01000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casa_rei_roque_direita_preto: 0x4000000000000000n,
   // 00100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casa_torre_roque_direita_preto: 0x2000000000000000n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001
+  casa_torre_esquerda_preto: 0x0000000000000001n,
   // 00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casa_rei_roque_esquerda_preto: 0x0400000000000000n,
   // 00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
@@ -158,7 +166,22 @@ export function zerar(){
   estado.bitboard_brancas = 0x000000000000FFFFn;
   estado.bitboard_pretas = 0xFFFF000000000000n;
 
+  estado.bitboard_casas_coluna_canto = 0xC3C3C3C3C3C3C3C3n;
+  estado.bitboard_casas_coluna_A = 0x101010101010101n;
+  estado.bitboard_casas_coluna_B = 0x202020202020202n;
+  estado.bitboard_casas_coluna_G = 0x4040404040404040n;
+  estado.bitboard_casas_coluna_H = 0x8080808080808080n;
+
+  estado.bitboard_casas_linha_canto = 0xC3C3C3C3C3C3C3C3n;
+  estado.bitboard_casas_linha_1 = 0x00000000000000FFn;
+  estado.bitboard_casas_linha_2 = 0x000000000000FF00n;
+  estado.bitboard_casas_linha_7 = 0x00FF000000000000n;
+  estado.bitboard_casas_linha_8 = 0xFF00000000000000n;
+
+  estado.rei_preto_em_ataque = false;
   estado.casas_atacadas_pelas_pretas = 0n;
+
+  estado.rei_branco_em_ataque = false;
   estado.casas_atacadas_pelas_brancas = 0n;
   
   estado.turno = 1;
@@ -185,11 +208,12 @@ export function zerar(){
   estado.casas_roque_direita_branco = 0x0000000000000060n;
   estado.casas_roque_esquerda_branco = 0x000000000000000En;
 
-  estado.casas_roque_direita_preto = 0x0E00000000000000n;
-  estado.casas_roque_esquerda_preto = 0x6000000000000000n;
-
+  
   estado.casa_rei_roque_direita_preto = 0x4000000000000000n;
   estado.casa_torre_roque_direita_preto = 0x2000000000000000n;
   estado.casa_rei_roque_esquerda_preto = 0x0400000000000000n;
   estado.casa_torre_roque_esquerda_preto = 0x0800000000000000n;
+  
+  estado.casas_roque_esquerda_preto = 0x0E00000000000000n;
+  estado.casas_roque_direita_preto = 0x6000000000000000n;
 }

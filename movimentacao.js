@@ -103,10 +103,10 @@ export function mover(de, para, promocao){
 
   // Verificando se o rei está sobe ataque
   if(estado.turno == 1){
+    verificarReiEmAtaque();
     if(estado.rei_branco_em_ataque == true){
       const movimentacao = de | para;
       estado.bitboard_brancas ^= movimentacao;
-      verificarReiEmAtaque();
       if(estado.rei_branco_em_ataque == true){
         console.log("\n\nVocê não defendeu o rei\n\n");
         throw new Error();
@@ -117,10 +117,10 @@ export function mover(de, para, promocao){
     }
   }
   else{
+    verificarReiEmAtaque();
     if(estado.rei_preto_em_ataque == true){
       const movimentacao = de | para;
       estado.bitboard_pretas ^= movimentacao;
-      verificarReiEmAtaque();
       if(estado.rei_preto_em_ataque == true){
         console.log("\n\nVocê não defendeu o rei\n\n");
         throw new Error();
@@ -921,6 +921,14 @@ class Torre{
   static efetuarMovimento(de, para, movimento_captura){
     // Brancas jogam
     if(estado.turno == 1){
+
+      if((de & estado.casa_torre_direita_branco) != 0n){
+        estado.roque_direita_branco = false;
+      }
+      else if((de & estado.casa_torre_esquerda_branco) != 0n){
+        estado.roque_esquerda_branco = false;
+      }
+
       // Verifica se foi feito um movimento de captura
       if(movimento_captura){
         //  Atualizando o bitboard das pretas (capturando a peça)
@@ -1106,19 +1114,19 @@ class Rei{
     // Brancas jogam
     if(estado.turno == 1){
 
-    // Verificando se foi feito o roque para a direita
-    if((para & estado.casa_rei_roque_direita_branco) !== 0n){
-      // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
-      if((estado.roque_direita_branco == true) && (((estado.bitboard_brancas & estado.casas_roque_direita_branco) == 0n))){
-        estado.roque_direita_branco = false;
-        console.log("Foi feito um movimento de roque válido (roque para direita)");
-        return 'd';
+      // Verificando se foi feito o movimento de roque para a direita
+      if((para & estado.casa_rei_roque_direita_branco) !== 0n){
+        // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
+        if((estado.roque_direita_branco == true) && (((estado.bitboard_brancas & estado.casas_roque_direita_branco) == 0n))){
+          estado.roque_direita_branco = false;
+          console.log("Foi feito um movimento de roque válido (roque para direita)");
+          return 'd';
+        }
+        else{
+          console.log("Foi feito um movimento de roque inválido");
+          throw new Error();
+        }
       }
-      else{
-        console.log("Foi feito um movimento de roque inválido");
-        throw new Error();
-      }
-    }
 
       // Verificando se foi feito o roque para a esquerda
       else if((para & (estado.casa_rei_roque_esquerda_branco >> 1n )) !== 0n){
@@ -1142,8 +1150,8 @@ class Rei{
     // Pretas jogam
     else{
 
-      // Verificando se foi feito o roque para a direita
-      if((para & estado.casa_rei_roque_direita_preto) !== 0n){https://pt.convertbinary.com/binario-para-hexadecimal/
+      // Verificando se foi feito o movimento de roque para a direita
+      if((para & estado.casa_rei_roque_direita_preto) !== 0n){
         // Verificando se é um movimento válido (1° Verificando se o rei ou a torre foi movida e também, verficando se as casas do roque estão vazias)
         if((estado.roque_direita_preto == true) && (((estado.bitboard_pretas & estado.casas_roque_direita_preto) == 0n))){
           estado.roque_direita_preto = false;
@@ -1266,6 +1274,10 @@ class Rei{
     // Brancas jogam
     if(estado.turno == 1){
       // Verifica se foi feito um movimento de captura
+
+      estado.roque_direita_branco = false;
+      estado.roque_esquerda_branco = false;
+
       if(movimento_captura){
         //  Atualizando o bitboard das pretas (capturando a peça)
         estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & para);
@@ -1273,6 +1285,15 @@ class Rei{
         estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & para);
         estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & para);
         estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & para);
+
+        // Realizando movimento
+        const movimentacao = de | para;
+        estado.bitboard_rei_branco ^= movimentacao;
+        console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_branco) + '\n');
+  
+        // Atualiza todos os bitboards restantes
+        atualizarTabuleiro();
+        return;
       }
       else if(roque == 'd'){
         estado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000080n) | estado.casa_torre_roque_direita_branco);
@@ -1286,18 +1307,14 @@ class Rei{
         atualizarTabuleiro();
         return;
       }
-      // Realizando movimento
-      const movimentacao = de | para;
-      estado.bitboard_rei_branco ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_branco) + '\n');
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
     }
 
     // Pretas jogam
     else{
+
+      estado.roque_direita_preto = false;
+      estado.roque_esquerda_preto = false;
+
       // Verifica se foi feito um movimento de captura
       if(movimento_captura){
         //  Atualizando o bitboard das pretas (capturando a peça)
@@ -1306,6 +1323,15 @@ class Rei{
         estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & para);
         estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & para);
         estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & para);
+        
+        // Realizando movimento
+        const movimentacao = de | para;
+        estado.bitboard_rei_preto ^= movimentacao;
+        console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_preto) + '\n');
+
+        // Atualiza todos os bitboards restantes
+        atualizarTabuleiro();
+        return;
       }
       else if(roque == 'd'){
         estado.bitboard_torre_preto = ((estado.bitboard_torre_preto ^ 0x8000000000000000n) | estado.casa_torre_roque_direita_preto);
@@ -1319,15 +1345,6 @@ class Rei{
         atualizarTabuleiro();
         return;
       }
-
-      // Realizando movimento
-      const movimentacao = de | para;
-      estado.bitboard_rei_preto ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_preto) + '\n');
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
     }
   }
 
