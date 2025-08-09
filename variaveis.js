@@ -1,3 +1,57 @@
+export const simulado = {
+  // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 00000000
+  bitboard_piao_branco: 0x000000000000FF00n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000010
+  bitboard_cavalo_branco: 0x0000000000000042n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100100 
+  bitboard_bispo_branco: 0x0000000000000024n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 10000001 
+  bitboard_torre_branco: 0x0000000000000081n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001000 
+  bitboard_rainha_branco: 0x0000000000000008n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00010000 
+  bitboard_rei_branco: 0x0000000000000010n,
+  
+  // ------------------
+  
+  // 00000000 11111111 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_piao_preto: 0x00FF000000000000n,
+  // 01000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_cavalo_preto: 0x4200000000000000n,
+  // 00100100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_bispo_preto: 0x2400000000000000n,
+  // 10000001 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_torre_preto: 0x8100000000000000n,
+  // 00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_rainha_preto: 0x0800000000000000n,
+  // 00010000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_rei_preto: 0x1000000000000000n,
+  
+  // 11111111 11111111 00000000 00000000 00000000 00000000 11111111 11111111
+  bitboard_tabuleiro: 0xFFFF00000000FFFFn,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 11111111
+  bitboard_brancas: 0x000000000000FFFFn,
+  // 11111111 11111111 00000000 00000000 00000000 00000000 00000000 00000000
+  bitboard_pretas: 0xFFFF000000000000n,
+
+  rei_preto_em_ataque: false,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_atacadas_pelas_pretas: 0n,
+
+  rei_branco_em_ataque: false,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_atacadas_pelas_brancas: 0n,
+  
+  en_passant_brancas: 0n,
+  en_passant_pretas: 0n,
+  
+  status_roque_esquerda_branco: true,
+  status_roque_direita_branco: true,
+
+  status_roque_esquerda_preto: true,
+  status_roque_direita_preto: true,
+}
+
 export const estado = {
   // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 00000000
   bitboard_piao_branco: 0x000000000000FF00n,
@@ -90,6 +144,7 @@ export const estado = {
   numero_lances_brancas: 0,
   numero_lances_pretas: 0,
   
+  // É bitboard com as casas inicias do pião
   movimento_duplo_piao_branco: 0x000000000000FF00n,
   movimento_duplo_piao_preto: 0x00FF000000000000n,
 
@@ -103,6 +158,16 @@ export const estado = {
   status_roque_direita_preto: true,
   
   // bitboard informando a posição de cada peça no roque (roque é um movimento de rei)
+
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001
+  casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco: 0x0000000000000001n,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 10000000
+  casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco: 0x0000000000000080n,
+
+  // 00000001 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto: 0x0100000000000000n,
+  // 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto: 0x8000000000000000n,
 
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000100
   casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco: 0x0000000000000004n,
@@ -209,4 +274,74 @@ export function zerar(){
   
   estado.casas_status_roque_esquerda_preto = 0x0E00000000000000n;
   estado.casas_status_roque_direita_preto = 0x6000000000000000n;
+}
+
+export function sincronizar_simulado_com_estado(){
+  simulado.bitboard_piao_branco = estado.bitboard_piao_branco;
+  simulado.bitboard_cavalo_branco = estado.bitboard_cavalo_branco;
+  simulado.bitboard_bispo_branco = estado.bitboard_bispo_branco;
+  simulado.bitboard_torre_branco = estado.bitboard_torre_branco;
+  simulado.bitboard_rainha_branco = estado.bitboard_rainha_branco;
+  simulado.bitboard_rei_branco = estado.bitboard_rei_branco;
+
+  simulado.bitboard_piao_preto = estado.bitboard_piao_preto;
+  simulado.bitboard_cavalo_preto = estado.bitboard_cavalo_preto;
+  simulado.bitboard_bispo_preto = estado.bitboard_bispo_preto;
+  simulado.bitboard_torre_preto = estado.bitboard_torre_preto;
+  simulado.bitboard_rainha_preto = estado.bitboard_rainha_preto;
+  simulado.bitboard_rei_preto = estado.bitboard_rei_preto;
+
+  simulado.bitboard_tabuleiro = estado.bitboard_tabuleiro;
+  simulado.bitboard_brancas = estado.bitboard_brancas;
+  simulado.bitboard_pretas = estado.bitboard_pretas;
+
+  simulado.rei_preto_em_ataque = estado.rei_preto_em_ataque;
+  simulado.casas_atacadas_pelas_pretas = estado.casas_atacadas_pelas_pretas;
+
+  simulado.rei_branco_em_ataque = estado.rei_branco_em_ataque;
+  simulado.casas_atacadas_pelas_brancas = estado.casas_atacadas_pelas_brancas;
+
+  simulado.en_passant_brancas = estado.en_passant_brancas;
+  simulado.en_passant_pretas = estado.en_passant_pretas;
+
+  simulado.status_roque_esquerda_branco = estado.status_roque_esquerda_branco;
+  simulado.status_roque_direita_branco = estado.status_roque_direita_branco;
+
+  simulado.status_roque_esquerda_preto = estado.status_roque_esquerda_preto;
+  simulado.status_roque_direita_preto = estado.status_roque_direita_preto;
+}
+
+export function sincronizar_estado_com_simulado(){
+    estado.bitboard_piao_branco = simulado.bitboard_piao_branco;
+  estado.bitboard_cavalo_branco = simulado.bitboard_cavalo_branco;
+  estado.bitboard_bispo_branco = simulado.bitboard_bispo_branco;
+  estado.bitboard_torre_branco = simulado.bitboard_torre_branco;
+  estado.bitboard_rainha_branco = simulado.bitboard_rainha_branco;
+  estado.bitboard_rei_branco = simulado.bitboard_rei_branco;
+
+  estado.bitboard_piao_preto = simulado.bitboard_piao_preto;
+  estado.bitboard_cavalo_preto = simulado.bitboard_cavalo_preto;
+  estado.bitboard_bispo_preto = simulado.bitboard_bispo_preto;
+  estado.bitboard_torre_preto = simulado.bitboard_torre_preto;
+  estado.bitboard_rainha_preto = simulado.bitboard_rainha_preto;
+  estado.bitboard_rei_preto = simulado.bitboard_rei_preto;
+
+  estado.bitboard_tabuleiro = simulado.bitboard_tabuleiro;
+  estado.bitboard_brancas = simulado.bitboard_brancas;
+  estado.bitboard_pretas = simulado.bitboard_pretas;
+
+  estado.rei_preto_em_ataque = simulado.rei_preto_em_ataque;
+  estado.casas_atacadas_pelas_pretas = simulado.casas_atacadas_pelas_pretas;
+
+  estado.rei_branco_em_ataque = simulado.rei_branco_em_ataque;
+  estado.casas_atacadas_pelas_brancas = simulado.casas_atacadas_pelas_brancas;
+
+  estado.en_passant_brancas = simulado.en_passant_brancas;
+  estado.en_passant_pretas = simulado.en_passant_pretas;
+
+  estado.status_roque_esquerda_branco = simulado.status_roque_esquerda_branco;
+  estado.status_roque_direita_branco = simulado.status_roque_direita_branco;
+
+  estado.status_roque_esquerda_preto = simulado.status_roque_esquerda_preto;
+  estado.status_roque_direita_preto = simulado.status_roque_direita_preto;
 }

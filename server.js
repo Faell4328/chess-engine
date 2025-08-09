@@ -37,11 +37,21 @@ app.post('/mover', (req, res) => {
   }
   catch(error){
 
-    console.log(error);
+    let response
 
-    const response = {
-      status: "invalido",
-      fen: traducao.converterFEN()
+    console.log(error);
+    console.log(error.message);
+
+    if(error.message == "Inválido"){
+      response = {
+        status: "invalido",
+        fen: traducao.converterFEN()
+      }
+    }
+    else if(error.message == "Xeque Mate"){
+      response = {
+        status: "xeque mate"
+      }
     }
 
     res.json(response);

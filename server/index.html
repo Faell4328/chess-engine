@@ -53,14 +53,20 @@
       return;
     }
 
+    console.log(retornoApi);
+
     if(retornoApi.status == "ok"){
       console.log(retornoApi.fen);
       board.position(retornoApi.fen);
       return;
     }
-    else{
+    else if(retornoApi.status == "invalido"){
       alert("Movimento inválido");
       board.position(retornoApi.fen);
+      return;
+    }
+    else{
+      alert("Xeque mate");
       return;
     }
   }

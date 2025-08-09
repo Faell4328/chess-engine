@@ -1,12 +1,13 @@
 // Arquivo responsável por realizar os calculos (possibilidades de movimento)
+import { descobrirPeca } from "./movimentacao.js";
 import { converter } from "./traducao.js";
-import { estado } from "./variaveis.js";
+import { estado, simulado, sincronizar_simulado_com_estado } from "./variaveis.js";
 import { visualizadeiro } from './visualizador.js';
 
 // Função para calcular todos possíveis movimentos e capturas do cavalo
 function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocamento, operador){
-  let pecas_aliada = (jogando == "w") ? estado.bitboard_brancas : estado.bitboard_pretas;
-  let pecas_inimiga = (jogando == "w") ? estado.bitboard_pretas : estado.bitboard_brancas;
+  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let pecas_inimiga = (jogando == "w") ? simulado.bitboard_pretas : simulado.bitboard_brancas;
   
   let movimentos = [];
   let capturas = [];
@@ -55,8 +56,8 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
 }
 
 function verificar_roque_peca_rei(jogando){
-  let pecas_aliada = (jogando == "w") ? estado.bitboard_brancas : estado.bitboard_pretas;
-  let casas_atacadas_inimigo = (jogando == "w") ? estado.casas_atacadas_pelas_pretas : estado.casas_atacadas_pelas_brancas;
+  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let casas_atacadas_inimigo = (jogando == "w") ? simulado.casas_atacadas_pelas_pretas : simulado.casas_atacadas_pelas_brancas;
 
   let casas_livre_para_o_roque_esquerda = (jogando == "w") ? estado.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_branco : estado.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_preto;
   let casas_livre_para_o_roque_direita = (jogando == "w") ? estado.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_branco : estado.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_preto;
@@ -92,9 +93,9 @@ function verificar_roque_peca_rei(jogando){
 }
 
 function calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, deslocamento, operador, borda){
-  let pecas_aliada = (jogando == "w") ? estado.bitboard_brancas : estado.bitboard_pretas;
-  let pecas_inimiga = (jogando == "w") ? estado.bitboard_pretas : estado.bitboard_brancas;
-  let casas_atacadas = (jogando == "w") ? estado.casas_atacadas_pelas_pretas : estado.casas_atacadas_pelas_pretas;
+  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let pecas_inimiga = (jogando == "w") ? simulado.bitboard_pretas : simulado.bitboard_brancas;
+  let casas_atacadas = (jogando == "w") ? simulado.casas_atacadas_pelas_pretas : simulado.casas_atacadas_pelas_brancas;
 
   let movimentos = [];
   let capturas = [];
@@ -154,9 +155,9 @@ function calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, deslocament
 
 // Função para calcular todos possíveis movimentos e capturas do pião
 function calcular_ataque_e_movimento_pecas_piao(jogando, origem, deslocamento, operador, isMovimentoPiao, borda, retornar_casas_atacadas){
-  let pecas_aliada = (jogando == "w") ? estado.bitboard_brancas : estado.bitboard_pretas;
-  let pecas_inimiga = (jogando == "w") ? estado.bitboard_pretas : estado.bitboard_brancas;
-  let bitboard_en_passant_inimigo = (jogando == "w") ? estado.en_passant_pretas : estado.en_passant_brancas;
+  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let pecas_inimiga = (jogando == "w") ? simulado.bitboard_pretas : simulado.bitboard_brancas;
+  let bitboard_en_passant_inimigo = (jogando == "w") ? simulado.en_passant_pretas : simulado.en_passant_brancas;
   let movimento_duplo = (jogando == "w") ? estado.movimento_duplo_piao_branco : estado.movimento_duplo_piao_preto;
 
   let movimentos = [];
@@ -218,8 +219,8 @@ function calcular_ataque_e_movimento_pecas_piao(jogando, origem, deslocamento, o
 
 // Função para calcular todos possíveis movimentos e capturas das peças: Bispo, Torre, Dama e Rei
 function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocamento, operador, borda){
-  let pecas_aliada = (jogando == "w") ? estado.bitboard_brancas : estado.bitboard_pretas;
-  let pecas_inimiga = (jogando == "w") ? estado.bitboard_pretas : estado.bitboard_brancas;
+  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let pecas_inimiga = (jogando == "w") ? simulado.bitboard_pretas : simulado.bitboard_brancas;
 
   let movimentos = [];
   let capturas = [];
@@ -648,42 +649,42 @@ export class Calcular{
       let origem = BigInt(2 ** cont);
 
       // Verificando se é um pião das brancas
-      if((origem & estado.bitboard_piao_branco) !== 0n){
-        movimentos_possiveis_piao_brancas = movimentos_possiveis_piao_brancas.concat(Calcular.ataque_e_movimento_piao("w", origem, true));
+      if((origem & simulado.bitboard_piao_branco) !== 0n){
+        movimentos_possiveis_piao_brancas = movimentos_possiveis_piao_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_piao("w", origem, true)});
       }
-      else if((origem & estado.bitboard_cavalo_branco) !== 0n){
-        movimentos_possiveis_cavalo_brancas = movimentos_possiveis_cavalo_brancas.concat(Calcular.ataque_e_movimento_cavalo("w", origem, true));
+      else if((origem & simulado.bitboard_cavalo_branco) !== 0n){
+        movimentos_possiveis_cavalo_brancas = movimentos_possiveis_cavalo_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_cavalo("w", origem, true)});
       }
-      else if((origem & estado.bitboard_bispo_branco) !== 0n){
-        movimentos_possiveis_bispo_brancas = movimentos_possiveis_bispo_brancas.concat(Calcular.ataque_e_movimento_bispo("w", origem, true));
+      else if((origem & simulado.bitboard_bispo_branco) !== 0n){
+        movimentos_possiveis_bispo_brancas = movimentos_possiveis_bispo_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_bispo("w", origem, true)});
       }
-      else if((origem & estado.bitboard_torre_branco) !== 0n){
-        movimentos_possiveis_torre_brancas = movimentos_possiveis_torre_brancas.concat(Calcular.ataque_e_movimento_torre("w", origem, true));
+      else if((origem & simulado.bitboard_torre_branco) !== 0n){
+        movimentos_possiveis_torre_brancas = movimentos_possiveis_torre_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_torre("w", origem, true)});
       }
-      else if((origem & estado.bitboard_rainha_branco) !== 0n){
-        movimentos_possiveis_rainha_brancas = movimentos_possiveis_rainha_brancas.concat(Calcular.ataque_e_movimento_rainha("w", origem, true));
+      else if((origem & simulado.bitboard_rainha_branco) !== 0n){
+        movimentos_possiveis_rainha_brancas = movimentos_possiveis_rainha_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_rainha("w", origem, true)});
       }
-      else if((origem & estado.bitboard_rei_branco) !== 0n){
-        movimentos_possiveis_rei_brancas = movimentos_possiveis_rei_brancas.concat(Calcular.ataque_e_movimento_rei("w", origem, true));
+      else if((origem & simulado.bitboard_rei_branco) !== 0n){
+        movimentos_possiveis_rei_brancas = movimentos_possiveis_rei_brancas.concat({origem: origem, destino: Calcular.ataque_e_movimento_rei("w", origem, true)});
       }
 
-      else if((origem & estado.bitboard_piao_preto) !== 0n){
-        movimentos_possiveis_piao_pretas = movimentos_possiveis_piao_pretas.concat(Calcular.ataque_e_movimento_piao("p", origem, true));
+      else if((origem & simulado.bitboard_piao_preto) !== 0n){
+        movimentos_possiveis_piao_pretas = movimentos_possiveis_piao_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_piao("b", origem, true)});
       }
-      else if((origem & estado.bitboard_cavalo_preto) !== 0n){
-        movimentos_possiveis_cavalo_pretas = movimentos_possiveis_cavalo_pretas.concat(Calcular.ataque_e_movimento_cavalo("p", origem, true));
+      else if((origem & simulado.bitboard_cavalo_preto) !== 0n){
+        movimentos_possiveis_cavalo_pretas = movimentos_possiveis_cavalo_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_cavalo("b", origem, true)});
       }
-      else if((origem & estado.bitboard_bispo_preto) !== 0n){
-        movimentos_possiveis_bispo_pretas = movimentos_possiveis_bispo_pretas.concat(Calcular.ataque_e_movimento_bispo("p", origem, true));
+      else if((origem & simulado.bitboard_bispo_preto) !== 0n){
+        movimentos_possiveis_bispo_pretas = movimentos_possiveis_bispo_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_bispo("b", origem, true)});
       }
-      else if((origem & estado.bitboard_torre_preto) !== 0n){
-        movimentos_possiveis_torre_pretas = movimentos_possiveis_torre_pretas.concat(Calcular.ataque_e_movimento_torre("p", origem, true));
+      else if((origem & simulado.bitboard_torre_preto) !== 0n){
+        movimentos_possiveis_torre_pretas = movimentos_possiveis_torre_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_torre("b", origem, true)});
       }
-      else if((origem & estado.bitboard_rainha_preto) !== 0n){
-        movimentos_possiveis_rainha_pretas = movimentos_possiveis_rainha_pretas.concat(Calcular.ataque_e_movimento_rainha("p", origem, true));
+      else if((origem & simulado.bitboard_rainha_preto) !== 0n){
+        movimentos_possiveis_rainha_pretas = movimentos_possiveis_rainha_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_rainha("b", origem, true)});
       }
-      else if((origem & estado.bitboard_rei_preto) !== 0n){
-        movimentos_possiveis_rei_pretas = movimentos_possiveis_rei_pretas.concat(Calcular.ataque_e_movimento_rei("b", origem, true));
+      else if((origem & simulado.bitboard_rei_preto) !== 0n){
+        movimentos_possiveis_rei_pretas = movimentos_possiveis_rei_pretas.concat({origem: origem, destino: Calcular.ataque_e_movimento_rei("b", origem, true)});
       }
     }
 
@@ -738,41 +739,41 @@ export class Calcular{
       let origem = BigInt(2 ** cont);
 
       // Verificando se é um pião das brancas
-      if((origem & estado.bitboard_piao_branco) !== 0n){
+      if((origem & simulado.bitboard_piao_branco) !== 0n){
         movimentos_possiveis_piao_brancas = movimentos_possiveis_piao_brancas.concat(Calcular.ataque_e_movimento_piao("w", origem, true, true));
       }
-      else if((origem & estado.bitboard_cavalo_branco) !== 0n){
+      else if((origem & simulado.bitboard_cavalo_branco) !== 0n){
         movimentos_possiveis_cavalo_brancas = movimentos_possiveis_cavalo_brancas.concat(Calcular.ataque_e_movimento_cavalo("w", origem, true));
       }
-      else if((origem & estado.bitboard_bispo_branco) !== 0n){
+      else if((origem & simulado.bitboard_bispo_branco) !== 0n){
         movimentos_possiveis_bispo_brancas = movimentos_possiveis_bispo_brancas.concat(Calcular.ataque_e_movimento_bispo("w", origem, true));
       }
-      else if((origem & estado.bitboard_torre_branco) !== 0n){
+      else if((origem & simulado.bitboard_torre_branco) !== 0n){
         movimentos_possiveis_torre_brancas = movimentos_possiveis_torre_brancas.concat(Calcular.ataque_e_movimento_torre("w", origem, true));
       }
-      else if((origem & estado.bitboard_rainha_branco) !== 0n){
+      else if((origem & simulado.bitboard_rainha_branco) !== 0n){
         movimentos_possiveis_rainha_brancas = movimentos_possiveis_rainha_brancas.concat(Calcular.ataque_e_movimento_rainha("w", origem, true));
       }
-      else if((origem & estado.bitboard_rei_branco) !== 0n){
+      else if((origem & simulado.bitboard_rei_branco) !== 0n){
         movimentos_possiveis_rei_brancas = movimentos_possiveis_rei_brancas.concat(Calcular.ataque_e_movimento_rei("w", origem, true));
       }
 
-      else if((origem & estado.bitboard_piao_preto) !== 0n){
-        movimentos_possiveis_piao_pretas = movimentos_possiveis_piao_pretas.concat(Calcular.ataque_e_movimento_piao("p", origem, true, true));
+      else if((origem & simulado.bitboard_piao_preto) !== 0n){
+        movimentos_possiveis_piao_pretas = movimentos_possiveis_piao_pretas.concat(Calcular.ataque_e_movimento_piao("b", origem, true, true));
       }
-      else if((origem & estado.bitboard_cavalo_preto) !== 0n){
-        movimentos_possiveis_cavalo_pretas = movimentos_possiveis_cavalo_pretas.concat(Calcular.ataque_e_movimento_cavalo("p", origem, true));
+      else if((origem & simulado.bitboard_cavalo_preto) !== 0n){
+        movimentos_possiveis_cavalo_pretas = movimentos_possiveis_cavalo_pretas.concat(Calcular.ataque_e_movimento_cavalo("b", origem, true));
       }
-      else if((origem & estado.bitboard_bispo_preto) !== 0n){
-        movimentos_possiveis_bispo_pretas = movimentos_possiveis_bispo_pretas.concat(Calcular.ataque_e_movimento_bispo("p", origem, true));
+      else if((origem & simulado.bitboard_bispo_preto) !== 0n){
+        movimentos_possiveis_bispo_pretas = movimentos_possiveis_bispo_pretas.concat(Calcular.ataque_e_movimento_bispo("b", origem, true));
       }
-      else if((origem & estado.bitboard_torre_preto) !== 0n){
-        movimentos_possiveis_torre_pretas = movimentos_possiveis_torre_pretas.concat(Calcular.ataque_e_movimento_torre("p", origem, true));
+      else if((origem & simulado.bitboard_torre_preto) !== 0n){
+        movimentos_possiveis_torre_pretas = movimentos_possiveis_torre_pretas.concat(Calcular.ataque_e_movimento_torre("b", origem, true));
       }
-      else if((origem & estado.bitboard_rainha_preto) !== 0n){
-        movimentos_possiveis_rainha_pretas = movimentos_possiveis_rainha_pretas.concat(Calcular.ataque_e_movimento_rainha("p", origem, true));
+      else if((origem & simulado.bitboard_rainha_preto) !== 0n){
+        movimentos_possiveis_rainha_pretas = movimentos_possiveis_rainha_pretas.concat(Calcular.ataque_e_movimento_rainha("b", origem, true));
       }
-      else if((origem & estado.bitboard_rei_preto) !== 0n){
+      else if((origem & simulado.bitboard_rei_preto) !== 0n){
         movimentos_possiveis_rei_pretas = movimentos_possiveis_rei_pretas.concat(Calcular.ataque_e_movimento_rei("b", origem, true));
       }
     }
@@ -781,87 +782,101 @@ export class Calcular{
     movimentos_possiveis_pretas = [...movimentos_possiveis_piao_pretas, ...movimentos_possiveis_cavalo_pretas, ...movimentos_possiveis_bispo_pretas, ... movimentos_possiveis_torre_pretas, ... movimentos_possiveis_rainha_pretas, ... movimentos_possiveis_rei_pretas];
 
     // Limpando a contagem anterior
-    estado.casas_atacadas_pelas_brancas = 0n;
-    estado.casas_atacadas_pelas_pretas = 0n
+    simulado.casas_atacadas_pelas_brancas = 0n;
+    simulado.casas_atacadas_pelas_pretas = 0n
 
     if(salvar_no_estado == true){
       movimentos_possiveis_brancas.map((movimento) => {
-        estado.casas_atacadas_pelas_brancas |= movimento;
+        simulado.casas_atacadas_pelas_brancas |= movimento;
       });
       movimentos_possiveis_pretas.map((movimento) => {
-        estado.casas_atacadas_pelas_pretas |= movimento;
+        simulado.casas_atacadas_pelas_pretas |= movimento;
       });
 
-    console.log("Todos")
-    console.log(visualizadeiro(estado.casas_atacadas_pelas_brancas));
     }
-
-    console.log(visualizadeiro(estado.casas_atacadas_pelas_brancas));
 
     return { movimentos_possiveis_brancas, movimentos_possiveis_pretas };
   }
 
   static verificar_rei_atacado(jogando){
+
+    this.calcular_casas_atacadas();
+
     // Brancas jogam
     if(jogando == "w"){
-      if(estado.bitboard_rei_branco & estado.casas_atacadas_pelas_pretas){
-        return true;
+      if(simulado.bitboard_rei_branco & simulado.casas_atacadas_pelas_pretas){
+        simulado.rei_branco_em_ataque = true;
       }
       else{
-        return false;
+        simulado.rei_branco_em_ataque = false;
       }
     }
 
     // Pretas jogam
     else{
-      if(estado.bitboard_rei_preto & estado.casas_atacadas_pelas_brancas){
-        return true;
+      if(simulado.bitboard_rei_preto & simulado.casas_atacadas_pelas_brancas){
+        simulado.rei_preto_em_ataque = true;
       }
       else{
-        return false;
+        simulado.rei_preto_em_ataque = false;
       }
     }
   }
 
   static calcular_defesa_rei(jogando, movimentos_possiveis){
-    const movimentos_possiveis_defender_rei = [];
-    // Backup dos valores originais
-    const bitboard_piao_branco = estado.bitboard_piao_branco;
-    const bitboard_cavalo_branco = estado.bitboard_cavalo_branco;
-    const bitboard_bispo_branco = estado.bitboard_bispo_branco;
-    const bitboard_torre_branco = estado.bitboard_torre_branco;
-    const bitboard_rainha_branco = estado.bitboard_rainha_branco;
-    const bitboard_rei_branco = estado.bitboard_rei_branco;
-    const bitboard_piao_preto = estado.bitboard_piao_preto;
-    const bitboard_cavalo_preto = estado.bitboard_cavalo_preto;
-    const bitboard_bispo_preto = estado.bitboard_bispo_preto;
-    const bitboard_torre_preto = estado.bitboard_torre_preto;
-    const bitboard_rainha_preto = estado.bitboard_rainha_preto;
-    const bitboard_rei_preto = estado.bitboard_rei_preto;
-    const bitboard_tabuleiro = estado.bitboard_tabuleiro;
-    const bitboard_brancas = estado.bitboard_brancas;
-    const bitboard_pretas = estado.bitboard_pretas;
+    const todos_possiveis_movimentos_defesa_rei = [];
     
     // Brancas jogam
     if(jogando == "w"){
-      
+
       // Verificando cada possível jogada para defender o rei
       movimentos_possiveis.brancas.map((movimento) => {
-        if(this.verificar_se_o_movimento_defende_o_rei("w", bitboard_teste_todas_pecas_brancas, null)){
-          console.log("Esse movimento defende o rei")
-          movimentos_possiveis_defender_rei.push(movimento);
+
+        // Verificando se tem algum movimento na peça
+        if(movimento.destino.length > 0){
+          movimento.destino.map((destino) => {
+            descobrirPeca(movimento.origem, destino);
+
+            this.calcular_casas_atacadas();
+            this.verificar_rei_atacado(estado.jogando);
+
+            if(simulado.rei_branco_em_ataque == false){
+              todos_possiveis_movimentos_defesa_rei.push({origem: movimento.origem, destino: destino});
+            }
+
+            sincronizar_simulado_com_estado();
+
+          });
         }
       });
-
-      if(movimentos_possiveis_defender_rei.length == 0){
-        console.log("Cheque mate");
-      }
 
     }
     // Pretas jogam
     else{
+      // Verificando cada possível jogada para defender o rei
+      movimentos_possiveis.pretas.map((movimento) => {
+
+        // Verificando se tem algum movimento na peça
+        if(movimento.destino.length > 0){
+          movimento.destino.map((destino) => {
+            descobrirPeca(movimento.origem, destino);
+
+            this.calcular_casas_atacadas();
+            this.verificar_rei_atacado(estado.jogando);
+
+            if(simulado.rei_preto_em_ataque == false){
+              todos_possiveis_movimentos_defesa_rei.push({origem: movimento.origem, destino: destino});
+            }
+
+            sincronizar_simulado_com_estado();
+
+          });
+        }
+      });
+
+
     }
 
-    return movimentos_possiveis_defender_rei;
+    return todos_possiveis_movimentos_defesa_rei;
   }
 }

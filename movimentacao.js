@@ -1,6 +1,6 @@
 import { Calcular } from './calcular.js';
 import { desconverter } from './traducao.js';
-import { estado } from './variaveis.js'
+import { estado, simulado, sincronizar_estado_com_simulado, sincronizar_simulado_com_estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Função orquestradora e que fica exporta (única).
@@ -8,7 +8,7 @@ export function mover(de, para, promocao){
   console.log("-- Iniciado a etapa de movimentação --");
 
   // Zerando os en passant caso tenha
-  if(estado.jogando == "p" && estado.en_passant_pretas !== 0n){
+  if(estado.jogando == "b" && estado.en_passant_pretas !== 0n){
     console.log("Foi zerado o en passant das pretas");
     estado.en_passant_pretas = 0n;
   }
@@ -17,20 +17,61 @@ export function mover(de, para, promocao){
     estado.en_passant_brancas = 0n;
   }
 
-  // Calcular.calcular_casas_atacadas();
-  // let retorno_verificacao_rei_atacado = Calcular.verificar_rei_atacado(estado.jogando);
-  
-  // if(retorno_verificacao_rei_atacado == true){
-  //   const todos_movimentos_possiveis = Calcular.calcular_todos_possiveis_movimento(estado.jogando);
-  //   const todos_movimentos_defem_o_rei = Calcular.calcular_defesa_rei(estado.jogando, todos_movimentos_possiveis);
-  //   console.log("Movimentos possíveis para defender o rei")
-  //   console.log((todos_movimentos_defem_o_rei));
-  // }
+  sincronizar_simulado_com_estado();
+
+  if(estado.jogando == "w"){
+    Calcular.verificar_rei_atacado("w");
+    if(simulado.rei_branco_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        throw new Error("Xeque Mate");
+      }
+      else{
+        console.log("Rei das brancas em xeque");
+      }
+    }
+  }
+  else{
+    Calcular.verificar_rei_atacado("b");
+    if(simulado.rei_preto_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        throw new Error("Xeque Mate");
+      }
+      else{
+        console.log("Rei das pretas em xeque");
+      }
+    }
+  }
+
+  // Verificando se o rei está em xeque. Caso o rei esteja em
 
   // Dentro da função já chama a classe para fazer a verificação e realizar o movimento.
   descobrirPeca(de, para, promocao);
 
-  estado.jogando = (estado.jogando == "w") ? "p" : "w";
+  Calcular.verificar_rei_atacado("w");
+  Calcular.verificar_rei_atacado("b");
+
+  (estado.jogando == "w") ? Calcular.verificar_rei_atacado("w") : Calcular.verificar_rei_atacado("b");
+
+  // Verificando se o movimento coloca o rei em xeque (brancas)
+  if(estado.jogando == "w" && (simulado.rei_branco_em_ataque == true)){
+    console.log("O rei está em xeque");
+  }
+  else if(estado.jogando == "b" && (simulado.rei_preto_em_ataque == true)){
+    console.log("O rei está em xeque");
+  }
+
+  // Efetivando os movimentos
+  sincronizar_estado_com_simulado();
+
+  estado.jogando = (estado.jogando == "w") ? "b" : "w";
 
   if(estado.jogando == "w"){
     console.log("Brancas jogam");
@@ -39,12 +80,41 @@ export function mover(de, para, promocao){
     console.log("Pretas jogam");
   }
 
-  Calcular.calcular_casas_atacadas();
-  retorno_verificacao_rei_atacado = Calcular.verificar_rei_atacado(estado.jogando);
-  console.log(`O rei está atacado? ${retorno_verificacao_rei_atacado}`);
+  // Brancas jogam
+  if(estado.jogando == "w"){
+    Calcular.verificar_rei_atacado("w");
+    if(simulado.rei_branco_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        throw new Error("Xeque Mate");
+      }
+      else{
+        console.log("Rei das brancas em xeque");
+      }
+    }
+  }
+  // Pretas jogam
+  else{
+    Calcular.verificar_rei_atacado("b");
+    if(simulado.rei_preto_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        throw new Error("Xeque Mate");
+      }
+      else{
+        console.log("Rei das pretas em xeque");
+      }
+    }
+  }
 }
 
-function descobrirPeca(origem, destino){
+export function descobrirPeca(origem, destino){
   console.log("\n\n-- Iniciado a etapa de verificação: peça movida --\n\n");
 
   // Brancas jogam
@@ -57,7 +127,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de pião");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito um en passant
@@ -74,7 +144,7 @@ function descobrirPeca(origem, destino){
       else{
         // Verificando se foi feito um movimento duplo. Se for feito vai atualizar o bitboard de en passant.
         if((origem << estado.movimento_piao[1]) == destino){
-          estado.en_passant_brancas = origem << estado.movimento_piao[0];
+          simulado.en_passant_brancas = origem << estado.movimento_piao[0];
         }
 
         Piao.efetuar_movimento(origem, destino);
@@ -91,7 +161,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de cavalo");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -115,7 +185,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de bispo");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -139,7 +209,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de torre");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -163,7 +233,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de dama");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -187,7 +257,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de rei");
-        throw new Error();
+        throw new Error("Inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
@@ -214,7 +284,7 @@ function descobrirPeca(origem, destino){
     }
     else{
       console.log("Movimento invalido - tentou mover a peça adversária (vez das brancas e não pretas)");
-      throw new Error();
+      throw new Error("Inválido");
     }
   }
 
@@ -228,7 +298,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de pião");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito um en passant
@@ -245,7 +315,7 @@ function descobrirPeca(origem, destino){
       else{
         // Verificando se foi feito um movimento duplo. Se for feito vai atualizar o bitboard de en passant.
         if((origem >> estado.movimento_piao[1]) == destino){
-          estado.en_passant_pretas = origem >> estado.movimento_piao[0];
+          simulado.en_passant_pretas = origem >> estado.movimento_piao[0];
         }
 
         Piao.efetuar_movimento(origem, destino);
@@ -262,7 +332,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de cavalo");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -286,7 +356,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de bispo");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -310,7 +380,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de torre");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -334,7 +404,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de dama");
-        throw new Error();
+        throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
@@ -358,7 +428,7 @@ function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         console.log("Você fez um movimento inválido de rei");
-        throw new Error();
+        throw new Error("Inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
@@ -385,7 +455,7 @@ function descobrirPeca(origem, destino){
     }
     else{
       console.log("Movimento invalido - tentou mover a peça adversária (vez das pretas e não brancas)");
-      throw new Error();
+      throw new Error("Inválido");
     }
   }
 }
@@ -394,13 +464,13 @@ class Piao{
   static efetuar_en_passant(origem, destino){
     // Brancas jogam
     if(estado.jogando == "w"){
-      estado.bitboard_piao_preto ^= (estado.en_passant_pretas >> estado.movimento_piao[0]) 
-      estado.en_passant_pretas = 0n;
+      simulado.bitboard_piao_preto ^= (simulado.en_passant_pretas >> estado.movimento_piao[0]) 
+      simulado.en_passant_pretas = 0n;
     }
     // Pretas jogam
     else{
-      estado.bitboard_piao_branco ^= (estado.en_passant_brancas << estado.movimento_piao[0]) 
-      estado.en_passant_brancas = 0n;
+      simulado.bitboard_piao_branco ^= (simulado.en_passant_brancas << estado.movimento_piao[0]) 
+      simulado.en_passant_brancas = 0n;
     }
 
     this.efetuar_movimento(origem, destino);
@@ -410,19 +480,19 @@ class Piao{
     // Brancas jogam
     if(estado.jogando == "w"){
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
     // Pretas jogam
     else{
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -434,8 +504,8 @@ class Piao{
     if(estado.jogando == "w"){
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_piao_branco ^= movimentacao;
-      console.log("Bitboard do pião: \n" + visualizadeiro(estado.bitboard_piao_branco) + '\n');
+      simulado.bitboard_piao_branco ^= movimentacao;
+      console.log("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -446,8 +516,8 @@ class Piao{
     else{
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_piao_preto ^= movimentacao;
-      console.log("Bitboard do pião: \n" + visualizadeiro(estado.bitboard_piao_preto) + '\n');
+      simulado.bitboard_piao_preto ^= movimentacao;
+      console.log("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -462,21 +532,21 @@ class Cavalo{
     // Brancas jogam
     if(estado.jogando == "w"){
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
 
     // Pretas jogam
     else{
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -489,8 +559,8 @@ class Cavalo{
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_cavalo_branco ^= movimentacao;
-      console.log("Bitboard do cavalo: \n" + visualizadeiro(estado.bitboard_cavalo_branco) + '\n');
+      simulado.bitboard_cavalo_branco ^= movimentacao;
+      console.log("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -502,8 +572,8 @@ class Cavalo{
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_cavalo_preto^= movimentacao;
-      console.log("Bitboard do cavalo: \n" + visualizadeiro(estado.bitboard_cavalo_preto) + '\n');
+      simulado.bitboard_cavalo_preto^= movimentacao;
+      console.log("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -518,21 +588,21 @@ class Bispo{
     // Brancas jogam
     if(estado.jogando == "w"){
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
 
     // Pretas jogam
     else{
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -544,8 +614,8 @@ class Bispo{
     if(estado.jogando == "w"){
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_bispo_branco ^= movimentacao;
-      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_bispo_branco) + '\n');
+      simulado.bitboard_bispo_branco ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -556,8 +626,8 @@ class Bispo{
     else{
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_bispo_preto ^= movimentacao;
-      console.log("Bitboard do bispo: \n" + visualizadeiro(estado.bitboard_bispo_preto) + '\n');
+      simulado.bitboard_bispo_preto ^= movimentacao;
+      console.log("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -571,21 +641,21 @@ class Torre{
     // Brancas jogam
     if(estado.jogando == "w"){
       // Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
 
     // Pretas jogam
     else{
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -597,17 +667,17 @@ class Torre{
     if(estado.jogando == "w"){
 
       // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & estado.casa_torre_direita_branco) != 0n){
+      if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
         estado.status_roque_direita_branco = false;
       }
-      else if((origem & estado.casa_torre_esquerda_branco) != 0n){
+      else if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
         estado.status_roque_esquerda_branco = false;
       }
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_torre_branco ^= movimentacao;
-      console.log("Bitboard da torre: \n" + visualizadeiro(estado.bitboard_torre_branco) + '\n');
+      simulado.bitboard_torre_branco ^= movimentacao;
+      console.log("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -618,17 +688,17 @@ class Torre{
     else{
 
       // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & estado.casa_torre_direita_preto) != 0n){
+      if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) != 0n){
         estado.status_roque_direita_preto = false;
       }
-      else if((origem & estado.casa_torre_esquerda_preto) != 0n){
+      else if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) != 0n){
         estado.status_roque_esquerda_preto = false;
       }
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_torre_preto ^= movimentacao;
-      console.log("Bitboard da torre: \n" + visualizadeiro(estado.bitboard_torre_preto) + '\n');
+      simulado.bitboard_torre_preto ^= movimentacao;
+      console.log("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -643,21 +713,21 @@ class Dama{
     // Brancas jogam
     if(estado.jogando == "w"){
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
 
     // Pretas jogam
     else{
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -670,8 +740,8 @@ class Dama{
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_rainha_branco ^= movimentacao;
-      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rainha_branco) + '\n');
+      simulado.bitboard_rainha_branco ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -683,8 +753,8 @@ class Dama{
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_rainha_preto ^= movimentacao;
-      console.log("Bitboard da dama: \n" + visualizadeiro(estado.bitboard_rainha_branco) + '\n');
+      simulado.bitboard_rainha_preto ^= movimentacao;
+      console.log("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -697,16 +767,16 @@ class Rei{
   static efetuar_roque_esquerda(){
     // Brancas jogam
     if(estado.jogando == "w"){
-      estado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000001n) | estado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
-      estado.bitboard_rei_branco = estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco;
+      simulado.bitboard_torre_branco = ((simulado.bitboard_torre_branco ^ 0x0000000000000001n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
+      simulado.bitboard_rei_branco = simulado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco;
       atualizarTabuleiro();
       return;
     }
 
     // Pretas jogam
     else{
-      estado.bitboard_torre_preto= ((estado.bitboard_torre_preto ^ 0x0100000000000000n) | estado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto);
-      estado.bitboard_rei_preto = estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
+      simulado.bitboard_torre_preto= ((simulado.bitboard_torre_preto ^ 0x0100000000000000n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto);
+      simulado.bitboard_rei_preto = simulado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
       atualizarTabuleiro();
       return;
     }
@@ -715,16 +785,16 @@ class Rei{
   static efetuar_roque_direita(){
     // Brancas jogam
     if(estado.jogando == "w"){
-      estado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000080n) | estado.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
-      estado.bitboard_rei_branco = estado.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
+      simulado.bitboard_torre_branco = ((simulado.bitboard_torre_branco ^ 0x0000000000000080n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
+      simulado.bitboard_rei_branco = simulado.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
       atualizarTabuleiro();
       return;
     }
 
     // Pretas jogam
     else{
-      estado.bitboard_torre_preto = ((estado.bitboard_torre_preto ^ 0x8000000000000000n) | estado.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
-      estado.bitboard_rei_preto = estado.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
+      simulado.bitboard_torre_preto = ((simulado.bitboard_torre_preto ^ 0x8000000000000000n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
+      simulado.bitboard_rei_preto = simulado.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
       atualizarTabuleiro();
       return;
     }
@@ -734,20 +804,20 @@ class Rei{
     // Brancas jogam
     if(estado.jogando == "w"){
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_preto ^= (estado.bitboard_piao_preto & destino);
-      estado.bitboard_cavalo_preto ^= (estado.bitboard_cavalo_preto & destino);
-      estado.bitboard_bispo_preto ^= (estado.bitboard_bispo_preto & destino);
-      estado.bitboard_torre_preto ^= (estado.bitboard_torre_preto & destino);
-      estado.bitboard_rainha_preto ^= (estado.bitboard_rainha_preto & destino);
+      simulado.bitboard_piao_preto ^= (simulado.bitboard_piao_preto & destino);
+      simulado.bitboard_cavalo_preto ^= (simulado.bitboard_cavalo_preto & destino);
+      simulado.bitboard_bispo_preto ^= (simulado.bitboard_bispo_preto & destino);
+      simulado.bitboard_torre_preto ^= (simulado.bitboard_torre_preto & destino);
+      simulado.bitboard_rainha_preto ^= (simulado.bitboard_rainha_preto & destino);
     }
     // Pretas jogam
     else{
       //  Atualizando o bitboard das pretas (capturando a peça)
-      estado.bitboard_piao_branco ^= (estado.bitboard_piao_branco & destino);
-      estado.bitboard_cavalo_branco ^= (estado.bitboard_cavalo_branco & destino);
-      estado.bitboard_bispo_branco ^= (estado.bitboard_bispo_branco & destino);
-      estado.bitboard_torre_branco ^= (estado.bitboard_torre_branco & destino);
-      estado.bitboard_rainha_branco ^= (estado.bitboard_rainha_branco & destino);
+      simulado.bitboard_piao_branco ^= (simulado.bitboard_piao_branco & destino);
+      simulado.bitboard_cavalo_branco ^= (simulado.bitboard_cavalo_branco & destino);
+      simulado.bitboard_bispo_branco ^= (simulado.bitboard_bispo_branco & destino);
+      simulado.bitboard_torre_branco ^= (simulado.bitboard_torre_branco & destino);
+      simulado.bitboard_rainha_branco ^= (simulado.bitboard_rainha_branco & destino);
     }
 
     this.efetuar_movimento(origem, destino);
@@ -758,13 +828,13 @@ class Rei{
     // Brancas jogam
     if(estado.jogando == "w"){
 
-      estado.status_roque_direita_branco = false;
-      estado.status_roque_esquerda_branco = false;
+      simulado.status_roque_direita_branco = false;
+      simulado.status_roque_esquerda_branco = false;
 
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_rei_branco ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_branco) + '\n');
+      simulado.bitboard_rei_branco ^= movimentacao;
+      console.log("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -774,13 +844,13 @@ class Rei{
     // Pretas jogam
     else{
 
-      estado.status_roque_direita_preto = false;
-      estado.status_roque_esquerda_preto = false;
+      simulado.status_roque_direita_preto = false;
+      simulado.status_roque_esquerda_preto = false;
         
       // Realizando movimento
       const movimentacao = origem | destino;
-      estado.bitboard_rei_preto ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(estado.bitboard_rei_preto) + '\n');
+      simulado.bitboard_rei_preto ^= movimentacao;
+      console.log("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -791,14 +861,14 @@ class Rei{
 
 function atualizarTabuleiro(){
   // Atualizando o bitboard de todas as peças brancas
-  estado.bitboard_brancas = estado.bitboard_piao_branco | estado.bitboard_cavalo_branco | estado.bitboard_bispo_branco | estado.bitboard_torre_branco | estado.bitboard_rainha_branco | estado.bitboard_rei_branco;
-  console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(estado.bitboard_brancas) + '\n');
+  simulado.bitboard_brancas = simulado.bitboard_piao_branco | simulado.bitboard_cavalo_branco | simulado.bitboard_bispo_branco | simulado.bitboard_torre_branco | simulado.bitboard_rainha_branco | simulado.bitboard_rei_branco;
+  console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(simulado.bitboard_brancas) + '\n');
 
   // Atualizando o bitboard de todas as peças pretas
-  estado.bitboard_pretas = estado.bitboard_piao_preto | estado.bitboard_cavalo_preto | estado.bitboard_bispo_preto | estado.bitboard_torre_preto | estado.bitboard_rainha_preto | estado.bitboard_rei_preto;
-  console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(estado.bitboard_pretas) + '\n');
+  simulado.bitboard_pretas = simulado.bitboard_piao_preto | simulado.bitboard_cavalo_preto | simulado.bitboard_bispo_preto | simulado.bitboard_torre_preto | simulado.bitboard_rainha_preto | simulado.bitboard_rei_preto;
+  console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(simulado.bitboard_pretas) + '\n');
   
   // Atualizando o bitboard com todas as casas ocupadas
-  estado.bitboard_tabuleiro = estado.bitboard_brancas | estado.bitboard_pretas;
-  console.log("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(estado.bitboard_tabuleiro) + '\n');
+  simulado.bitboard_tabuleiro = simulado.bitboard_brancas | simulado.bitboard_pretas;
+  console.log("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(simulado.bitboard_tabuleiro) + '\n');
 }

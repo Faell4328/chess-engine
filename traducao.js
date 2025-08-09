@@ -11,11 +11,11 @@ export function converter(valor){
   
   if(Number(valor[0].charCodeAt(0) - "A".charCodeAt(0)) > 7){
     console.log("Jogada invalida");
-    throw new Error()
+    throw new Error("Inválido");
   }
   else if(Number(valor[1])  > 8){
     console.log("Jogada invalida");
-    throw new Error()
+    throw new Error("Inválido");
   }
   
   potencia += (valor[0].charCodeAt(0) - "A".charCodeAt(0));
