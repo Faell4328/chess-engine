@@ -63,13 +63,34 @@ export function mover(de, para, promocao){
   // Verificando se o movimento coloca o rei em xeque (brancas)
   if(estado.jogando == "w" && (simulado.rei_branco_em_ataque == true)){
     console.log("O rei está em xeque");
+    throw new Error("xeque");
   }
+  // Verificando se o movimento coloca o rei em xeque (pretas)
   else if(estado.jogando == "b" && (simulado.rei_preto_em_ataque == true)){
     console.log("O rei está em xeque");
+    throw new Error("xeque");
   }
 
   // Efetivando os movimentos
   sincronizar_estado_com_simulado();
+
+  // Verificando se a casa atacada é da torre e se o status de roque é true (evitando que o bitboard de roque fique desatualizado, caso a torre seja capturada)
+  if(estado.jogando == "w"){
+    if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) && estado.status_roque_esquerda_preto == true){
+      estado.status_roque_esquerda_preto = false;
+    }
+    else if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) && estado.status_roque_direita_preto == true){
+      estado.status_roque_direita_preto = false;
+    }
+  }
+  else{
+    if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) && estado.status_roque_esquerda_branco == true){
+      estado.status_roque_esquerda_branco = false;
+    }
+    else if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) && estado.status_roque_direita_branco == true){
+      estado.status_roque_direita_branco = false;
+    }
+  }
 
   estado.jogando = (estado.jogando == "w") ? "b" : "w";
 
@@ -253,6 +274,11 @@ export function descobrirPeca(origem, destino){
       console.log("A peça movida é rei brancas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_rei("w", origem);
+
+      console.log("debugger 2");
+      console.log((movimentos_possiveis));
+      console.log(visualizadeiro(origem));
+      console.log(visualizadeiro(destino));
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
@@ -668,10 +694,10 @@ class Torre{
 
       // Caso a torre seja movida, vai desativar o roque do lado movido
       if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
-        estado.status_roque_direita_branco = false;
+        simulado.status_roque_direita_branco = false;
       }
       else if((origem & estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
-        estado.status_roque_esquerda_branco = false;
+        simulado.status_roque_esquerda_branco = false;
       }
 
       // Realizando movimento
@@ -767,34 +793,43 @@ class Rei{
   static efetuar_roque_esquerda(){
     // Brancas jogam
     if(estado.jogando == "w"){
-      simulado.bitboard_torre_branco = ((simulado.bitboard_torre_branco ^ 0x0000000000000001n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
-      simulado.bitboard_rei_branco = simulado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco;
+      simulado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000001n) | estado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
+      simulado.bitboard_rei_branco = estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco;
+      simulado.status_roque_esquerda_branco = false;
+      simulado.status_roque_direita_branco = false;
       atualizarTabuleiro();
       return;
     }
 
     // Pretas jogam
     else{
-      simulado.bitboard_torre_preto= ((simulado.bitboard_torre_preto ^ 0x0100000000000000n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto);
-      simulado.bitboard_rei_preto = simulado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
+      simulado.bitboard_torre_preto= ((estado.bitboard_torre_preto ^ 0x0100000000000000n) | estado.casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto);
+      simulado.bitboard_rei_preto = estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
+      simulado.status_roque_esquerda_preto = false;
+      simulado.status_roque_direita_preto = false;
       atualizarTabuleiro();
       return;
     }
+    
   }
 
   static efetuar_roque_direita(){
     // Brancas jogam
     if(estado.jogando == "w"){
-      simulado.bitboard_torre_branco = ((simulado.bitboard_torre_branco ^ 0x0000000000000080n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
-      simulado.bitboard_rei_branco = simulado.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
+      simulado.bitboard_torre_branco = ((estado.bitboard_torre_branco ^ 0x0000000000000080n) | estado.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
+      simulado.bitboard_rei_branco = estado.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
+      simulado.status_roque_esquerda_branco = false;
+      simulado.status_roque_direita_branco = false;
       atualizarTabuleiro();
       return;
     }
 
     // Pretas jogam
     else{
-      simulado.bitboard_torre_preto = ((simulado.bitboard_torre_preto ^ 0x8000000000000000n) | simulado.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
-      simulado.bitboard_rei_preto = simulado.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
+      simulado.bitboard_torre_preto = ((estado.bitboard_torre_preto ^ 0x8000000000000000n) | estado.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
+      simulado.bitboard_rei_preto = estado.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
+      simulado.status_roque_esquerda_preto = false;
+      simulado.status_roque_direita_preto = false;
       atualizarTabuleiro();
       return;
     }

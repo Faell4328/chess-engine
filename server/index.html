@@ -65,6 +65,11 @@
       board.position(retornoApi.fen);
       return;
     }
+    else if(retornoApi.status == "xeque"){
+      alert("Você está em xeque");
+      board.position(retornoApi.fen);
+      return;
+    }
     else{
       alert("Xeque mate");
       return;

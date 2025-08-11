@@ -183,6 +183,9 @@ export const estado = {
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01100000
   casas_que_deve_estar_vazio_para_fazer_o_roque_direita_branco: 0x0000000000000060n,
 
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001100
+  casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_branco: 0x000000000000000Cn,
+
   // 00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto: 0x0400000000000000n,
   // 00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
@@ -196,6 +199,9 @@ export const estado = {
   casas_que_deve_estar_vazio_para_fazer_o_roque_direita_preto: 0x6000000000000000n,
   // 00001110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_preto: 0x0E00000000000000n,
+
+  // 00001110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_preto: 0x0C00000000000000n,
 
   piao: "p",
   cavalo: "n",

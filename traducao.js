@@ -57,21 +57,6 @@ export function desconverter(valor){
 // Gera o FEN com base nos bitboards e outra variáveis de controle do jogo
 export function converterFEN(){
 
-  // console.log("Pião");
-  // console.log(visualizadeiro(estado.bitboard_piao_preto));
-  // console.log("Cavalo");
-  // console.log(visualizadeiro(estado.bitboard_cavalo_preto));
-  // console.log("Bispo");
-  // console.log(visualizadeiro(estado.bitboard_bispo_preto));
-  // console.log("Torre");
-  // console.log(visualizadeiro(estado.bitboard_torre_preto));
-  // console.log("Rainha");
-  // console.log(visualizadeiro(estado.bitboard_rainha_preto));
-  // console.log("Rei");
-  // console.log(visualizadeiro(estado.bitboard_rei_preto));
-  // console.log("Todas pretas");
-  // console.log(visualizadeiro(estado.bitboard_pretas));
-
   console.log("\n-- Gerando FEN --\n");
 
   let fen = "";

@@ -56,8 +56,11 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
 }
 
 function verificar_roque_peca_rei(jogando){
-  let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
+  let tabuleiro_todo = (simulado.bitboard_brancas | simulado.bitboard_pretas);
   let casas_atacadas_inimigo = (jogando == "w") ? simulado.casas_atacadas_pelas_pretas : simulado.casas_atacadas_pelas_brancas;
+  let casas_que_nao_podem_estar_sendo_atacadas_pelo_inimigo_esquerda = (jogando == "w") ? estado.casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_branco : estado.casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_preto;
+  let bitboard_torres = (jogando == "w") ? simulado.bitboard_torre_branco : simulado.bitboard_torre_preto;
+  let status_rei_em_ataque = (jogando == "w") ? simulado.rei_branco_em_ataque : simulado.rei_preto_em_ataque;
 
   let casas_livre_para_o_roque_esquerda = (jogando == "w") ? estado.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_branco : estado.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_preto;
   let casas_livre_para_o_roque_direita = (jogando == "w") ? estado.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_branco : estado.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_preto;
@@ -65,16 +68,62 @@ function verificar_roque_peca_rei(jogando){
   let status_roque_direita = (jogando == "w") ? estado.status_roque_direita_branco : estado.status_roque_direita_preto;
   let casas_roque_rei_esquerda = (jogando == "w") ? estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco : estado.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
   let casas_roque_rei_direita = (jogando == "w") ? estado.casa_onde_o_rei_vai_ficar_no_roque_direita_branco : estado.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
+  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_esquerda = (jogando == "w") ? estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco : estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto;
+  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_direita = (jogando == "w") ? estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco : estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto;
 
   let roque_esquerda = [];
   let roque_direita = [];
 
+  let algum_erro_encontrado_no_roque_esquerdo = false;
+  let algum_erro_encontrado_no_roque_direito = false;
+
+  // Verificando se o rei está em xeque
+  if(status_rei_em_ataque == true){
+    return { todos: [], roque_esquerda: [], roque_direita: [] }
+  }
+  
+  /** VERIFICANDO O LADO ESQUERDO */
+  // Verificando o status do roque
+  if(status_roque_esquerda == false){
+    algum_erro_encontrado_no_roque_esquerdo = true;
+  }
+  // Verificando se existe alguma peça (alida ou inimiga) entre o rei e a torre
+  else if((casas_livre_para_o_roque_esquerda & tabuleiro_todo) != 0n){
+    algum_erro_encontrado_no_roque_esquerdo = true;
+  }
+  // Verificando se a torre está na casa inicial corretamente
+  else if((bitboard_torres & casa_onde_a_torre_deve_estar_para_fazer_o_roque_esquerda) == 0n){
+    algum_erro_encontrado_no_roque_esquerdo = true;
+  }
+  // Verificando se as casas essenciais estão sendo atacadas por algum inimigo
+  else if((casas_atacadas_inimigo & casas_que_nao_podem_estar_sendo_atacadas_pelo_inimigo_esquerda) !== 0n){
+    algum_erro_encontrado_no_roque_esquerdo = true;
+  }
+
+  /** VERIFICANDO O LADO DIREITO*/
+  // Verificando o status do roque
+  if(status_roque_direita == false){
+    algum_erro_encontrado_no_roque_direito = true;
+  }
+  // Verificando se existe alguma peça (alida ou inimiga) entre o rei e a torre
+  else if((casas_livre_para_o_roque_direita & tabuleiro_todo) != 0n){
+    algum_erro_encontrado_no_roque_direito = true;
+  }
+  // Verificando se a torre está na casa inicial corretamente
+  else if((bitboard_torres & casa_onde_a_torre_deve_estar_para_fazer_o_roque_direita) == 0n){
+    algum_erro_encontrado_no_roque_direito = true;
+  }
+  // Verificando se as casas essenciais estão sendo atacadas por algum inimigo. OBS: Está sendo usado "casas_livre_para...", porque é as mesmas casas.
+  else if((casas_atacadas_inimigo & casas_livre_para_o_roque_direita) !== 0n){
+    algum_erro_encontrado_no_roque_direito = true;
+  }
+
   // Verifica se é possível fazer roque na esquerda
-  if(((casas_livre_para_o_roque_esquerda & pecas_aliada) == 0n) && (status_roque_esquerda) && ((casas_atacadas_inimigo & casas_livre_para_o_roque_esquerda) == 0n)){
+  if(algum_erro_encontrado_no_roque_esquerdo == false){
     roque_esquerda.push(casas_roque_rei_esquerda);
   }
   // Verifica se é possível fazer roque na direita
-  if(((casas_livre_para_o_roque_direita & pecas_aliada) == 0n) && (status_roque_direita) && ((casas_atacadas_inimigo & casas_livre_para_o_roque_direita) == 0n)){
+  if(algum_erro_encontrado_no_roque_direito == false){
     roque_direita.push(casas_roque_rei_direita);
   }
 
@@ -92,7 +141,7 @@ function verificar_roque_peca_rei(jogando){
   }
 }
 
-function calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, deslocamento, operador, borda){
+function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, operador, borda){
   let pecas_aliada = (jogando == "w") ? simulado.bitboard_brancas : simulado.bitboard_pretas;
   let pecas_inimiga = (jogando == "w") ? simulado.bitboard_pretas : simulado.bitboard_brancas;
   let casas_atacadas = (jogando == "w") ? simulado.casas_atacadas_pelas_pretas : simulado.casas_atacadas_pelas_brancas;
@@ -546,28 +595,28 @@ export class Calcular{
       roque_direita: [],
     };;
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente, "<<", (estado.bitboard_casas_linha_8));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente, "<<", (estado.bitboard_casas_linha_8));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente_esquerda, "<<", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente_esquerda, "<<", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_8));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente_direita, "<<", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente_direita, "<<", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_8));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_direita, "<<", (estado.bitboard_casas_coluna_H));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_direita, "<<", (estado.bitboard_casas_coluna_H));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -575,35 +624,35 @@ export class Calcular{
     };
 
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente, ">>", (estado.bitboard_casas_linha_1));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente, ">>", (estado.bitboard_casas_linha_1));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente_esquerda, ">>", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente_esquerda, ">>", (estado.bitboard_casas_coluna_H | estado.bitboard_casas_linha_1));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_frente_direita, ">>", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente_direita, ">>", (estado.bitboard_casas_coluna_A | estado.bitboard_casas_linha_1));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_direita, ">>", (estado.bitboard_casas_coluna_A));
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_direita, ">>", (estado.bitboard_casas_coluna_A));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_movimento_e_roque_peca_rei(jogando, origem, estado.movimento_rei_direita, ">>", 0n, true);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_direita, ">>", 0n, true);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],

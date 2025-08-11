@@ -53,6 +53,12 @@ app.post('/mover', (req, res) => {
         status: "xeque mate"
       }
     }
+    else if(error.message == "xeque"){
+      response = {
+        status: "xeque",
+        fen: traducao.converterFEN()
+      }
+    }
 
     res.json(response);
     return;
