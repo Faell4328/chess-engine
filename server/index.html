@@ -7,9 +7,39 @@
 <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" crossorigin="anonymous"></script>
-<div style="width: 800px" id="tabuleiro"></div><br />
-<button onclick="start()">Posição inicial</button>
+<div style="width: 700px" id="tabuleiro"></div><br />
+<input type="text" id="fen" placeholder="FEN personalizado" /><button style="margin-left: 5" onClick="fen_personalizado()">Usar FEN personalizado</button><br /><br />
+<button onclick="start()">Posição inicial</button><span style="margin-left: 5">Que é: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</span>
 <script>
+
+  async function fen_personalizado(){
+    let fen = document.getElementById("fen");
+
+    // Verificando se o FEN está vazio
+    if(fen == ""){
+      alert("O FEN está vazio");
+    }
+
+    const retorno = await fetch('http://localhost:4000/fen', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        "fen": fen.value
+      })
+    })
+    
+    let retornoApi = await retorno.json();
+
+    if(retornoApi == null){
+      console.warn("Erro ao consultar API");
+      return;
+    }
+
+    board.position(fen.value);
+    fen.value = ""
+  }
   
   async function start(){
     board.start();
@@ -41,8 +71,8 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "de": source,
-        "para": target
+        "de": source.toLowerCase(),
+        "para": target.toLowerCase()
       })
     })
     
@@ -67,6 +97,11 @@
     }
     else if(retornoApi.status == "xeque"){
       alert("Você está em xeque");
+      board.position(retornoApi.fen);
+      return;
+    }
+    else if(retornoApi.status == "FEN incompleto"){
+      alert("O FEM está incompleto");
       board.position(retornoApi.fen);
       return;
     }

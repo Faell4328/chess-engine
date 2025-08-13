@@ -34,6 +34,10 @@ export const simulado = {
   // 11111111 11111111 00000000 00000000 00000000 00000000 00000000 00000000
   bitboard_pretas: 0xFFFF000000000000n,
 
+  // p é pretas e w é brancas
+  jogando: "w",
+  numero_lances_completo: 1,
+
   rei_preto_em_ataque: false,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   casas_atacadas_pelas_pretas: 0n,
@@ -141,8 +145,7 @@ export const estado = {
   
   // p é pretas e w é brancas
   jogando: "w",
-  numero_lances_brancas: 0,
-  numero_lances_pretas: 0,
+  numero_lances_completo: 1,
   
   // É bitboard com as casas inicias do pião
   movimento_duplo_piao_branco: 0x000000000000FF00n,
@@ -249,8 +252,7 @@ export function zerar(){
   estado.casas_atacadas_pelas_brancas = 0n;
   
   estado.jogando = "w";
-  estado.numero_lances_brancas = 0;
-  estado.numero_lances_pretas = 0;
+  estado.numero_lances_completo = 1;
   
   estado.movimento_duplo_piao_branco = 0x000000000000FF00n;
   estado.movimento_duplo_piao_preto = 0x00FF000000000000n;
@@ -306,6 +308,8 @@ export function sincronizar_simulado_com_estado(){
 
   simulado.rei_branco_em_ataque = estado.rei_branco_em_ataque;
   simulado.casas_atacadas_pelas_brancas = estado.casas_atacadas_pelas_brancas;
+  simulado.jogando = estado.jogando,
+  simulado.numero_lances_completo = estado.numero_lances_completo,
 
   simulado.en_passant_brancas = estado.en_passant_brancas;
   simulado.en_passant_pretas = estado.en_passant_pretas;
@@ -318,7 +322,7 @@ export function sincronizar_simulado_com_estado(){
 }
 
 export function sincronizar_estado_com_simulado(){
-    estado.bitboard_piao_branco = simulado.bitboard_piao_branco;
+  estado.bitboard_piao_branco = simulado.bitboard_piao_branco;
   estado.bitboard_cavalo_branco = simulado.bitboard_cavalo_branco;
   estado.bitboard_bispo_branco = simulado.bitboard_bispo_branco;
   estado.bitboard_torre_branco = simulado.bitboard_torre_branco;
@@ -341,6 +345,9 @@ export function sincronizar_estado_com_simulado(){
 
   estado.rei_branco_em_ataque = simulado.rei_branco_em_ataque;
   estado.casas_atacadas_pelas_brancas = simulado.casas_atacadas_pelas_brancas;
+
+  estado.jogando = simulado.jogando,
+  estado.numero_lances_completo = simulado.numero_lances_completo,
 
   estado.en_passant_brancas = simulado.en_passant_brancas;
   estado.en_passant_pretas = simulado.en_passant_pretas;

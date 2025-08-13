@@ -73,6 +73,7 @@ export function mover(de, para, promocao){
 
   // Efetivando os movimentos
   sincronizar_estado_com_simulado();
+  estado.jogando == "b" && estado.numero_lances_completo++;
 
   // Verificando se a casa atacada é da torre e se o status de roque é true (evitando que o bitboard de roque fique desatualizado, caso a torre seja capturada)
   if(estado.jogando == "w"){
@@ -163,8 +164,8 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito um movimento
       else{
-        // Verificando se foi feito um movimento duplo. Se for feito vai atualizar o bitboard de en passant.
-        if((origem << estado.movimento_piao[1]) == destino){
+        // Verificando se foi feito um movimento duplo e se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
+        if(((origem << estado.movimento_piao[1]) == destino) && (((destino << 1n) | (destino >> 1n)) & simulado.bitboard_piao_preto) != 0n){
           simulado.en_passant_brancas = origem << estado.movimento_piao[0];
         }
 
@@ -339,9 +340,13 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito um movimento
       else{
-        // Verificando se foi feito um movimento duplo. Se for feito vai atualizar o bitboard de en passant.
-        if((origem >> estado.movimento_piao[1]) == destino){
+        // Verificando se foi feito um movimento duplo e se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
+        if(((origem >> estado.movimento_piao[1]) == destino) && ((((destino << 1n) | (destino >> 1n)) & simulado.bitboard_piao_branco) != 0n)){
           simulado.en_passant_pretas = origem >> estado.movimento_piao[0];
+          console.log("Foi adicionado en passant")
+        }
+        else{
+          console.log("Não foi feito en passant")
         }
 
         Piao.efetuar_movimento(origem, destino);

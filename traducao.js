@@ -1,4 +1,4 @@
-import { estado } from './variaveis.js'
+import { estado, simulado, sincronizar_estado_com_simulado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Recebe a coordenada normal e converte para binário.
@@ -9,7 +9,7 @@ export function converter(valor){
   potencia = Number((valor[1])-1) * 8;
 
   
-  if(Number(valor[0].charCodeAt(0) - "A".charCodeAt(0)) > 7){
+  if(Number(valor[0].toLowerCase() - "a".charCodeAt(0)) > 7){
     console.log("Jogada invalida");
     throw new Error("Inválido");
   }
@@ -18,9 +18,9 @@ export function converter(valor){
     throw new Error("Inválido");
   }
   
-  potencia += (valor[0].charCodeAt(0) - "A".charCodeAt(0));
+  potencia += (valor[0].toLowerCase().charCodeAt(0) - "a".charCodeAt(0));
   console.log("A é pontência é: 2^" + potencia);
-  binario = 2**potencia;
+  binario = BigInt(2**potencia);
 
   return binario;
 }
@@ -48,7 +48,7 @@ export function desconverter(valor){
   console.log(linhas)
   console.log(colunas)
 
-  let letra = String.fromCharCode(Number("A".charCodeAt(0)) + colunas);
+  let letra = String.fromCharCode(Number("a".charCodeAt(0)) + colunas);
   let numero = Number(linhas + 1);
 
   return letra + numero;
@@ -138,8 +138,161 @@ export function converterFEN(){
     }
   }
   
+  // FEN com todas as peças no tabuleiro
   fen = fen.split("/").reverse().join("/");
+
+  // FEN com quem está jogando
+  fen += ` ${estado.jogando}`;
+
+  // FEN com os roques
+  let roques = (estado.status_roque_direita_branco == true) ? "K" : "";
+  roques += (estado.status_roque_esquerda_branco == true) ? "Q" : "";
+  roques += (estado.status_roque_direita_preto == true) ? "k" : "";
+  roques += (estado.status_roque_esquerda_preto == true) ? "q" : "";
+  fen += (roques == "") ? " -" : ` ${roques}`;
+
+  // FEN com en passant
+  if((estado.en_passant_brancas | estado.en_passant_pretas) !== 0n){
+    fen += ` ${desconverter(estado.en_passant_pretas | estado.en_passant_brancas)}`;
+  }
+  else {
+    fen += " -";
+  }
+
+  // FEN com regra dos 50 lances (ainda não implementado)
+  fen += " 0";
+
+  // FEN com regra dos 50 lances (ainda não implementado)
+  fen += ` ${estado.numero_lances_completo}`
 
   console.log(fen);
   return fen;
+}
+
+// Gera os bitboards com base no FEN (já salvando no simulado)
+export function desconverterFEN(fen){
+
+  console.log("\n-- Gerando bitboard com base no FEN --\n");
+
+  let fen_separado_completo = fen.split(" ");
+  const fen_pecas = fen_separado_completo[0].split("/").reverse();
+
+  // Verificando se o FEN está incompleto
+  if(fen_separado_completo.length < 6){
+    console.log("O FEN é menor que o esperado");
+    throw new Error("FEN incompleto");
+  }
+  
+  const fen_jogando = fen_separado_completo[1];
+  const fen_roque = fen_separado_completo[2];
+  const fen_en_passant = fen_separado_completo[3];
+  const fen_meio_move = fen_separado_completo[4];
+  const fen_numero_movimento = fen_separado_completo[5];
+
+  let casas_vazias = 0;
+  let potencia = 0n;
+  let cont = 0;
+
+  // Bitboard das peças
+  simulado.bitboard_piao_branco = 0n;
+  simulado.bitboard_piao_preto = 0n;
+  simulado.bitboard_bispo_branco = 0n;
+  simulado.bitboard_bispo_preto = 0n;
+  simulado.bitboard_cavalo_branco = 0n;
+  simulado.bitboard_cavalo_preto = 0n;
+  simulado.bitboard_torre_branco = 0n;
+  simulado.bitboard_torre_preto = 0n;
+  simulado.bitboard_rainha_branco = 0n;
+  simulado.bitboard_rainha_preto = 0n;
+  simulado.bitboard_rei_branco = 0n;
+  simulado.bitboard_rei_preto = 0n;
+
+  // Bitboard de quem joga 
+  simulado.jogando = fen_jogando;
+  simulado.numero_lances_completo = fen_numero_movimento;
+
+  // Bitboard do enpassant
+  simulado.en_passant_brancas = (fen_jogando == "b" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+  simulado.en_passant_pretas = (fen_jogando == "w" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+
+  simulado.status_roque_esquerda_branco = (fen_roque.indexOf("K") != -1) ? true : false;
+  simulado.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
+  simulado.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
+  simulado.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
+
+  console.log("Jogando")
+  console.log(simulado.jogando);
+  console.log("En passant brancas")
+  console.log(simulado.en_passant_brancas);
+  console.log("En passant pretas")
+  console.log(simulado.en_passant_pretas);
+  console.log("roque esquerda branco")
+  console.log(simulado.status_roque_esquerda_branco);
+  console.log("roque direita branco")
+  console.log(simulado.status_roque_direita_branco);
+  console.log("roque esquerda preta")
+  console.log(simulado.status_roque_esquerda_preto);
+  console.log("roque direita preta")
+  console.log(simulado.status_roque_direita_preto);
+
+  for(let cont1 = 0; cont1 < 8; cont1++){
+    const linha_atual = fen_pecas[cont1].split("");
+    let casas_vazias = 0;
+
+    for(let cont2 = 0; cont2 < linha_atual.length; cont2++){
+      let potencia = (cont1 == 0) ? (cont1 + (cont2 + casas_vazias)) : (cont1 * 8 + (cont2 + casas_vazias));
+      let valor = BigInt(2 ** potencia);
+
+      switch(linha_atual[cont2]){
+        case "p":
+          simulado.bitboard_piao_preto |= valor;
+          break;
+        case "n":
+          simulado.bitboard_cavalo_preto |= valor;
+          break;
+        case "b":
+          simulado.bitboard_bispo_preto |= valor;
+          break;
+        case "r":
+          simulado.bitboard_torre_preto |= valor;
+          break;
+        case "q":
+          simulado.bitboard_rainha_preto |= valor;
+          break;
+        case "k":
+          simulado.bitboard_rei_preto |= valor;
+          break;
+        case "P":
+          simulado.bitboard_piao_branco |= valor;
+          break;
+        case "N":
+          simulado.bitboard_cavalo_branco |= valor;
+          break;
+        case "B":
+          simulado.bitboard_bispo_branco |= valor;
+          break;
+        case "R":
+          simulado.bitboard_torre_branco |= valor;
+          break;
+        case "Q":
+          simulado.bitboard_rainha_branco |= valor;
+          break;
+        case "K":
+          simulado.bitboard_rei_branco |= valor;
+          break;
+        default:
+          casas_vazias += Number(linha_atual[cont2]) - 1;
+          break;
+      }
+      
+      //console.log(`cont1: ${cont1} - cont2: ${cont2} - potencia é ${potencia} - valor é ${valor}`);
+    }
+  }
+  simulado.bitboard_pretas = simulado.bitboard_piao_preto | simulado.bitboard_cavalo_preto | simulado.bitboard_bispo_preto | simulado.bitboard_torre_preto | simulado.bitboard_rainha_preto | simulado.bitboard_rei_preto;
+  simulado.bitboard_brancas = simulado.bitboard_piao_branco | simulado.bitboard_cavalo_branco | simulado.bitboard_bispo_branco | simulado.bitboard_torre_branco | simulado.bitboard_rainha_branco | simulado.bitboard_rei_branco;
+  simulado.bitboard_tabuleiro = simulado.bitboard_pretas | simulado.bitboard_brancas;
+
+  sincronizar_estado_com_simulado();
+
+  return;  
 }

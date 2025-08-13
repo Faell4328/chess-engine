@@ -236,7 +236,6 @@ function calcular_ataque_e_movimento_pecas_piao(jogando, origem, deslocamento, o
     }
     // Verificando se um en passant é válido (se for um pião)
     else if(isMovimentoPiao == false && (destino & bitboard_en_passant_inimigo) !== 0n){
-      console.log("en passant adicionado")
       en_passant.push(destino);
       break;
     }

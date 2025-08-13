@@ -59,8 +59,37 @@ app.post('/mover', (req, res) => {
         fen: traducao.converterFEN()
       }
     }
+    else if(error.message == "FEN incompleto"){
+      response = {
+        status: "FEN incompleto",
+      }
+    }
 
     res.json(response);
+    return;
+  }
+});
+
+app.post('/fen', (req, res) => {
+
+  try{
+    const fen = req.body.fen;
+
+    traducao.desconverterFEN(fen);
+
+    const response = {
+      status: "ok",
+      fen: traducao.converterFEN()
+    }
+
+    res.json(response);
+    return;
+  }
+  catch(error){
+    console.log(error);
+    console.log(error.message);
+
+    res.end();
     return;
   }
 });
