@@ -1,25 +1,26 @@
+import { implementar } from './escritor.js';
 import { estado, simulado, sincronizar_estado_com_simulado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Recebe a coordenada normal e converte para binário.
 export function converter(valor){
-  console.log("\n-- Está convertendo de coordenadas para binário --\n");
+  implementar("\n-- Está convertendo de coordenadas para binário --\n");
   let potencia = 0;
   let binario = 0n;
   potencia = Number((valor[1])-1) * 8;
 
   
   if(Number(valor[0].toLowerCase() - "a".charCodeAt(0)) > 7){
-    console.log("Jogada invalida");
+    implementar("Jogada invalida");
     throw new Error("Inválido");
   }
   else if(Number(valor[1])  > 8){
-    console.log("Jogada invalida");
+    implementar("Jogada invalida");
     throw new Error("Inválido");
   }
   
   potencia += (valor[0].toLowerCase().charCodeAt(0) - "a".charCodeAt(0));
-  console.log("A é pontência é: 2^" + potencia);
+  implementar("A é pontência é: 2^" + potencia);
   binario = BigInt(2**potencia);
 
   return binario;
@@ -27,10 +28,10 @@ export function converter(valor){
 
 // Recebe o binário e converte para coordenada normal
 export function desconverter(valor){
-  console.log("\n-- Está convertendo de binário para coordenadas --\n");
-  console.log("Valor é: "+valor);
+  implementar("\n-- Está convertendo de binário para coordenadas --\n");
+  implementar("Valor é: "+valor);
 
-  console.log("O log é " + (valor.toString(2).length - 1))
+  implementar("O log é " + (valor.toString(2).length - 1))
   let log2 = (valor.toString(2).length -1);
   let linhas = 0;
   let colunas = 0;
@@ -45,8 +46,8 @@ export function desconverter(valor){
     }
   }
 
-  console.log(linhas)
-  console.log(colunas)
+  implementar(linhas)
+  implementar(colunas)
 
   let letra = String.fromCharCode(Number("a".charCodeAt(0)) + colunas);
   let numero = Number(linhas + 1);
@@ -57,7 +58,7 @@ export function desconverter(valor){
 // Gera o FEN com base nos bitboards e outra variáveis de controle do jogo
 export function converterFEN(){
 
-  console.log("\n-- Gerando FEN --\n");
+  implementar("\n-- Gerando FEN --\n");
 
   let fen = "";
   let casas_vazias = 0;
@@ -165,21 +166,21 @@ export function converterFEN(){
   // FEN com regra dos 50 lances (ainda não implementado)
   fen += ` ${estado.numero_lances_completo}`
 
-  console.log(fen);
+  implementar(fen + "\n\n\n\n------------------------------------------\n\n\n\n");
   return fen;
 }
 
 // Gera os bitboards com base no FEN (já salvando no simulado)
 export function desconverterFEN(fen){
 
-  console.log("\n-- Gerando bitboard com base no FEN --\n");
+  implementar("\n-- Gerando bitboard com base no FEN --\n");
 
   let fen_separado_completo = fen.split(" ");
   const fen_pecas = fen_separado_completo[0].split("/").reverse();
 
   // Verificando se o FEN está incompleto
   if(fen_separado_completo.length < 6){
-    console.log("O FEN é menor que o esperado");
+    implementar("O FEN é menor que o esperado");
     throw new Error("FEN incompleto");
   }
   
@@ -220,20 +221,20 @@ export function desconverterFEN(fen){
   simulado.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
   simulado.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
 
-  console.log("Jogando")
-  console.log(simulado.jogando);
-  console.log("En passant brancas")
-  console.log(simulado.en_passant_brancas);
-  console.log("En passant pretas")
-  console.log(simulado.en_passant_pretas);
-  console.log("roque esquerda branco")
-  console.log(simulado.status_roque_esquerda_branco);
-  console.log("roque direita branco")
-  console.log(simulado.status_roque_direita_branco);
-  console.log("roque esquerda preta")
-  console.log(simulado.status_roque_esquerda_preto);
-  console.log("roque direita preta")
-  console.log(simulado.status_roque_direita_preto);
+  implementar("Jogando")
+  implementar(simulado.jogando);
+  implementar("En passant brancas")
+  implementar(simulado.en_passant_brancas);
+  implementar("En passant pretas")
+  implementar(simulado.en_passant_pretas);
+  implementar("roque esquerda branco")
+  implementar(simulado.status_roque_esquerda_branco);
+  implementar("roque direita branco")
+  implementar(simulado.status_roque_direita_branco);
+  implementar("roque esquerda preta")
+  implementar(simulado.status_roque_esquerda_preto);
+  implementar("roque direita preta")
+  implementar(simulado.status_roque_direita_preto);
 
   for(let cont1 = 0; cont1 < 8; cont1++){
     const linha_atual = fen_pecas[cont1].split("");
@@ -262,6 +263,7 @@ export function desconverterFEN(fen){
         case "k":
           simulado.bitboard_rei_preto |= valor;
           break;
+
         case "P":
           simulado.bitboard_piao_branco |= valor;
           break;
@@ -280,19 +282,18 @@ export function desconverterFEN(fen){
         case "K":
           simulado.bitboard_rei_branco |= valor;
           break;
+          
         default:
           casas_vazias += Number(linha_atual[cont2]) - 1;
           break;
       }
       
-      //console.log(`cont1: ${cont1} - cont2: ${cont2} - potencia é ${potencia} - valor é ${valor}`);
+      //implementar(`cont1: ${cont1} - cont2: ${cont2} - potencia é ${potencia} - valor é ${valor}`);
     }
   }
   simulado.bitboard_pretas = simulado.bitboard_piao_preto | simulado.bitboard_cavalo_preto | simulado.bitboard_bispo_preto | simulado.bitboard_torre_preto | simulado.bitboard_rainha_preto | simulado.bitboard_rei_preto;
   simulado.bitboard_brancas = simulado.bitboard_piao_branco | simulado.bitboard_cavalo_branco | simulado.bitboard_bispo_branco | simulado.bitboard_torre_branco | simulado.bitboard_rainha_branco | simulado.bitboard_rei_branco;
   simulado.bitboard_tabuleiro = simulado.bitboard_pretas | simulado.bitboard_brancas;
-
-  sincronizar_estado_com_simulado();
 
   return;  
 }

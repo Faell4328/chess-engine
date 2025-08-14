@@ -4,7 +4,8 @@ import { resolve } from 'path';
 import * as movimentacao from './movimentacao.js';
 import * as traducao from './traducao.js';
 import { visualizadeiro } from './visualizador.js';
-import { zerar } from './variaveis.js';
+import { sincronizar_estado_com_simulado, zerar } from './variaveis.js';
+import { implementar, inicio } from './escritor.js';
 
 const app = express();
 
@@ -19,13 +20,13 @@ app.get("/", (req, res) => {
 app.post('/mover', (req, res) => {
 
   try{
-    const de = traducao.converter(req.body.de.toUpperCase());
-    const para = traducao.converter(req.body.para.toUpperCase());
+    const origem = traducao.converter(req.body.origem.toUpperCase());
+    const destino = traducao.converter(req.body.destino.toUpperCase());
 
-    console.log("\n-- Movimentação feita --\n");
-    console.log("A peça vai de: \n" + visualizadeiro(de) + '\n');
-    console.log("Para: \n" + visualizadeiro(para) + '\n');
-    movimentacao.mover(BigInt(de), BigInt(para), 0b111);
+    implementar("\n-- Movimento realizado feita --\n");
+    implementar("A peça vai de: \n" + visualizadeiro(origem) + '\n');
+    implementar("destino: \n" + visualizadeiro(destino) + '\n');
+    movimentacao.mover(BigInt(origem), BigInt(destino), 0b111);
 
     const response = {
       status: "ok",
@@ -76,6 +77,7 @@ app.post('/fen', (req, res) => {
     const fen = req.body.fen;
 
     traducao.desconverterFEN(fen);
+    sincronizar_estado_com_simulado();
 
     const response = {
       status: "ok",
@@ -102,5 +104,6 @@ app.get("/resetar", (req, res) => {
 })
 
 app.listen(4000 , () => {
+  inicio()
   console.log("Rodando servidor");
 });

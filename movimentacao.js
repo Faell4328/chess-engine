@@ -1,19 +1,21 @@
 import { Calcular } from './calcular.js';
+import { implementar } from './escritor.js';
 import { desconverter } from './traducao.js';
 import { estado, simulado, sincronizar_estado_com_simulado, sincronizar_simulado_com_estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Função orquestradora e que fica exporta (única).
-export function mover(de, para, promocao){
-  console.log("-- Iniciado a etapa de movimentação --");
+export function mover(origem, destino, promocao){
+
+  implementar("-- Iniciado a etapa de movimentação --");
 
   // Zerando os en passant caso tenha
   if(estado.jogando == "b" && estado.en_passant_pretas !== 0n){
-    console.log("Foi zerado o en passant das pretas");
+    implementar("Foi zerado o en passant das pretas");
     estado.en_passant_pretas = 0n;
   }
   else if(estado.jogando == "w" && estado.en_passant_brancas !== 0n){
-    console.log("Foi zerado o en passant das brancas");
+    implementar("Foi zerado o en passant das brancas");
     estado.en_passant_brancas = 0n;
   }
 
@@ -26,11 +28,11 @@ export function mover(de, para, promocao){
       const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
 
       if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
+        implementar("Xeque mate");
         throw new Error("Xeque Mate");
       }
       else{
-        console.log("Rei das brancas em xeque");
+        implementar("Rei das brancas em xeque");
       }
     }
   }
@@ -41,11 +43,11 @@ export function mover(de, para, promocao){
       const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
 
       if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
+        implementar("Xeque mate");
         throw new Error("Xeque Mate");
       }
       else{
-        console.log("Rei das pretas em xeque");
+        implementar("Rei das pretas em xeque");
       }
     }
   }
@@ -53,7 +55,7 @@ export function mover(de, para, promocao){
   // Verificando se o rei está em xeque. Caso o rei esteja em
 
   // Dentro da função já chama a classe para fazer a verificação e realizar o movimento.
-  descobrirPeca(de, para, promocao);
+  descobrirPeca(origem, destino, promocao);
 
   Calcular.verificar_rei_atacado("w");
   Calcular.verificar_rei_atacado("b");
@@ -62,12 +64,12 @@ export function mover(de, para, promocao){
 
   // Verificando se o movimento coloca o rei em xeque (brancas)
   if(estado.jogando == "w" && (simulado.rei_branco_em_ataque == true)){
-    console.log("O rei está em xeque");
+    implementar("O rei está em xeque");
     throw new Error("xeque");
   }
   // Verificando se o movimento coloca o rei em xeque (pretas)
   else if(estado.jogando == "b" && (simulado.rei_preto_em_ataque == true)){
-    console.log("O rei está em xeque");
+    implementar("O rei está em xeque");
     throw new Error("xeque");
   }
 
@@ -77,18 +79,18 @@ export function mover(de, para, promocao){
 
   // Verificando se a casa atacada é da torre e se o status de roque é true (evitando que o bitboard de roque fique desatualizado, caso a torre seja capturada)
   if(estado.jogando == "w"){
-    if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) && estado.status_roque_esquerda_preto == true){
+    if((destino == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) && estado.status_roque_esquerda_preto == true){
       estado.status_roque_esquerda_preto = false;
     }
-    else if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) && estado.status_roque_direita_preto == true){
+    else if((destino == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) && estado.status_roque_direita_preto == true){
       estado.status_roque_direita_preto = false;
     }
   }
   else{
-    if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) && estado.status_roque_esquerda_branco == true){
+    if((destino == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) && estado.status_roque_esquerda_branco == true){
       estado.status_roque_esquerda_branco = false;
     }
-    else if((para == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) && estado.status_roque_direita_branco == true){
+    else if((destino == estado.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) && estado.status_roque_direita_branco == true){
       estado.status_roque_direita_branco = false;
     }
   }
@@ -96,10 +98,10 @@ export function mover(de, para, promocao){
   estado.jogando = (estado.jogando == "w") ? "b" : "w";
 
   if(estado.jogando == "w"){
-    console.log("Brancas jogam");
+    implementar("Brancas jogam");
   }
   else{
-    console.log("Pretas jogam");
+    implementar("Pretas jogam");
   }
 
   // Brancas jogam
@@ -110,11 +112,11 @@ export function mover(de, para, promocao){
       const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
 
       if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
+        implementar("Xeque mate");
         throw new Error("Xeque Mate");
       }
       else{
-        console.log("Rei das brancas em xeque");
+        implementar("Rei das brancas em xeque");
       }
     }
   }
@@ -126,41 +128,41 @@ export function mover(de, para, promocao){
       const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
 
       if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
+        implementar("Xeque mate");
         throw new Error("Xeque Mate");
       }
       else{
-        console.log("Rei das pretas em xeque");
+        implementar("Rei das pretas em xeque");
       }
     }
   }
 }
 
 export function descobrirPeca(origem, destino){
-  console.log("\n\n-- Iniciado a etapa de verificação: peça movida --\n\n");
+  implementar("\n\n-- Iniciado a etapa de verificação: peça movida --\n\n");
 
   // Brancas jogam
   if(estado.jogando == "w"){
     if(estado.bitboard_piao_branco & origem){
-      console.log("A peça movida é piao brancas");
+      implementar("A peça movida é piao brancas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_piao("w", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de pião");
+        implementar("Você fez um movimento inválido de pião");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito um en passant
       if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
         Piao.efetuar_en_passant(origem, destino);
-        console.log("Foi feito um en passant");
+        implementar("Foi feito um en passant");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Piao.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
@@ -170,147 +172,147 @@ export function descobrirPeca(origem, destino){
         }
 
         Piao.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_cavalo_branco & origem){
-      console.log("A peça movida é cavalo brancas");
+      implementar("A peça movida é cavalo brancas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_cavalo("w", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de cavalo");
+        implementar("Você fez um movimento inválido de cavalo");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Cavalo.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Cavalo.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_bispo_branco & origem){
-      console.log("A peça movida é bispo brancas");
+      implementar("A peça movida é bispo brancas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_bispo("w", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de bispo");
+        implementar("Você fez um movimento inválido de bispo");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Bispo.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Bispo.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_torre_branco & origem){
-      console.log("A peça movida é torre brancas");
+      implementar("A peça movida é torre brancas");
       
       const movimentos_possiveis = Calcular.ataque_e_movimento_torre("w", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de torre");
+        implementar("Você fez um movimento inválido de torre");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Torre.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Torre.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_rainha_branco & origem){
-      console.log("A peça movida é rainha brancas");
+      implementar("A peça movida é rainha brancas");
       
       const movimentos_possiveis = Calcular.ataque_e_movimento_rainha("w", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de dama");
+        implementar("Você fez um movimento inválido de dama");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Dama.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Dama.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_rei_branco & origem){
-      console.log("A peça movida é rei brancas");
+      implementar("A peça movida é rei brancas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_rei("w", origem);
 
-      console.log("debugger 2");
-      console.log((movimentos_possiveis));
-      console.log(visualizadeiro(origem));
-      console.log(visualizadeiro(destino));
+      implementar("debugger 2");
+      movimentos_possiveis.todos.map((lance) => {
+        implementar(visualizadeiro(lance));
+      })
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de rei");
+        implementar("Você fez um movimento inválido de rei");
         throw new Error("Inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
         Rei.efetuar_roque_esquerda(origem, destino);
-        console.log("Foi feito roque para esquerda");
+        implementar("Foi feito roque para esquerda");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.roque_direita.length > 0) && movimentos_possiveis.roque_direita.includes(destino)){
         Rei.efetuar_roque_direita(origem, destino);
-        console.log("Foi feito roque para direita");
+        implementar("Foi feito roque para direita");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Rei.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Rei.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else{
-      console.log("Movimento invalido - tentou mover a peça adversária (vez das brancas e não pretas)");
+      implementar("Movimento invalido - tentou mover a peça adversária (vez das brancas e não pretas)");
       throw new Error("Inválido");
     }
   }
@@ -318,174 +320,174 @@ export function descobrirPeca(origem, destino){
   // Pretas jogam
   else{
     if(estado.bitboard_piao_preto & origem){
-      console.log("A peça movida é piao pretas");
+      implementar("A peça movida é piao pretas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_piao("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de pião");
+        implementar("Você fez um movimento inválido de pião");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito um en passant
       if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
         Piao.efetuar_en_passant(origem, destino);
-        console.log("Foi feito um en passant");
+        implementar("Foi feito um en passant");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Piao.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         // Verificando se foi feito um movimento duplo e se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
         if(((origem >> estado.movimento_piao[1]) == destino) && ((((destino << 1n) | (destino >> 1n)) & simulado.bitboard_piao_branco) != 0n)){
           simulado.en_passant_pretas = origem >> estado.movimento_piao[0];
-          console.log("Foi adicionado en passant")
+          implementar("Foi adicionado en passant")
         }
         else{
-          console.log("Não foi feito en passant")
+          implementar("Não foi feito en passant")
         }
 
         Piao.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_cavalo_preto & origem){
-      console.log("A peça movida é cavalo pretas");
+      implementar("A peça movida é cavalo pretas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_cavalo("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de cavalo");
+        implementar("Você fez um movimento inválido de cavalo");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Cavalo.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Cavalo.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_bispo_preto & origem){
-      console.log("A peça movida é bispo pretas");
+      implementar("A peça movida é bispo pretas");
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_bispo("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de bispo");
+        implementar("Você fez um movimento inválido de bispo");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Bispo.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Bispo.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_torre_preto & origem){
-      console.log("A peça movida é torre pretas");
+      implementar("A peça movida é torre pretas");
       
       const movimentos_possiveis = Calcular.ataque_e_movimento_torre("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de torre");
+        implementar("Você fez um movimento inválido de torre");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Torre.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Torre.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_rainha_preto & origem){
-      console.log("A peça movida é rainha pretas");
+      implementar("A peça movida é rainha pretas");
       
       const movimentos_possiveis = Calcular.ataque_e_movimento_rainha("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de dama");
+        implementar("Você fez um movimento inválido de dama");
         throw new Error("Inválido");
       }
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Dama.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Dama.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else if(estado.bitboard_rei_preto & origem){
-      console.log("A peça movida é rei pretas");
+      implementar("A peça movida é rei pretas");
 
      const movimentos_possiveis = Calcular.ataque_e_movimento_rei("b", origem);
 
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
-        console.log("Você fez um movimento inválido de rei");
+        implementar("Você fez um movimento inválido de rei");
         throw new Error("Inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
         Rei.efetuar_roque_esquerda(origem, destino);
-        console.log("Foi feito roque para esquerda");
+        implementar("Foi feito roque para esquerda");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.roque_direita.length > 0) && movimentos_possiveis.roque_direita.includes(destino)){
         Rei.efetuar_roque_direita(origem, destino);
-        console.log("Foi feito roque para direita");
+        implementar("Foi feito roque para direita");
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
         Rei.efetuar_captura(origem, destino);
-        console.log("Foi feito captura");
+        implementar("Foi feito captura");
       }
       // Entra se foi feito um movimento
       else{
         Rei.efetuar_movimento(origem, destino);
-        console.log("Foi feito movimento");
+        implementar("Foi feito movimento");
       }
 
       return;
     }
     else{
-      console.log("Movimento invalido - tentou mover a peça adversária (vez das pretas e não brancas)");
+      implementar("Movimento invalido - tentou mover a peça adversária (vez das pretas e não brancas)");
       throw new Error("Inválido");
     }
   }
@@ -536,7 +538,7 @@ class Piao{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_piao_branco ^= movimentacao;
-      console.log("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_branco) + '\n');
+      implementar("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -548,7 +550,7 @@ class Piao{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_piao_preto ^= movimentacao;
-      console.log("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_preto) + '\n');
+      implementar("Bitboard do pião: \n" + visualizadeiro(simulado.bitboard_piao_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -591,7 +593,7 @@ class Cavalo{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_cavalo_branco ^= movimentacao;
-      console.log("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_branco) + '\n');
+      implementar("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -604,7 +606,7 @@ class Cavalo{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_cavalo_preto^= movimentacao;
-      console.log("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_preto) + '\n');
+      implementar("Bitboard do cavalo: \n" + visualizadeiro(simulado.bitboard_cavalo_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -646,7 +648,7 @@ class Bispo{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_bispo_branco ^= movimentacao;
-      console.log("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_branco) + '\n');
+      implementar("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -658,7 +660,7 @@ class Bispo{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_bispo_preto ^= movimentacao;
-      console.log("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_preto) + '\n');
+      implementar("Bitboard do bispo: \n" + visualizadeiro(simulado.bitboard_bispo_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -708,7 +710,7 @@ class Torre{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_torre_branco ^= movimentacao;
-      console.log("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_branco) + '\n');
+      implementar("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -729,7 +731,7 @@ class Torre{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_torre_preto ^= movimentacao;
-      console.log("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_preto) + '\n');
+      implementar("Bitboard da torre: \n" + visualizadeiro(simulado.bitboard_torre_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -772,7 +774,7 @@ class Dama{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_rainha_branco ^= movimentacao;
-      console.log("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
+      implementar("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -785,7 +787,7 @@ class Dama{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_rainha_preto ^= movimentacao;
-      console.log("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
+      implementar("Bitboard da dama: \n" + visualizadeiro(simulado.bitboard_rainha_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -874,7 +876,7 @@ class Rei{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_rei_branco ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_branco) + '\n');
+      implementar("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_branco) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -890,7 +892,7 @@ class Rei{
       // Realizando movimento
       const movimentacao = origem | destino;
       simulado.bitboard_rei_preto ^= movimentacao;
-      console.log("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_preto) + '\n');
+      implementar("Bitboard do rei: \n" + visualizadeiro(simulado.bitboard_rei_preto) + '\n');
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -902,13 +904,13 @@ class Rei{
 function atualizarTabuleiro(){
   // Atualizando o bitboard de todas as peças brancas
   simulado.bitboard_brancas = simulado.bitboard_piao_branco | simulado.bitboard_cavalo_branco | simulado.bitboard_bispo_branco | simulado.bitboard_torre_branco | simulado.bitboard_rainha_branco | simulado.bitboard_rei_branco;
-  console.log("Bitboard das brancas (todas peças): \n" + visualizadeiro(simulado.bitboard_brancas) + '\n');
+  implementar("Bitboard das brancas (todas peças): \n" + visualizadeiro(simulado.bitboard_brancas) + '\n');
 
   // Atualizando o bitboard de todas as peças pretas
   simulado.bitboard_pretas = simulado.bitboard_piao_preto | simulado.bitboard_cavalo_preto | simulado.bitboard_bispo_preto | simulado.bitboard_torre_preto | simulado.bitboard_rainha_preto | simulado.bitboard_rei_preto;
-  console.log("Bitboard das pretas (todas peças): \n" + visualizadeiro(simulado.bitboard_pretas) + '\n');
+  implementar("Bitboard das pretas (todas peças): \n" + visualizadeiro(simulado.bitboard_pretas) + '\n');
   
   // Atualizando o bitboard com todas as casas ocupadas
   simulado.bitboard_tabuleiro = simulado.bitboard_brancas | simulado.bitboard_pretas;
-  console.log("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(simulado.bitboard_tabuleiro) + '\n');
+  implementar("Bitboard do tabuleiro (um todo): \n" + visualizadeiro(simulado.bitboard_tabuleiro) + '\n');
 }
