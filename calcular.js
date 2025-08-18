@@ -919,3 +919,40 @@ export class Calcular{
     return todos_possiveis_movimentos_defesa_rei;
   }
 }
+
+export function verificar_se_esta_em_xeque(jogando){
+  // Brancas jogam
+  if(jogando == "w"){
+    Calcular.verificar_rei_atacado("w");
+    if(partida_virtual.rei_branco_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        process.exit(0);
+      }
+      else{
+        // Está em xeque
+        return true;
+      }
+    }
+    // Não está em xeque ou xeque mate
+    return false;
+  }
+  // Pretas jogam
+  else{
+    Calcular.verificar_rei_atacado("b");
+    if(partida_virtual.rei_preto_em_ataque == true){
+      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
+      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
+
+      if(todos_possiveis_movimentos_defesa_rei.length == 0){
+        console.log("Xeque mate");
+        process.exit(0);
+      }
+    }
+    // Não está em xeque ou xeque mate
+    return false;
+  }
+}

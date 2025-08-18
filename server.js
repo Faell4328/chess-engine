@@ -51,7 +51,6 @@ app.post('/fen', (req, res) => {
     const fen = req.body.fen;
 
     desconverterFEN(fen);
-    sincronizar_estado_com_simulado();
 
     const response = {
       status: "ok",
@@ -78,6 +77,5 @@ app.get("/resetar", (req, res) => {
 })
 
 app.listen(4000 , () => {
-  inicio()
   console.log("Rodando servidor");
 });

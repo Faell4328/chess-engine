@@ -1,4 +1,4 @@
-import { partida, partida_virtual } from './variaveis.js'
+import { partida, zerar } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Recebe a coordenada normal e converte para binário.
@@ -158,6 +158,8 @@ export function converterFEN(){
 // Gera os bitboards com base no FEN (já salvando no simulado)
 export function desconverterFEN(fen){
 
+  zerar();
+
   let fen_separado_completo = fen.split(" ");
   const fen_pecas = fen_separado_completo[0].split("/").reverse();
 
@@ -177,31 +179,31 @@ export function desconverterFEN(fen){
   let cont = 0;
 
   // Bitboard das peças
-  partida_virtual.bitboard_piao_branco = 0n;
-  partida_virtual.bitboard_piao_preto = 0n;
-  partida_virtual.bitboard_bispo_branco = 0n;
-  partida_virtual.bitboard_bispo_preto = 0n;
-  partida_virtual.bitboard_cavalo_branco = 0n;
-  partida_virtual.bitboard_cavalo_preto = 0n;
-  partida_virtual.bitboard_torre_branco = 0n;
-  partida_virtual.bitboard_torre_preto = 0n;
-  partida_virtual.bitboard_rainha_branco = 0n;
-  partida_virtual.bitboard_rainha_preto = 0n;
-  partida_virtual.bitboard_rei_branco = 0n;
-  partida_virtual.bitboard_rei_preto = 0n;
+  partida.bitboard_piao_branco = 0n;
+  partida.bitboard_piao_preto = 0n;
+  partida.bitboard_bispo_branco = 0n;
+  partida.bitboard_bispo_preto = 0n;
+  partida.bitboard_cavalo_branco = 0n;
+  partida.bitboard_cavalo_preto = 0n;
+  partida.bitboard_torre_branco = 0n;
+  partida.bitboard_torre_preto = 0n;
+  partida.bitboard_rainha_branco = 0n;
+  partida.bitboard_rainha_preto = 0n;
+  partida.bitboard_rei_branco = 0n;
+  partida.bitboard_rei_preto = 0n;
 
   // Bitboard de quem joga 
-  partida_virtual.jogando = fen_jogando;
-  partida_virtual.numero_lances_completo = fen_numero_movimento;
+  partida.jogando = fen_jogando;
+  partida.numero_lances_completo = fen_numero_movimento;
 
   // Bitboard do enpassant
-  partida_virtual.en_passant_brancas = (fen_jogando == "b" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
-  partida_virtual.en_passant_pretas = (fen_jogando == "w" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+  partida.en_passant_brancas = (fen_jogando == "b" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+  partida.en_passant_pretas = (fen_jogando == "w" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
 
-  partida_virtual.status_roque_esquerda_branco = (fen_roque.indexOf("K") != -1) ? true : false;
-  partida_virtual.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
-  partida_virtual.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
-  partida_virtual.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
+  partida.status_roque_esquerda_branco = (fen_roque.indexOf("K") != -1) ? true : false;
+  partida.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
+  partida.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
+  partida.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
 
   for(let cont1 = 0; cont1 < 8; cont1++){
     const linha_atual = fen_pecas[cont1].split("");
@@ -213,41 +215,41 @@ export function desconverterFEN(fen){
 
       switch(linha_atual[cont2]){
         case "p":
-          partida_virtual.bitboard_piao_preto |= valor;
+          partida.bitboard_piao_preto |= valor;
           break;
         case "n":
-          partida_virtual.bitboard_cavalo_preto |= valor;
+          partida.bitboard_cavalo_preto |= valor;
           break;
         case "b":
-          partida_virtual.bitboard_bispo_preto |= valor;
+          partida.bitboard_bispo_preto |= valor;
           break;
         case "r":
-          partida_virtual.bitboard_torre_preto |= valor;
+          partida.bitboard_torre_preto |= valor;
           break;
         case "q":
-          partida_virtual.bitboard_rainha_preto |= valor;
+          partida.bitboard_rainha_preto |= valor;
           break;
         case "k":
-          partida_virtual.bitboard_rei_preto |= valor;
+          partida.bitboard_rei_preto |= valor;
           break;
 
         case "P":
-          partida_virtual.bitboard_piao_branco |= valor;
+          partida.bitboard_piao_branco |= valor;
           break;
         case "N":
-          partida_virtual.bitboard_cavalo_branco |= valor;
+          partida.bitboard_cavalo_branco |= valor;
           break;
         case "B":
-          partida_virtual.bitboard_bispo_branco |= valor;
+          partida.bitboard_bispo_branco |= valor;
           break;
         case "R":
-          partida_virtual.bitboard_torre_branco |= valor;
+          partida.bitboard_torre_branco |= valor;
           break;
         case "Q":
-          partida_virtual.bitboard_rainha_branco |= valor;
+          partida.bitboard_rainha_branco |= valor;
           break;
         case "K":
-          partida_virtual.bitboard_rei_branco |= valor;
+          partida.bitboard_rei_branco |= valor;
           break;
           
         default:
@@ -257,9 +259,9 @@ export function desconverterFEN(fen){
       
     }
   }
-  partida_virtual.bitboard_de_todas_pecas_pretas = partida_virtual.bitboard_piao_preto | partida_virtual.bitboard_cavalo_preto | partida_virtual.bitboard_bispo_preto | partida_virtual.bitboard_torre_preto | partida_virtual.bitboard_rainha_preto | partida_virtual.bitboard_rei_preto;
-  partida_virtual.bitboard_de_todas_pecas_brancas = partida_virtual.bitboard_piao_branco | partida_virtual.bitboard_cavalo_branco | partida_virtual.bitboard_bispo_branco | partida_virtual.bitboard_torre_branco | partida_virtual.bitboard_rainha_branco | partida_virtual.bitboard_rei_branco;
-  partida_virtual.bitboard_de_todas_as_pecas_do_tabuleiro = partida_virtual.bitboard_de_todas_pecas_pretas | partida_virtual.bitboard_de_todas_pecas_brancas;
+  partida.bitboard_de_todas_pecas_pretas = partida.bitboard_piao_preto | partida.bitboard_cavalo_preto | partida.bitboard_bispo_preto | partida.bitboard_torre_preto | partida.bitboard_rainha_preto | partida.bitboard_rei_preto;
+  partida.bitboard_de_todas_pecas_brancas = partida.bitboard_piao_branco | partida.bitboard_cavalo_branco | partida.bitboard_bispo_branco | partida.bitboard_torre_branco | partida.bitboard_rainha_branco | partida.bitboard_rei_branco;
+  partida.bitboard_de_todas_as_pecas_do_tabuleiro = partida.bitboard_de_todas_pecas_pretas | partida.bitboard_de_todas_pecas_brancas;
 
   return;  
 }

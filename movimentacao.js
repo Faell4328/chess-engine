@@ -1,7 +1,5 @@
-import { Calcular } from './calcular.js';
-import { desconverter } from './traducao.js';
+import { Calcular, verificar_se_esta_em_xeque } from './calcular.js';
 import { partida, partida_virtual, informacoes_xadrez, sincronizar_estado_com_simulado, sincronizar_simulado_com_estado } from './variaveis.js'
-import { visualizadeiro } from './visualizador.js';
 
 // Função orquestradora e que fica exporta (única).
 export function mover(origem, destino, promocao){
@@ -16,47 +14,20 @@ export function mover(origem, destino, promocao){
 
   sincronizar_simulado_com_estado();
 
-  // Verificando se o rei está atacado
-  if(partida.jogando == "w"){
-    Calcular.verificar_rei_atacado("w");
-    if(partida_virtual.rei_branco_em_ataque == true){
-      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
-      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
-
-      if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
-        process.exit(0);
-      }
-    }
-  }
-  else{
-    Calcular.verificar_rei_atacado("b");
-    if(partida_virtual.rei_preto_em_ataque == true){
-      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
-      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
-
-      if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
-        process.exit(0);
-      }
-    }
-  }
-
   // Desobre a peça e já realiza o movimento
   descobrirPeca(origem, destino, promocao);
 
   // Verificando se o movimento realizado coloquei o rei em xeque
-  (partida.jogando == "w") ? Calcular.verificar_rei_atacado("w") : Calcular.verificar_rei_atacado("b");
+  Calcular.verificar_rei_atacado("w");
+  Calcular.verificar_rei_atacado("b");
 
   // Verificando se o movimento coloca o rei em xeque (brancas)
   if(partida.jogando == "w" && (partida_virtual.rei_branco_em_ataque == true)){
-    console.log("Xeque mate");
-    process.exit(0);
+    throw new Error("Movimento Inválido - esse movimento coloca o rei em xeque");
   }
   // Verificando se o movimento coloca o rei em xeque (pretas)
   else if(partida.jogando == "b" && (partida_virtual.rei_preto_em_ataque == true)){
-    console.log("Xeque mate");
-    process.exit(0);
+    throw new Error("Movimento Inválido - esse movimento coloca o rei em xeque");
   }
 
   // Efetivando o movimento (OBS: o rei não está em xeque)
@@ -85,37 +56,13 @@ export function mover(origem, destino, promocao){
 
   partida.jogando = (partida.jogando == "w") ? "b" : "w";
 
-  // Brancas jogam
-  if(partida.jogando == "w"){
-    Calcular.verificar_rei_atacado("w");
-    if(partida_virtual.rei_branco_em_ataque == true){
-      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
-      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("w", todos_possiveis_movimentos);
-
-      if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
-        process.exit(0);
-      }
-    }
-  }
-  // Pretas jogam
-  else{
-    Calcular.verificar_rei_atacado("b");
-    if(partida_virtual.rei_preto_em_ataque == true){
-      const todos_possiveis_movimentos = Calcular.calcular_todos_possiveis_movimento();
-      const todos_possiveis_movimentos_defesa_rei = Calcular.calcular_defesa_rei("b", todos_possiveis_movimentos);
-
-      if(todos_possiveis_movimentos_defesa_rei.length == 0){
-        console.log("Xeque mate");
-        process.exit(0);
-      }
-    }
-  }
+  verificar_se_esta_em_xeque(partida.jogando);
 }
 
 export function descobrirPeca(origem, destino){
   // Brancas jogam
   if(partida.jogando == "w"){
+    // Verificando se a peça movida é um pião das brancas
     if(partida.bitboard_piao_branco & origem){
       const movimentos_possiveis = Calcular.ataque_e_movimento_piao("w", origem);
 
@@ -130,7 +77,8 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Piao.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Piao.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -144,6 +92,8 @@ export function descobrirPeca(origem, destino){
 
       return;
     }
+
+    // Verificando se a peça movida é um cavalo da brancas
     else if(partida.bitboard_cavalo_branco & origem){
       const movimentos_possiveis = Calcular.ataque_e_movimento_cavalo("w", origem);
 
@@ -154,7 +104,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Cavalo.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Cavalo.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -173,7 +124,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Bispo.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Bispo.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -193,7 +145,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Torre.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Torre.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -213,7 +166,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Dama.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Dama.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -240,7 +194,8 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Rei.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Rei.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -271,7 +226,8 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Piao.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Rei.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -298,7 +254,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Cavalo.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Cavalo.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -318,7 +275,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Bispo.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Bispo.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -338,7 +296,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Torre.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Torre.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -358,7 +317,8 @@ export function descobrirPeca(origem, destino){
 
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Dama.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Dama.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -385,7 +345,8 @@ export function descobrirPeca(origem, destino){
       }
       // Entra se foi feito uma captura
       else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        Rei.efetuar_captura(origem, destino);
+        efetuar_captura(origem, destino);
+        Rei.efetuar_movimento(origem, destino);
       }
       // Entra se foi feito um movimento
       else{
@@ -416,35 +377,13 @@ class Piao{
     this.efetuar_movimento(origem, destino);
     return;
   }
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-    // Pretas jogam
-    else{
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
-  }
   
   static efetuar_movimento(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_piao_branco ^= movimentacao;
+      partida_virtual.bitboard_piao_branco ^= origem;
+      partida_virtual.bitboard_piao_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -454,8 +393,8 @@ class Piao{
     // Pretas jogam
     else{
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_piao_preto ^= movimentacao;
+      partida_virtual.bitboard_piao_preto ^= origem;
+      partida_virtual.bitboard_piao_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -466,38 +405,13 @@ class Piao{
 }
 
 class Cavalo{
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-
-    // Pretas jogam
-    else{
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
-  }
-
   static efetuar_movimento(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_cavalo_branco ^= movimentacao;
+      partida_virtual.bitboard_cavalo_branco ^= origem;
+      partida_virtual.bitboard_cavalo_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -508,8 +422,8 @@ class Cavalo{
     else{
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_cavalo_preto^= movimentacao;
+      partida_virtual.bitboard_cavalo_preto ^= origem;
+      partida_virtual.bitboard_cavalo_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -520,37 +434,12 @@ class Cavalo{
 }
 
 class Bispo{
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-
-    // Pretas jogam
-    else{
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
-  }
-
   static efetuar_movimento(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_bispo_branco ^= movimentacao;
+      partida_virtual.bitboard_bispo_branco ^= origem;
+      partida_virtual.bitboard_bispo_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -560,8 +449,8 @@ class Bispo{
     // Pretas jogam
     else{
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_bispo_preto ^= movimentacao;
+      partida_virtual.bitboard_bispo_preto ^= origem;
+      partida_virtual.bitboard_bispo_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -571,31 +460,6 @@ class Bispo{
 }
 
 class Torre{
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      // Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-
-    // Pretas jogam
-    else{
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
-  }
-  
   static efetuar_movimento(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
@@ -609,8 +473,8 @@ class Torre{
       }
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_torre_branco ^= movimentacao;
+      partida_virtual.bitboard_torre_branco ^= origem;
+      partida_virtual.bitboard_torre_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -629,8 +493,8 @@ class Torre{
       }
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_torre_preto ^= movimentacao;
+      partida_virtual.bitboard_torre_preto ^= origem;
+      partida_virtual.bitboard_torre_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -641,38 +505,13 @@ class Torre{
 }
 
 class Dama{
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-
-    // Pretas jogam
-    else{
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
-  }
-
   static efetuar_movimento(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_rainha_branco ^= movimentacao;
+      partida_virtual.bitboard_rainha_branco ^= origem;
+      partida_virtual.bitboard_rainha_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -683,8 +522,8 @@ class Dama{
     else{
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_rainha_preto ^= movimentacao;
+      partida_virtual.bitboard_rainha_preto ^= origem;
+      partida_virtual.bitboard_rainha_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -695,6 +534,7 @@ class Dama{
 
 class Rei{
   static efetuar_roque_esquerda(){
+
     // Brancas jogam
     if(partida.jogando == "w"){
       partida_virtual.bitboard_torre_branco = ((partida.bitboard_torre_branco ^ 0x0000000000000001n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
@@ -720,7 +560,7 @@ class Rei{
   static efetuar_roque_direita(){
     // Brancas jogam
     if(partida.jogando == "w"){
-      partida_virtual.bitboard_torre_branco = ((partida.bitboard_torre_branco ^ 0x0000000000000080n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
+      partida_virtual.bitboard_torre_branco = ((partida_virtual.bitboard_torre_branco ^ 0x0000000000000080n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
       partida_virtual.bitboard_rei_branco = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
       partida_virtual.status_roque_esquerda_branco = false;
       partida_virtual.status_roque_direita_branco = false;
@@ -730,37 +570,13 @@ class Rei{
 
     // Pretas jogam
     else{
-      partida_virtual.bitboard_torre_preto = ((partida.bitboard_torre_preto ^ 0x8000000000000000n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
+      partida_virtual.bitboard_torre_preto = ((partida_virtual.bitboard_torre_preto ^ 0x8000000000000000n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
       partida_virtual.bitboard_rei_preto = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
       partida_virtual.status_roque_esquerda_preto = false;
       partida_virtual.status_roque_direita_preto = false;
       atualizarTabuleiro();
       return;
     }
-  }
-
-  static efetuar_captura(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
-      partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
-      partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
-      partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
-      partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
-    }
-    // Pretas jogam
-    else{
-      //  Atualizando o bitboard das pretas (capturando a peça)
-      partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
-      partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
-      partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
-      partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
-      partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
-    }
-
-    this.efetuar_movimento(origem, destino);
-    return;
   }
 
   static efetuar_movimento(origem, destino){
@@ -771,8 +587,8 @@ class Rei{
       partida_virtual.status_roque_esquerda_branco = false;
 
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_rei_branco ^= movimentacao;
+      partida_virtual.bitboard_rei_branco ^= origem;
+      partida_virtual.bitboard_rei_branco |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
@@ -786,14 +602,35 @@ class Rei{
       partida_virtual.status_roque_esquerda_preto = false;
         
       // Realizando movimento
-      const movimentacao = origem | destino;
-      partida_virtual.bitboard_rei_preto ^= movimentacao;
+      partida_virtual.bitboard_rei_preto ^= origem;
+      partida_virtual.bitboard_rei_preto |= destino;
 
       // Atualiza todos os bitboards restantes
       atualizarTabuleiro();
       return;
     }
   }
+}
+
+function efetuar_captura(origem, destino){
+  // Brancas jogam
+  if(partida.jogando == "w"){
+    //  Atualizando o bitboard das pretas (capturando a peça)
+    partida_virtual.bitboard_piao_preto ^= (partida_virtual.bitboard_piao_preto & destino);
+    partida_virtual.bitboard_cavalo_preto ^= (partida_virtual.bitboard_cavalo_preto & destino);
+    partida_virtual.bitboard_bispo_preto ^= (partida_virtual.bitboard_bispo_preto & destino);
+    partida_virtual.bitboard_torre_preto ^= (partida_virtual.bitboard_torre_preto & destino);
+    partida_virtual.bitboard_rainha_preto ^= (partida_virtual.bitboard_rainha_preto & destino);
+  }
+  // Pretas jogam
+  else{
+    partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
+    partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
+    partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
+    partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
+    partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
+  }
+  return;
 }
 
 function atualizarTabuleiro(){
