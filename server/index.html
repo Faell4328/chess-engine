@@ -1,9 +1,3 @@
-<style>
-  .highlight-check {
-    background-color: red !important;
-  }
-</style>
-
 <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" crossorigin="anonymous"></script>
@@ -13,10 +7,10 @@
 <script>
 
   async function fen_personalizado(){
-    let fen = document.getElementById("fen");
+    let campo_input_contendo_fen_personalizado = document.getElementById("fen");
 
     // Verificando se o FEN está vazio
-    if(fen == ""){
+    if(campo_input_contendo_fen_personalizado == ""){
       alert("O FEN está vazio");
     }
 
@@ -26,7 +20,7 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "fen": fen.value
+        "fen": campo_input_contendo_fen_personalizado.value
       })
     })
     
@@ -37,8 +31,8 @@
       return;
     }
 
-    board.position(fen.value);
-    fen.value = ""
+    board.position(campo_input_contendo_fen_personalizado.value);
+    campo_input_contendo_fen_personalizado.value = ""
   }
   
   async function start(){
@@ -56,15 +50,7 @@
     console.clear();
   };
   
-  async function onDrop (source, target, piece, newPos, oldPos, orientation) {
-    // console.log('Source: ' + source)
-    // console.log('Target: ' + target)
-    // console.log('Piece: ' + piece)
-    // console.log('New position: ' + Chessboard.objToFen(newPos))
-    // console.log('Old position: ' + Chessboard.objToFen(oldPos))
-    // console.log('Orientation: ' + orientation)
-    // console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
-
+  async function onDrop (source, target) {
     const retorno = await fetch('http://localhost:4000/mover', {
       method: 'POST',
       headers: {
@@ -90,23 +76,9 @@
       board.position(retornoApi.fen);
       return;
     }
-    else if(retornoApi.status == "invalido"){
-      alert("Movimento inválido");
-      board.position(retornoApi.fen);
-      return;
-    }
-    else if(retornoApi.status == "xeque"){
-      alert("Você está em xeque");
-      board.position(retornoApi.fen);
-      return;
-    }
-    else if(retornoApi.status == "FEN incompleto"){
-      alert("O FEM está incompleto");
-      board.position(retornoApi.fen);
-      return;
-    }
     else{
-      alert("Xeque mate");
+      alert(retornoApi.status);
+      board.position(retornoApi.fen);
       return;
     }
   }

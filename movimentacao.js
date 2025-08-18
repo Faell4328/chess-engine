@@ -151,7 +151,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de pião");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito um en passant
@@ -185,7 +185,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de cavalo");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -209,7 +209,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de bispo");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -233,7 +233,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de torre");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -257,7 +257,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de dama");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -278,15 +278,10 @@ export function descobrirPeca(origem, destino){
 
       const movimentos_possiveis = Calcular.ataque_e_movimento_rei("w", origem);
 
-      implementar("debugger 2");
-      movimentos_possiveis.todos.map((lance) => {
-        implementar(visualizadeiro(lance));
-      })
-
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de rei");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
@@ -313,7 +308,7 @@ export function descobrirPeca(origem, destino){
     }
     else{
       implementar("Movimento invalido - tentou mover a peça adversária (vez das brancas e não pretas)");
-      throw new Error("Inválido");
+      throw new Error("Movimento inválido");
     }
   }
 
@@ -327,7 +322,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de pião");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito um en passant
@@ -365,7 +360,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de cavalo");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -389,7 +384,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de bispo");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -413,7 +408,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de torre");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -437,7 +432,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de dama");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
 
       // Entra se foi feito uma captura
@@ -461,7 +456,7 @@ export function descobrirPeca(origem, destino){
       // Verificando se o lance feito é um lance inválido
       if(movimentos_possiveis.todos.includes(destino) == false){
         implementar("Você fez um movimento inválido de rei");
-        throw new Error("Inválido");
+        throw new Error("Movimento inválido");
       }
       // Entra se foi feito um roque para direita
       else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
@@ -488,7 +483,7 @@ export function descobrirPeca(origem, destino){
     }
     else{
       implementar("Movimento invalido - tentou mover a peça adversária (vez das pretas e não brancas)");
-      throw new Error("Inválido");
+      throw new Error("Movimento inválido");
     }
   }
 }

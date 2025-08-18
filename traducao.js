@@ -12,11 +12,11 @@ export function converter(valor){
   
   if(Number(valor[0].toLowerCase() - "a".charCodeAt(0)) > 7){
     implementar("Jogada invalida");
-    throw new Error("Inválido");
+    throw new Error("Movimento inválido");
   }
   else if(Number(valor[1])  > 8){
     implementar("Jogada invalida");
-    throw new Error("Inválido");
+    throw new Error("Movimento inválido");
   }
   
   potencia += (valor[0].toLowerCase().charCodeAt(0) - "a".charCodeAt(0));

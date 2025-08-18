@@ -43,27 +43,9 @@ app.post('/mover', (req, res) => {
     console.log(error);
     console.log(error.message);
 
-    if(error.message == "Inválido"){
-      response = {
-        status: "invalido",
-        fen: traducao.converterFEN()
-      }
-    }
-    else if(error.message == "Xeque Mate"){
-      response = {
-        status: "xeque mate"
-      }
-    }
-    else if(error.message == "xeque"){
-      response = {
-        status: "xeque",
-        fen: traducao.converterFEN()
-      }
-    }
-    else if(error.message == "FEN incompleto"){
-      response = {
-        status: "FEN incompleto",
-      }
+    response = {
+      status: error.message,
+      fen: traducao.converterFEN(),
     }
 
     res.json(response);

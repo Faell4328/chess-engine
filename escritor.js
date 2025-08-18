@@ -7,6 +7,13 @@ export function inicio(){
             console.log("Erro ao abrir o arquivo de log");
             process.exit(0);
         }
+
+        fs.write(arquivo, "-- Iniciando --", (error) => {
+            if(error){
+                console.log("Erro ao salvar log");
+                process.exit(0);
+            }
+        })
     });
 }
 
@@ -18,7 +25,7 @@ export function implementar(texto){
             process.exit(0);
         }
 
-        fs.write(arquivo, texto, (error) => {
+        fs.write(arquivo, texto.toString()+"\n", (error) => {
             if(error){
                 console.log("Erro ao salvar log");
                 process.exit(0);

@@ -1,4 +1,5 @@
 // Arquivo responsável por realizar os calculos (possibilidades de movimento)
+import { implementar } from "./escritor.js";
 import { descobrirPeca } from "./movimentacao.js";
 import { converter } from "./traducao.js";
 import { estado, simulado, sincronizar_simulado_com_estado } from "./variaveis.js";
@@ -592,7 +593,7 @@ export class Calcular{
       capturas: [],
       roque_esquerda: [],
       roque_direita: [],
-    };;
+    };
 
     retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente, "<<", (estado.bitboard_casas_linha_8));
     lances = {
@@ -622,7 +623,6 @@ export class Calcular{
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-
     retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_frente, ">>", (estado.bitboard_casas_linha_1));
     lances = {
       todos: [...lances.todos, ...retorno.todos],
@@ -651,13 +651,6 @@ export class Calcular{
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, estado.movimento_rei_direita, ">>", 0n, true);
-    lances = {
-      todos: [...lances.todos, ...retorno.todos],
-      movimentos: [...lances.movimentos, ...retorno.movimentos],
-      capturas: [...lances.capturas, ...retorno.capturas],
-    };
-
     retorno = verificar_roque_peca_rei(jogando);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
@@ -666,8 +659,7 @@ export class Calcular{
       roque_esquerda: [...retorno.roque_esquerda],
       roque_direita: [...retorno.roque_direita],
     };
-
-
+    
     if(simplificar_retorno == true){
       return lances.todos;
     }
