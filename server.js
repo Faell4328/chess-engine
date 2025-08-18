@@ -1,9 +1,8 @@
 import express from 'express';
 import { resolve } from 'path';
 
-import * as movimentacao from './movimentacao.js';
-import * as traducao from './traducao.js';
-import { visualizadeiro } from './visualizador.js';
+import { mover } from './movimentacao.js';
+import { converter, converterFEN, desconverterFEN } from './traducao.js';
 import { sincronizar_estado_com_simulado, zerar } from './variaveis.js';
 
 const app = express();
@@ -19,14 +18,14 @@ app.get("/", (req, res) => {
 app.post('/mover', (req, res) => {
 
   try{
-    const origem = traducao.converter(req.body.origem.toUpperCase());
-    const destino = traducao.converter(req.body.destino.toUpperCase());
+    const origem = converter(req.body.origem.toUpperCase());
+    const destino = converter(req.body.destino.toUpperCase());
 
-    movimentacao.mover(BigInt(origem), BigInt(destino), 0b111);
+    mover(BigInt(origem), BigInt(destino), 0b111);
 
     const response = {
       status: "ok",
-      fen: traducao.converterFEN()
+      fen: converterFEN()
     }
 
     res.json(response);
@@ -36,12 +35,9 @@ app.post('/mover', (req, res) => {
 
     let response
 
-    console.log(error);
-    console.log(error.message);
-
     response = {
       status: error.message,
-      fen: traducao.converterFEN(),
+      fen: converterFEN(),
     }
 
     res.json(response);
@@ -54,12 +50,12 @@ app.post('/fen', (req, res) => {
   try{
     const fen = req.body.fen;
 
-    traducao.desconverterFEN(fen);
+    desconverterFEN(fen);
     sincronizar_estado_com_simulado();
 
     const response = {
       status: "ok",
-      fen: traducao.converterFEN()
+      fen: converterFEN()
     }
 
     res.json(response);
