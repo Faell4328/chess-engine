@@ -5,7 +5,6 @@ import * as movimentacao from './movimentacao.js';
 import * as traducao from './traducao.js';
 import { visualizadeiro } from './visualizador.js';
 import { sincronizar_estado_com_simulado, zerar } from './variaveis.js';
-import { implementar, inicio } from './escritor.js';
 
 const app = express();
 
@@ -23,9 +22,6 @@ app.post('/mover', (req, res) => {
     const origem = traducao.converter(req.body.origem.toUpperCase());
     const destino = traducao.converter(req.body.destino.toUpperCase());
 
-    implementar("\n-- Movimento realizado feita --\n");
-    implementar("A peça vai de: \n" + visualizadeiro(origem) + '\n');
-    implementar("destino: \n" + visualizadeiro(destino) + '\n');
     movimentacao.mover(BigInt(origem), BigInt(destino), 0b111);
 
     const response = {

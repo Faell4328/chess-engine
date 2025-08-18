@@ -1,26 +1,21 @@
-import { implementar } from './escritor.js';
 import { partida, partida_virtual } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Recebe a coordenada normal e converte para binário.
 export function converter(valor){
-  implementar("\n-- Está convertendo de coordenadas para binário --\n");
   let potencia = 0;
   let binario = 0n;
   potencia = Number((valor[1])-1) * 8;
 
   
   if(Number(valor[0].toLowerCase() - "a".charCodeAt(0)) > 7){
-    implementar("Jogada invalida");
     throw new Error("Movimento inválido");
   }
   else if(Number(valor[1])  > 8){
-    implementar("Jogada invalida");
     throw new Error("Movimento inválido");
   }
   
   potencia += (valor[0].toLowerCase().charCodeAt(0) - "a".charCodeAt(0));
-  implementar("A é pontência é: 2^" + potencia);
   binario = BigInt(2**potencia);
 
   return binario;
@@ -28,10 +23,6 @@ export function converter(valor){
 
 // Recebe o binário e converte para coordenada normal
 export function desconverter(valor){
-  implementar("\n-- Está convertendo de binário para coordenadas --\n");
-  implementar("Valor é: "+valor);
-
-  implementar("O log é " + (valor.toString(2).length - 1))
   let log2 = (valor.toString(2).length -1);
   let linhas = 0;
   let colunas = 0;
@@ -46,9 +37,6 @@ export function desconverter(valor){
     }
   }
 
-  implementar(linhas)
-  implementar(colunas)
-
   let letra = String.fromCharCode(Number("a".charCodeAt(0)) + colunas);
   let numero = Number(linhas + 1);
 
@@ -57,8 +45,6 @@ export function desconverter(valor){
 
 // Gera o FEN com base nos bitboards e outra variáveis de controle do jogo
 export function converterFEN(){
-
-  implementar("\n-- Gerando FEN --\n");
 
   let fen = "";
   let casas_vazias = 0;
@@ -166,21 +152,17 @@ export function converterFEN(){
   // FEN com regra dos 50 lances (ainda não implementado)
   fen += ` ${partida.numero_lances_completo}`
 
-  implementar(fen + "\n\n\n\n------------------------------------------\n\n\n\n");
   return fen;
 }
 
 // Gera os bitboards com base no FEN (já salvando no simulado)
 export function desconverterFEN(fen){
 
-  implementar("\n-- Gerando bitboard com base no FEN --\n");
-
   let fen_separado_completo = fen.split(" ");
   const fen_pecas = fen_separado_completo[0].split("/").reverse();
 
   // Verificando se o FEN está incompleto
   if(fen_separado_completo.length < 6){
-    implementar("O FEN é menor que o esperado");
     throw new Error("FEN incompleto");
   }
   
@@ -220,21 +202,6 @@ export function desconverterFEN(fen){
   partida_virtual.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
   partida_virtual.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
   partida_virtual.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
-
-  implementar("Jogando")
-  implementar(partida_virtual.jogando);
-  implementar("En passant brancas")
-  implementar(partida_virtual.en_passant_brancas);
-  implementar("En passant pretas")
-  implementar(partida_virtual.en_passant_pretas);
-  implementar("roque esquerda branco")
-  implementar(partida_virtual.status_roque_esquerda_branco);
-  implementar("roque direita branco")
-  implementar(partida_virtual.status_roque_direita_branco);
-  implementar("roque esquerda preta")
-  implementar(partida_virtual.status_roque_esquerda_preto);
-  implementar("roque direita preta")
-  implementar(partida_virtual.status_roque_direita_preto);
 
   for(let cont1 = 0; cont1 < 8; cont1++){
     const linha_atual = fen_pecas[cont1].split("");
@@ -288,7 +255,6 @@ export function desconverterFEN(fen){
           break;
       }
       
-      //implementar(`cont1: ${cont1} - cont2: ${cont2} - potencia é ${potencia} - valor é ${valor}`);
     }
   }
   partida_virtual.bitboard_de_todas_pecas_pretas = partida_virtual.bitboard_piao_preto | partida_virtual.bitboard_cavalo_preto | partida_virtual.bitboard_bispo_preto | partida_virtual.bitboard_torre_preto | partida_virtual.bitboard_rainha_preto | partida_virtual.bitboard_rei_preto;

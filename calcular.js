@@ -1,5 +1,4 @@
 // Arquivo responsável por realizar os calculos (possibilidades de movimento)
-import { implementar } from "./escritor.js";
 import { descobrirPeca } from "./movimentacao.js";
 import { converter } from "./traducao.js";
 import { partida, partida_virtual, informacoes_xadrez, sincronizar_simulado_com_estado } from './variaveis.js'
