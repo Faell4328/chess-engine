@@ -21,8 +21,18 @@ app.post('/mover', (req, res) => {
   try{
     const origem = converter(req.body.origem.toUpperCase());
     const destino = converter(req.body.destino.toUpperCase());
+    let promocao = req.body.promocao;
 
-    mover(BigInt(origem), BigInt(destino));
+    // if(promocao != null){
+
+    //   promocao = promocao.toLowerCase();
+      
+    //   if(promocao != "q" && promocao != "r" && promocao != "b" && promocao != "n"){
+    //     promocao = "q";
+    //   }
+    // }
+
+    mover(BigInt(origem), BigInt(destino), promocao);
 
     const response = {
       status: "ok",

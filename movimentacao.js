@@ -1,9 +1,9 @@
-import { Calcular, verificar_se_esta_em_xeque } from './calcular.js';
+import { Calcular, verificar_se_esta_em_xeque, verificar_se_tem_promocao } from './calcular.js';
 import { partida, partida_virtual, informacoes_xadrez, sincronizar_estado_com_simulado, sincronizar_simulado_com_estado } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Função orquestradora e que fica exporta (única).
-export function mover(origem, destino, movimentos = null, promocao){
+export function mover(origem, destino, promocao, movimentos = null){
 
   // Zerando os en passant caso tenha
   if(partida.jogando == "b" && partida.en_passant_pretas !== 0n){
@@ -12,11 +12,6 @@ export function mover(origem, destino, movimentos = null, promocao){
   else if(partida.jogando == "w" && partida.en_passant_brancas !== 0n){
     partida.en_passant_brancas = 0n;
   }
-
-  console.log(`Foi de: ${origem}`);
-  console.log(visualizadeiro(origem))
-  console.log(`Para: ${destino}`);
-  console.log(visualizadeiro(destino))
 
   sincronizar_simulado_com_estado();
 
@@ -34,7 +29,7 @@ export function mover(origem, destino, movimentos = null, promocao){
   // Classificando qual movimento foi feito (movimento, captura, en passant, roque e etc) e dependendo validando
   switch(peca_movida){
     case "p":
-      Piao.validador(origem, destino, movimentos);
+      Piao.validador(origem, destino, promocao, movimentos);
       break;
     case "n":
       Cavalo.validador(origem, destino, movimentos);
@@ -54,7 +49,7 @@ export function mover(origem, destino, movimentos = null, promocao){
   }
 
   // Verificando se o movimento realizado coloquei o rei em xeque
-  this.calcular_casas_atacadas();
+  Calcular.calcular_casas_atacadas();
   Calcular.verificar_rei_atacado("w");
   Calcular.verificar_rei_atacado("b");
 
@@ -163,7 +158,7 @@ export function descobrir_peca(origem){
 }
 
 export class Piao{
-  static validador(origem, destino, movimentos){
+  static validador(origem, destino, promocao, movimentos){
     let movimentos_possiveis = [];
 
     if(movimentos == null){
@@ -174,13 +169,6 @@ export class Piao{
       // Recebendo os movimentos já calculados
       movimentos_possiveis = movimentos;
     }
-    
-    console.log("Todos movimentos possíveis do pião");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "p");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
     
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
@@ -200,7 +188,7 @@ export class Piao{
       const destino_esperado_duplo = (partida.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[1] : origem >> informacoes_xadrez.movimento_piao[1];
       const bitboard_piao_adversario = (partida.jogando == "w") ? partida_virtual.bitboard_piao_preto : partida_virtual.bitboard_piao_branco;
       const bitboard_com_en_passant = (partida.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[0] : origem >> informacoes_xadrez.movimento_piao[0];
-
+      
       // Verificando se foi feito um movimento duplo AND se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
       if((destino_esperado_duplo == destino) && (((destino << 1n) | (destino >> 1n) & bitboard_piao_adversario) != 0n)){
         if(partida.jogando == "w"){
@@ -211,6 +199,42 @@ export class Piao{
         }
       }
       efetuar_movimento(origem, destino, "p");
+    }
+    
+    // Entra se tiver promocao
+    if(verificar_se_tem_promocao(partida.jogando)){
+      if(partida.jogando == "w"){
+        if(promocao == "r"){
+          partida_virtual.bitboard_torre_branco ^= partida_virtual.bitboard_piao_branco & destino;
+        }
+        else if(promocao == "b"){
+          partida_virtual.bitboard_bispo_branco ^= partida_virtual.bitboard_piao_branco & destino;
+        }
+        else if(promocao == "n"){
+          partida_virtual.bitboard_cavalo_branco ^= partida_virtual.bitboard_piao_branco & destino;
+        }
+        else{
+          partida_virtual.bitboard_rainha_branco ^= partida_virtual.bitboard_piao_branco & destino;
+        }
+
+        partida_virtual.bitboard_piao_branco ^= partida_virtual.bitboard_piao_branco & destino;
+      }
+      else{
+        if(promocao == "r"){
+          partida_virtual.bitboard_torre_preto ^= partida_virtual.bitboard_piao_preto & destino;
+        }
+        else if(promocao == "b"){
+          partida_virtual.bitboard_bispo_preto ^= partida_virtual.bitboard_piao_preto & destino;
+        }
+        else if(promocao == "n"){
+          partida_virtual.bitboard_cavalo_preto ^= partida_virtual.bitboard_piao_preto & destino;
+        }
+        else{
+          partida_virtual.bitboard_rainha_preto ^= partida_virtual.bitboard_piao_preto & destino;
+        }
+
+        partida_virtual.bitboard_piao_preto ^= partida_virtual.bitboard_piao_preto & destino;
+      }
     }
 
     return;
@@ -246,13 +270,6 @@ class Cavalo{
       movimentos_possiveis = movimentos;
     }
     
-    console.log("Todos movimentos possíveis do cavalo");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "n");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
-
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
       throw new Error("Movimento inválido");
@@ -283,13 +300,6 @@ class Bispo{
       // Recebendo os movimentos já calculados
       movimentos_possiveis = movimentos;
     }
-
-    console.log("Todos movimentos possíveis do bispo");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "b");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
 
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
@@ -322,13 +332,6 @@ class Torre{
       movimentos_possiveis = movimentos;
     }
 
-    console.log("Todos movimentos possíveis da torre");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "r");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
-
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
       throw new Error("Movimento inválido");
@@ -360,13 +363,6 @@ class Dama{
       movimentos_possiveis = movimentos;
     }
 
-    console.log("Todos movimentos possíveis do pião");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "q");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
-
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
       throw new Error("Movimento inválido");
@@ -397,13 +393,6 @@ export class Rei{
       // Recebendo os movimentos já calculados
       movimentos_possiveis = movimentos;
     }
-
-    console.log("Todos movimentos possíveis do rei");
-    console.log(movimentos_possiveis);
-
-    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "k");
-    // console.log("Todos movimentos filtrados")
-    // console.log(movimentos_filtrados);
 
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
@@ -497,10 +486,10 @@ export function efetuar_movimento(origem, destino, peca){
     else if(peca == "r"){
       // Caso a torre seja movida, vai desativar o roque do lado movido
       if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
-        partida.status_roque_direita_branco = false;
+        partida_virtual.status_roque_direita_branco = false;
       }
       else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
-        partida.status_roque_esquerda_branco = false;
+        partida_virtual.status_roque_esquerda_branco = false;
       }
 
       partida_virtual.bitboard_torre_branco ^= origem;
@@ -544,10 +533,10 @@ export function efetuar_movimento(origem, destino, peca){
     else if(peca == "r"){
       // Caso a torre seja movida, vai desativar o roque do lado movido
       if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) != 0n){
-        partida.status_roque_direita_preto = false;
+        partida_virtual.status_roque_direita_preto = false;
       }
       else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) != 0n){
-        partida.status_roque_esquerda_preto = false;
+        partida_virtual.status_roque_esquerda_preto = false;
       }
 
       partida_virtual.bitboard_torre_preto ^= origem;

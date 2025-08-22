@@ -1064,6 +1064,29 @@ export class Calcular{
   }
 }
 
+export function verificar_se_tem_promocao(jogando){
+  // Brancas jogam
+  if(jogando == "w"){
+    // Entra caso tenha pião nas casas de promoção 
+    if((informacoes_xadrez.bitboard_casas_linha_8 & partida_virtual.bitboard_piao_branco) != 0n){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  // Pretas jogam
+  else{
+    // Entra caso tenha pião nas casas de promoção 
+    if((informacoes_xadrez.bitboard_casas_linha_1 & partida_virtual.bitboard_piao_preto) != 0n){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+}
+
 export function verificar_se_esta_em_xeque(jogando){
   // Brancas jogam
   if(jogando == "w"){
