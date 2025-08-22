@@ -1,3 +1,4 @@
+import { Calcular } from './calcular.js';
 import { partida, zerar } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 

@@ -1,8 +1,9 @@
 import { Calcular, verificar_se_esta_em_xeque } from './calcular.js';
 import { partida, partida_virtual, informacoes_xadrez, sincronizar_estado_com_simulado, sincronizar_simulado_com_estado } from './variaveis.js'
+import { visualizadeiro } from './visualizador.js';
 
 // Função orquestradora e que fica exporta (única).
-export function mover(origem, destino, promocao){
+export function mover(origem, destino, movimentos = null, promocao){
 
   // Zerando os en passant caso tenha
   if(partida.jogando == "b" && partida.en_passant_pretas !== 0n){
@@ -12,23 +13,50 @@ export function mover(origem, destino, promocao){
     partida.en_passant_brancas = 0n;
   }
 
+  console.log(`Foi de: ${origem}`);
+  console.log(visualizadeiro(origem))
+  console.log(`Para: ${destino}`);
+  console.log(visualizadeiro(destino))
+
   sincronizar_simulado_com_estado();
 
-  // Desobre a peça e já realiza o movimento
-  descobrirPeca(origem, destino, promocao);
-
-  // Verificando se o movimento realizado coloquei o rei em xeque
+  Calcular.calcular_casas_atacadas();
   Calcular.verificar_rei_atacado("w");
   Calcular.verificar_rei_atacado("b");
 
-  // Verificando se o movimento coloca o rei em xeque (brancas)
-  if(partida.jogando == "w" && (partida_virtual.rei_branco_em_ataque == true)){
-    throw new Error("Movimento Inválido - esse movimento coloca o rei em xeque");
+  sincronizar_estado_com_simulado();
+
+  let peca_movida = "";
+
+  // Desobre a peça e já realiza o movimento
+  peca_movida = descobrir_peca(origem);
+
+  // Classificando qual movimento foi feito (movimento, captura, en passant, roque e etc) e dependendo validando
+  switch(peca_movida){
+    case "p":
+      Piao.validador(origem, destino, movimentos);
+      break;
+    case "n":
+      Cavalo.validador(origem, destino, movimentos);
+      break;
+    case "b":
+      Bispo.validador(origem, destino, movimentos);
+      break;
+    case "r":
+      Torre.validador(origem, destino, movimentos);
+      break;
+    case "q":
+      Dama.validador(origem, destino, movimentos);
+      break;
+    case "k":
+      Rei.validador(origem, destino, movimentos);
+      break;
   }
-  // Verificando se o movimento coloca o rei em xeque (pretas)
-  else if(partida.jogando == "b" && (partida_virtual.rei_preto_em_ataque == true)){
-    throw new Error("Movimento Inválido - esse movimento coloca o rei em xeque");
-  }
+
+  // Verificando se o movimento realizado coloquei o rei em xeque
+  this.calcular_casas_atacadas();
+  Calcular.verificar_rei_atacado("w");
+  Calcular.verificar_rei_atacado("b");
 
   // Efetivando o movimento (OBS: o rei não está em xeque)
   sincronizar_estado_com_simulado();
@@ -59,309 +87,135 @@ export function mover(origem, destino, promocao){
   verificar_se_esta_em_xeque(partida.jogando);
 }
 
-export function descobrirPeca(origem, destino){
-  // Brancas jogam
+export function descobrir_peca(origem){
   if(partida.jogando == "w"){
     // Verificando se a peça movida é um pião das brancas
     if(partida.bitboard_piao_branco & origem){
-      const movimentos_possiveis = Calcular.ataque_e_movimento_piao("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito um en passant
-      if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
-        Piao.efetuar_en_passant(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Piao.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        // Verificando se foi feito um movimento duplo e se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
-        if(((origem << informacoes_xadrez.movimento_piao[1]) == destino) && (((destino << 1n) | (destino >> 1n)) & partida_virtual.bitboard_piao_preto) != 0n){
-          partida_virtual.en_passant_brancas = origem << informacoes_xadrez.movimento_piao[0];
-        }
-
-        Piao.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "p";
     }
 
     // Verificando se a peça movida é um cavalo da brancas
     else if(partida.bitboard_cavalo_branco & origem){
-      const movimentos_possiveis = Calcular.ataque_e_movimento_cavalo("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Cavalo.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Cavalo.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "n";
     }
+
+    // Verificando se a peça movida é um bispo da brancas
     else if(partida.bitboard_bispo_branco & origem){
-      const movimentos_possiveis = Calcular.ataque_e_movimento_bispo("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Bispo.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Bispo.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "b";
     }
+
+    // Verificando se a peça movida é um torre da brancas
     else if(partida.bitboard_torre_branco & origem){
-      
-      const movimentos_possiveis = Calcular.ataque_e_movimento_torre("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Torre.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Torre.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "r";
     }
+
+    // Verificando se a peça movida é uma rainha da brancas
     else if(partida.bitboard_rainha_branco & origem){
-      
-      const movimentos_possiveis = Calcular.ataque_e_movimento_rainha("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Dama.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Dama.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "q";
     }
-    else if(partida.bitboard_rei_branco & origem){
 
-      const movimentos_possiveis = Calcular.ataque_e_movimento_rei("w", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-      // Entra se foi feito um roque para direita
-      else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
-        Rei.efetuar_roque_esquerda(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.roque_direita.length > 0) && movimentos_possiveis.roque_direita.includes(destino)){
-        Rei.efetuar_roque_direita(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Rei.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Rei.efetuar_movimento(origem, destino);
-      }
-
-      return;
+    // Verificando se a peça movida é um rei da brancas
+    else if(partida.bitboard_rei_branco  & origem){
+      return "k";
     }
+
+    // Caso não encontre
     else{
-      throw new Error("Movimento inválido");
+      throw new Error("Vez do adversário");
     }
   }
-
-  // Pretas jogam
   else{
+    // Verificando se a peça movida é um pião das brancas
     if(partida.bitboard_piao_preto & origem){
-
-      const movimentos_possiveis = Calcular.ataque_e_movimento_piao("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito um en passant
-      if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
-        Piao.efetuar_en_passant(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Rei.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        // Verificando se foi feito um movimento duplo e se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
-        if(((origem >> informacoes_xadrez.movimento_piao[1]) == destino) && ((((destino << 1n) | (destino >> 1n)) & partida_virtual.bitboard_piao_branco) != 0n)){
-          partida_virtual.en_passant_pretas = origem >> informacoes_xadrez.movimento_piao[0];
-        }
-        else{
-        }
-
-        Piao.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "p";
     }
+
+    // Verificando se a peça movida é um cavalo da brancas
     else if(partida.bitboard_cavalo_preto & origem){
-
-      const movimentos_possiveis = Calcular.ataque_e_movimento_cavalo("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Cavalo.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Cavalo.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "n";
     }
+
+    // Verificando se a peça movida é um bispo da brancas
     else if(partida.bitboard_bispo_preto & origem){
-
-      const movimentos_possiveis = Calcular.ataque_e_movimento_bispo("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Bispo.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Bispo.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "b";
     }
+
+    // Verificando se a peça movida é um torre da brancas
     else if(partida.bitboard_torre_preto & origem){
-      
-      const movimentos_possiveis = Calcular.ataque_e_movimento_torre("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Torre.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Torre.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "r";
     }
+
+    // Verificando se a peça movida é uma rainha da brancas
     else if(partida.bitboard_rainha_preto & origem){
-      
-      const movimentos_possiveis = Calcular.ataque_e_movimento_rainha("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Dama.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Dama.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "q";
     }
+
+    // Verificando se a peça movida é um rei da brancas
     else if(partida.bitboard_rei_preto & origem){
-
-     const movimentos_possiveis = Calcular.ataque_e_movimento_rei("b", origem);
-
-      // Verificando se o lance feito é um lance inválido
-      if(movimentos_possiveis.todos.includes(destino) == false){
-        throw new Error("Movimento inválido");
-      }
-      // Entra se foi feito um roque para direita
-      else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
-        Rei.efetuar_roque_esquerda(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.roque_direita.length > 0) && movimentos_possiveis.roque_direita.includes(destino)){
-        Rei.efetuar_roque_direita(origem, destino);
-      }
-      // Entra se foi feito uma captura
-      else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
-        efetuar_captura(origem, destino);
-        Rei.efetuar_movimento(origem, destino);
-      }
-      // Entra se foi feito um movimento
-      else{
-        Rei.efetuar_movimento(origem, destino);
-      }
-
-      return;
+      return "k";
     }
+
+    // Caso não encontre
     else{
-      throw new Error("Movimento inválido");
+      throw new Error("Vez do adversário");
     }
   }
 }
 
-class Piao{
+export class Piao{
+  static validador(origem, destino, movimentos){
+    let movimentos_possiveis = [];
+
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_piao(partida.jogando, origem);
+    }
+    else{
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
+    }
+    
+    console.log("Todos movimentos possíveis do pião");
+    console.log(movimentos_possiveis);
+
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "p");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
+    
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
+    }
+
+    // Entra se foi feito um en passant
+    if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
+      Piao.efetuar_en_passant(origem, destino);
+    }
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "p");
+    }
+    // Entra se foi feito um movimento
+    else{
+      const destino_esperado_duplo = (partida.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[1] : origem >> informacoes_xadrez.movimento_piao[1];
+      const bitboard_piao_adversario = (partida.jogando == "w") ? partida_virtual.bitboard_piao_preto : partida_virtual.bitboard_piao_branco;
+      const bitboard_com_en_passant = (partida.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[0] : origem >> informacoes_xadrez.movimento_piao[0];
+
+      // Verificando se foi feito um movimento duplo AND se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
+      if((destino_esperado_duplo == destino) && (((destino << 1n) | (destino >> 1n) & bitboard_piao_adversario) != 0n)){
+        if(partida.jogando == "w"){
+          partida_virtual.en_passant_brancas = bitboard_com_en_passant;
+        }
+        else{
+          partida_virtual.en_passant_pretas = bitboard_com_en_passant;
+        }
+      }
+      efetuar_movimento(origem, destino, "p");
+    }
+
+    return;
+  }
+
   static efetuar_en_passant(origem, destino){
     // Brancas jogam
     if(partida.jogando == "w"){
@@ -374,167 +228,208 @@ class Piao{
       partida_virtual.en_passant_brancas = 0n;
     }
 
-    this.efetuar_movimento(origem, destino);
+    efetuar_movimento(origem, destino, "p");
     return;
   }
-  
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      // Realizando movimento
-      partida_virtual.bitboard_piao_branco ^= origem;
-      partida_virtual.bitboard_piao_branco |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
-    }
-
-    // Pretas jogam
-    else{
-      // Realizando movimento
-      partida_virtual.bitboard_piao_preto ^= origem;
-      partida_virtual.bitboard_piao_preto |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
-    }
-  }
-
 }
 
 class Cavalo{
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
+  static validador(origem, destino, movimentos){
+    let movimentos_possiveis = [];
 
-      // Realizando movimento
-      partida_virtual.bitboard_cavalo_branco ^= origem;
-      partida_virtual.bitboard_cavalo_branco |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_cavalo(partida.jogando, origem);
     }
-
-    // Pretas jogam
     else{
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
+    }
+    
+    console.log("Todos movimentos possíveis do cavalo");
+    console.log(movimentos_possiveis);
 
-      // Realizando movimento
-      partida_virtual.bitboard_cavalo_preto ^= origem;
-      partida_virtual.bitboard_cavalo_preto |= destino;
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "n");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
 
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
     }
 
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "n");
+    }
+    // Entra se foi feito um movimento
+    else{
+      efetuar_movimento(origem, destino, "n");
+    }
+
+    return;
   }
 }
 
 class Bispo{
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
-      // Realizando movimento
-      partida_virtual.bitboard_bispo_branco ^= origem;
-      partida_virtual.bitboard_bispo_branco |= destino;
+  static validador(origem, destino, movimentos = null){
+    let movimentos_possiveis = [];
 
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_bispo(partida.jogando, origem);
     }
-
-    // Pretas jogam
     else{
-      // Realizando movimento
-      partida_virtual.bitboard_bispo_preto ^= origem;
-      partida_virtual.bitboard_bispo_preto |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
     }
+
+    console.log("Todos movimentos possíveis do bispo");
+    console.log(movimentos_possiveis);
+
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "b");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
+
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
+    }
+
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "b");
+    }
+    // Entra se foi feito um movimento
+    else{
+      efetuar_movimento(origem, destino, "b");
+    }
+
+    return;
   }
 }
 
 class Torre{
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
+  static validador(origem, destino, movimentos = null){
+    let movimentos_possiveis = [];
 
-      // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
-        partida_virtual.status_roque_direita_branco = false;
-      }
-      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
-        partida_virtual.status_roque_esquerda_branco = false;
-      }
-
-      // Realizando movimento
-      partida_virtual.bitboard_torre_branco ^= origem;
-      partida_virtual.bitboard_torre_branco |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_torre(partida.jogando, origem);
     }
-
-    // Pretas jogam
     else{
-
-      // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) != 0n){
-        partida.status_roque_direita_preto = false;
-      }
-      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) != 0n){
-        partida.status_roque_esquerda_preto = false;
-      }
-
-      // Realizando movimento
-      partida_virtual.bitboard_torre_preto ^= origem;
-      partida_virtual.bitboard_torre_preto |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
     }
-  }
 
+    console.log("Todos movimentos possíveis da torre");
+    console.log(movimentos_possiveis);
+
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "r");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
+
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
+    }
+
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "r");
+    }
+    // Entra se foi feito um movimento
+    else{
+      efetuar_movimento(origem, destino, "r");
+    }
+
+    return;
+  }
 }
 
 class Dama{
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
+  static validador(origem, destino, movimentos = null){
+    let movimentos_possiveis = [];
 
-      // Realizando movimento
-      partida_virtual.bitboard_rainha_branco ^= origem;
-      partida_virtual.bitboard_rainha_branco |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_rainha(partida.jogando, origem);
     }
-
-    // Pretas jogam
     else{
-
-      // Realizando movimento
-      partida_virtual.bitboard_rainha_preto ^= origem;
-      partida_virtual.bitboard_rainha_preto |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
     }
+
+    console.log("Todos movimentos possíveis do pião");
+    console.log(movimentos_possiveis);
+
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "q");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
+
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
+    }
+
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "q");
+    }
+    // Entra se foi feito um movimento
+    else{
+      efetuar_movimento(origem, destino, "q");
+    }
+
+    return;
   }
 }
 
-class Rei{
-  static efetuar_roque_esquerda(){
+export class Rei{
+  static validador(origem, destino, movimentos = null){
+    let movimentos_possiveis = [];
 
+    if(movimentos == null){
+      // Calculandos os movimentos possiveis referente a peça
+      movimentos_possiveis = Calcular.ataque_e_movimento_rei(partida.jogando, origem);
+    }
+    else{
+      // Recebendo os movimentos já calculados
+      movimentos_possiveis = movimentos;
+    }
+
+    console.log("Todos movimentos possíveis do rei");
+    console.log(movimentos_possiveis);
+
+    // const movimentos_filtrados = filtrar_apenas_movimentos_validos_peca_especifica(origem, movimentos_possiveis, "k");
+    // console.log("Todos movimentos filtrados")
+    // console.log(movimentos_filtrados);
+
+    // Verificando se o lance feito é um lance inválido
+    if(movimentos_possiveis.todos.includes(destino) == false){
+      throw new Error("Movimento inválido");
+    }
+    // Entra se foi feito um roque para direita
+    else if((movimentos_possiveis.roque_esquerda.length > 0) && movimentos_possiveis.roque_esquerda.includes(destino)){
+      Rei.efetuar_roque_esquerda(origem, destino);
+    }
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.roque_direita.length > 0) && movimentos_possiveis.roque_direita.includes(destino)){
+      Rei.efetuar_roque_direita(origem, destino);
+    }
+    // Entra se foi feito uma captura
+    else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
+      efetuar_captura(origem, destino, "k");
+    }
+    // Entra se foi feito um movimento
+    else{
+      efetuar_movimento(origem, destino, "k");
+    }
+
+    return;
+  }
+
+  static efetuar_roque_esquerda(){
     // Brancas jogam
     if(partida.jogando == "w"){
       partida_virtual.bitboard_torre_branco = ((partida.bitboard_torre_branco ^ 0x0000000000000001n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
@@ -578,41 +473,109 @@ class Rei{
       return;
     }
   }
+}
 
-  static efetuar_movimento(origem, destino){
-    // Brancas jogam
-    if(partida.jogando == "w"){
+export function efetuar_movimento(origem, destino, peca){
+  // Brancas jogam
+  if(partida.jogando == "w"){
+    // Realiza o movimento do pião
+    if(peca == "p"){
+      partida_virtual.bitboard_piao_branco ^= origem;
+      partida_virtual.bitboard_piao_branco |= destino;
+    }
+    // Realiza o movimento do cavalo
+    else if(peca == "n"){
+      partida_virtual.bitboard_cavalo_branco ^= origem;
+      partida_virtual.bitboard_cavalo_branco |= destino;
+    }
+    // Realiza o movimento do bispo
+    else if(peca == "b"){
+      partida_virtual.bitboard_bispo_branco ^= origem;
+      partida_virtual.bitboard_bispo_branco |= destino;
+    }
+    // Realiza o movimento da torre
+    else if(peca == "r"){
+      // Caso a torre seja movida, vai desativar o roque do lado movido
+      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
+        partida.status_roque_direita_branco = false;
+      }
+      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
+        partida.status_roque_esquerda_branco = false;
+      }
 
+      partida_virtual.bitboard_torre_branco ^= origem;
+      partida_virtual.bitboard_torre_branco |= destino;
+    }
+    // Realiza o movimento da dama
+    else if(peca == "q"){
+      partida_virtual.bitboard_rainha_branco ^= origem;
+      partida_virtual.bitboard_rainha_branco |= destino;
+    }
+    // Realiza o movimento do rei
+    else if(peca == "k"){
+      // Caso o rei seja movido, vai desativar o roque
       partida_virtual.status_roque_direita_branco = false;
       partida_virtual.status_roque_esquerda_branco = false;
-
+      
       // Realizando movimento
       partida_virtual.bitboard_rei_branco ^= origem;
       partida_virtual.bitboard_rei_branco |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
     }
+  }
 
-    // Pretas jogam
-    else{
+  // Pretas jogam
+  else{
+    // Realiza o movimento do pião
+    if(peca == "p"){
+      partida_virtual.bitboard_piao_preto ^= origem;
+      partida_virtual.bitboard_piao_preto |= destino;
+    }
+    // Realiza o movimento do cavalo
+    else if(peca == "n"){
+      partida_virtual.bitboard_cavalo_preto ^= origem;
+      partida_virtual.bitboard_cavalo_preto |= destino;
+    }
+    // Realiza o movimento do bispo
+    else if(peca == "b"){
+      partida_virtual.bitboard_bispo_preto ^= origem;
+      partida_virtual.bitboard_bispo_preto |= destino;
+    }
+    // Realiza o movimento da torre
+    else if(peca == "r"){
+      // Caso a torre seja movida, vai desativar o roque do lado movido
+      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) != 0n){
+        partida.status_roque_direita_preto = false;
+      }
+      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) != 0n){
+        partida.status_roque_esquerda_preto = false;
+      }
 
+      partida_virtual.bitboard_torre_preto ^= origem;
+      partida_virtual.bitboard_torre_preto |= destino;
+    }
+    // Realiza o movimento da dama
+    else if(peca == "q"){
+      partida_virtual.bitboard_rainha_preto ^= origem;
+      partida_virtual.bitboard_rainha_preto |= destino;
+    }
+    // Realiza o movimento do rei
+    else if(peca == "k"){
+      // Caso o rei seja movido, vai desativar o roque
       partida_virtual.status_roque_direita_preto = false;
       partida_virtual.status_roque_esquerda_preto = false;
-        
+      
       // Realizando movimento
       partida_virtual.bitboard_rei_preto ^= origem;
       partida_virtual.bitboard_rei_preto |= destino;
-
-      // Atualiza todos os bitboards restantes
-      atualizarTabuleiro();
-      return;
     }
   }
+  
+  // Atualiza todos os bitboards restantes
+  atualizarTabuleiro();
+  return;
 }
 
-function efetuar_captura(origem, destino){
+export function efetuar_captura(origem, destino, peca){
   // Brancas jogam
   if(partida.jogando == "w"){
     //  Atualizando o bitboard das pretas (capturando a peça)
@@ -624,16 +587,19 @@ function efetuar_captura(origem, destino){
   }
   // Pretas jogam
   else{
+    //  Atualizando o bitboard das brancas (capturando a peça)
     partida_virtual.bitboard_piao_branco ^= (partida_virtual.bitboard_piao_branco & destino);
     partida_virtual.bitboard_cavalo_branco ^= (partida_virtual.bitboard_cavalo_branco & destino);
     partida_virtual.bitboard_bispo_branco ^= (partida_virtual.bitboard_bispo_branco & destino);
     partida_virtual.bitboard_torre_branco ^= (partida_virtual.bitboard_torre_branco & destino);
     partida_virtual.bitboard_rainha_branco ^= (partida_virtual.bitboard_rainha_branco & destino);
   }
+
+  efetuar_movimento(origem, destino, peca)
   return;
 }
 
-function atualizarTabuleiro(){
+export function atualizarTabuleiro(){
   // Atualizando o bitboard de todas as peças brancas
   partida_virtual.bitboard_de_todas_pecas_brancas = partida_virtual.bitboard_piao_branco | partida_virtual.bitboard_cavalo_branco | partida_virtual.bitboard_bispo_branco | partida_virtual.bitboard_torre_branco | partida_virtual.bitboard_rainha_branco | partida_virtual.bitboard_rei_branco;
 

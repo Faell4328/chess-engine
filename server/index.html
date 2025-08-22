@@ -49,18 +49,38 @@
 
     console.clear();
   };
+
+  let origem = null;
+  let destino = null;
   
-  async function onDrop (source, target) {
+  function onDrop (source, target) {
+    origem = source.toLowerCase();
+    destino = target.toLowerCase();
+  }
+
+  async function onSnapEnd(){
+    let fen = board.fen().split(" ")[0];
+    fen = fen.split("/");
+    console.log(fen)
+
+    if(fen[0].indexOf("P") != -1){
+      console.log("Promoção brancas")
+    }
+    if(fen[7].indexOf("p") != -1){
+      console.log("Promoção pretas")
+    }
+
     const retorno = await fetch('http://localhost:4000/mover', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        "origem": source.toLowerCase(),
-        "destino": target.toLowerCase()
+        "origem": origem,
+        "destino": destino
       })
     })
+
     
     let retornoApi = await retorno.json();
 
@@ -73,20 +93,23 @@
 
     if(retornoApi.status == "ok"){
       console.log(retornoApi.fen);
-      board.position(retornoApi.fen);
-      return;
+    }
+    else if(retornoApi.status == "Xeque mate"){
+      alert("Xeque mate");
     }
     else{
-      alert(retornoApi.status);
-      board.position(retornoApi.fen);
-      return;
+      console.log(retornoApi.status);
     }
+    
+    board.position(retornoApi.fen);
+    return;
   }
 
   const board = Chessboard("tabuleiro", {
     position: "start",
     draggable: true,
-    onDrop: onDrop
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
   });
   
 </script>
