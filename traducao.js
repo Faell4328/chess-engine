@@ -56,7 +56,7 @@ export function converterFEN(){
       potencia = (potencia == 0n ) ? 1n : (potencia * 2n);
       
       // Verificando se na casa tem peça
-      if((partida.bitboard_de_todas_as_pecas_do_tabuleiro & potencia) !== 0n){
+      if((partida.bitboard_tabuleiro_completo & potencia) !== 0n){
 
         // Verificando se tem alguma casa vazia
         if(casas_vazias != 0){
@@ -65,7 +65,7 @@ export function converterFEN(){
         }
 
         //Verificando se é uma peça preta
-        if(partida.bitboard_de_todas_pecas_pretas & potencia){
+        if(partida.bitboard_pecas_pretas & potencia){
 
           if(partida.bitboard_piao_preto & potencia){
             fen += "p";
@@ -260,9 +260,9 @@ export function desconverterFEN(fen){
       
     }
   }
-  partida.bitboard_de_todas_pecas_pretas = partida.bitboard_piao_preto | partida.bitboard_cavalo_preto | partida.bitboard_bispo_preto | partida.bitboard_torre_preto | partida.bitboard_rainha_preto | partida.bitboard_rei_preto;
-  partida.bitboard_de_todas_pecas_brancas = partida.bitboard_piao_branco | partida.bitboard_cavalo_branco | partida.bitboard_bispo_branco | partida.bitboard_torre_branco | partida.bitboard_rainha_branco | partida.bitboard_rei_branco;
-  partida.bitboard_de_todas_as_pecas_do_tabuleiro = partida.bitboard_de_todas_pecas_pretas | partida.bitboard_de_todas_pecas_brancas;
+  partida.bitboard_pecas_pretas = partida.bitboard_piao_preto | partida.bitboard_cavalo_preto | partida.bitboard_bispo_preto | partida.bitboard_torre_preto | partida.bitboard_rainha_preto | partida.bitboard_rei_preto;
+  partida.bitboard_pecas_brancas = partida.bitboard_piao_branco | partida.bitboard_cavalo_branco | partida.bitboard_bispo_branco | partida.bitboard_torre_branco | partida.bitboard_rainha_branco | partida.bitboard_rei_branco;
+  partida.bitboard_tabuleiro_completo = partida.bitboard_pecas_pretas | partida.bitboard_pecas_brancas;
 
   return;  
 }

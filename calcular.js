@@ -6,8 +6,8 @@ import { visualizadeiro } from './visualizador.js';
 
 // Função para calcular todos possíveis movimentos e capturas do cavalo
 function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocamento, operador, calculando_casas_atacadas = false){
-  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_brancas : partida_virtual.bitboard_de_todas_pecas_pretas;
-  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_pretas : partida_virtual.bitboard_de_todas_pecas_brancas;
+  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_pecas_brancas : partida_virtual.bitboard_pecas_pretas;
+  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_pecas_pretas : partida_virtual.bitboard_pecas_brancas;
   
   let movimentos = [];
   let capturas = [];
@@ -20,11 +20,11 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
       continue;
     }
     // Verificando se foi feito um wrap de coluna (canto esquerdo para o canto direito)
-    else if(((origem & informacoes_xadrez.bitboard_casas_coluna_canto_esquerdo) !== 0n) && (destino & informacoes_xadrez.bitboard_casas_coluna_canto_direito) !== 0n){
+    else if(((origem & informacoes_xadrez.casas_coluna_A_e_B) !== 0n) && (destino & informacoes_xadrez.casas_coluna_G_e_H) !== 0n){
       continue;
     }
     // Verificando se foi feito um wrap de coluna (canto direito para o canto esquerdo)
-    else if(((origem & informacoes_xadrez.bitboard_casas_coluna_canto_direito) !== 0n) && (destino & informacoes_xadrez.bitboard_casas_coluna_canto_esquerdo) !== 0n){
+    else if(((origem & informacoes_xadrez.casas_coluna_G_e_H) !== 0n) && (destino & informacoes_xadrez.casas_coluna_A_e_B) !== 0n){
       continue;
     }
     // Verificiando se a casa está ocupada por um inimigo
@@ -78,16 +78,16 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
 }
 
 function verificar_roque_peca_rei_esquerda(jogando){
-  let tabuleiro_todo = (partida_virtual.bitboard_de_todas_pecas_brancas | partida_virtual.bitboard_de_todas_pecas_pretas);
+  let tabuleiro_todo = (partida_virtual.bitboard_pecas_brancas | partida_virtual.bitboard_pecas_pretas);
   let casas_atacadas_inimigo = (jogando == "w") ? partida_virtual.casas_atacadas_pelas_pretas : partida_virtual.casas_atacadas_pelas_brancas;
-  let casas_que_nao_podem_estar_sendo_atacadas_pelo_inimigo_esquerda = (jogando == "w") ? informacoes_xadrez.casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_branco : informacoes_xadrez.casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_preto;
+  let casas_que_nao_podem_estar_sendo_atacadas_pelo_inimigo_esquerda = (jogando == "w") ? informacoes_xadrez.casas_nao_atacadas_roque_esquerda_branco : informacoes_xadrez.casas_nao_atacadas_roque_esquerda_preto;
   let bitboard_torres = (jogando == "w") ? partida_virtual.bitboard_torre_branco : partida_virtual.bitboard_torre_preto;
   let status_rei_em_ataque = (jogando == "w") ? partida_virtual.rei_branco_em_ataque : partida_virtual.rei_preto_em_ataque;
 
-  let casas_livre_para_o_roque_esquerda = (jogando == "w") ? informacoes_xadrez.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_branco : informacoes_xadrez.casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_preto;
+  let casas_livre_para_o_roque_esquerda = (jogando == "w") ? informacoes_xadrez.casas_vazias_roque_esquerda_branco : informacoes_xadrez.casas_vazias_roque_esquerda_preto;
   let status_roque_esquerda = (jogando == "w") ? partida.status_roque_esquerda_branco : partida.status_roque_esquerda_preto;
-  let casas_roque_rei_esquerda = (jogando == "w") ? informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco : informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
-  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_esquerda = (jogando == "w") ? informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco : informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto;
+  let casas_roque_rei_esquerda = (jogando == "w") ? informacoes_xadrez.casa_destino_rei_roque_esquerda_branco : informacoes_xadrez.casa_destino_rei_roque_esquerda_preto;
+  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_esquerda = (jogando == "w") ? informacoes_xadrez.casa_inicial_torre_esquerda_branca : informacoes_xadrez.casa_inicial_torre_esquerda_preto;
 
   let roque_esquerda = [];
 
@@ -134,15 +134,16 @@ function verificar_roque_peca_rei_esquerda(jogando){
 
 function verificar_roque_peca_rei_direita(jogando){
 
-  let tabuleiro_todo = (partida_virtual.bitboard_de_todas_pecas_brancas | partida_virtual.bitboard_de_todas_pecas_pretas);
+  let tabuleiro_todo = (partida_virtual.bitboard_pecas_brancas | partida_virtual.bitboard_pecas_pretas);
   let casas_atacadas_inimigo = (jogando == "w") ? partida_virtual.casas_atacadas_pelas_pretas : partida_virtual.casas_atacadas_pelas_brancas;
+  let casas_que_nao_podem_estar_sendo_atacadas_pelo_inimigo_direita = (jogando == "w") ? informacoes_xadrez.casas_nao_atacadas_roque_direita_branco : informacoes_xadrez.casas_nao_atacadas_roque_direita_preto;
   let bitboard_torres = (jogando == "w") ? partida_virtual.bitboard_torre_branco : partida_virtual.bitboard_torre_preto;
   let status_rei_em_ataque = (jogando == "w") ? partida_virtual.rei_branco_em_ataque : partida_virtual.rei_preto_em_ataque;
 
-  let casas_livre_para_o_roque_direita = (jogando == "w") ? informacoes_xadrez.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_branco : informacoes_xadrez.casas_que_deve_estar_vazio_para_fazer_o_roque_direita_preto;
+  let casas_livre_para_o_roque_direita = (jogando == "w") ? informacoes_xadrez.casas_vazias_roque_direita_branco : informacoes_xadrez.casas_vazias_roque_direita_preto;
   let status_roque_direita = (jogando == "w") ? partida.status_roque_direita_branco : partida.status_roque_direita_preto;
-  let casas_roque_rei_direita = (jogando == "w") ? informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_branco : informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
-  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_direita = (jogando == "w") ? informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco : informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto;
+  let casas_roque_rei_direita = (jogando == "w") ? informacoes_xadrez.casa_destino_rei_roque_direita_branco : informacoes_xadrez.casa_destino_rei_roque_direita_preto;
+  let casa_onde_a_torre_deve_estar_para_fazer_o_roque_direita = (jogando == "w") ? informacoes_xadrez.casa_inicial_torre_direita_branca : informacoes_xadrez.casa_inicial_torre_direita_preto;
 
   let roque_direita = [];
 
@@ -188,8 +189,8 @@ function verificar_roque_peca_rei_direita(jogando){
 }
 
 function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, operador, borda, calculando_casas_atacadas = false){
-  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_brancas : partida_virtual.bitboard_de_todas_pecas_pretas;
-  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_pretas : partida_virtual.bitboard_de_todas_pecas_brancas;
+  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_pecas_brancas : partida_virtual.bitboard_pecas_pretas;
+  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_pecas_pretas : partida_virtual.bitboard_pecas_brancas;
   let casas_atacadas = (jogando == "w") ? partida_virtual.casas_atacadas_pelas_pretas : partida_virtual.casas_atacadas_pelas_brancas;
 
   let movimentos = [];
@@ -290,10 +291,10 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
 
 // Função para calcular todos possíveis movimentos e capturas do pião
 function calcular_ataque_e_movimento_pecas_piao(jogando, origem, deslocamento, operador, isMovimentoPiao, borda, calculando_casas_atacadas = false){
-  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_brancas : partida_virtual.bitboard_de_todas_pecas_pretas;
-  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_pretas : partida_virtual.bitboard_de_todas_pecas_brancas;
+  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_pecas_brancas : partida_virtual.bitboard_pecas_pretas;
+  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_pecas_pretas : partida_virtual.bitboard_pecas_brancas;
   let bitboard_en_passant_inimigo = (jogando == "w") ? partida_virtual.en_passant_pretas : partida_virtual.en_passant_brancas;
-  let movimento_duplo = (jogando == "w") ? informacoes_xadrez.movimento_duplo_piao_branco : informacoes_xadrez.movimento_duplo_piao_preto;
+  let movimento_duplo = (jogando == "w") ? informacoes_xadrez.casas_iniciais_piao_branco : informacoes_xadrez.casas_iniciais_piao_preto;
 
   let movimentos = [];
   let capturas = [];
@@ -382,8 +383,8 @@ function calcular_ataque_e_movimento_pecas_piao(jogando, origem, deslocamento, o
 
 // Função para calcular todos possíveis movimentos e capturas das peças: Bispo, Torre, Dama e Rei
 function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocamento, operador, borda, peca = null, calculando_casas_atacadas = false){
-  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_brancas : partida_virtual.bitboard_de_todas_pecas_pretas;
-  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_de_todas_pecas_pretas : partida_virtual.bitboard_de_todas_pecas_brancas;
+  let pecas_aliada = (jogando == "w") ? partida_virtual.bitboard_pecas_brancas : partida_virtual.bitboard_pecas_pretas;
+  let pecas_inimiga = (jogando == "w") ? partida_virtual.bitboard_pecas_pretas : partida_virtual.bitboard_pecas_brancas;
 
   let movimentos = [];
   let capturas = [];
@@ -494,10 +495,10 @@ export class Calcular{
 
     // Brancas jogam
     if(jogando == "w"){
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_captura_piao_esquerda, "<<", false, (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.captura_piao_esquerda, "<<", false, (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
       lances = retorno;
 
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_captura_piao_direita, "<<", false, (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.captura_piao_direita, "<<", false, (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
       lances = {
         todos: [...lances.todos, ...retorno.todos],
         movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -505,7 +506,7 @@ export class Calcular{
         en_passant: [...lances.en_passant, ...retorno.en_passant]
       }
 
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_piao, "<<", true, (informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_piao, "<<", true, (informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
       lances = {
         todos: [...lances.todos, ...retorno.todos],
         movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -515,10 +516,10 @@ export class Calcular{
     }
     // Pretas jogam
     else{
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_captura_piao_esquerda, ">>", false, (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.captura_piao_esquerda, ">>", false, (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
       lances = retorno;
 
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_captura_piao_direita, ">>", false, (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.captura_piao_direita, ">>", false, (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
       lances = {
         todos: [...lances.todos, ...retorno.todos],
         movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -526,7 +527,7 @@ export class Calcular{
         en_passant: [...lances.en_passant, ...retorno.en_passant]
       }
 
-      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_piao, ">>", true, (informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+      retorno = calcular_ataque_e_movimento_pecas_piao(jogando, origem, informacoes_xadrez.movimento_piao, ">>", true, (informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
       lances = {
         todos: [...lances.todos, ...retorno.todos],
         movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -599,24 +600,24 @@ export class Calcular{
 
     // Calculando todos os possiveis lances
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, "<<", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_8), "b", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, "<<", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8), "b", calculando_casas_atacadas),
     lances = retorno;
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, ">>", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_1), "b", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, ">>", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1), "b", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, "<<", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_8), "b", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, "<<", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8), "b", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, ">>", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_1), "b", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, ">>", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1), "b", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -639,24 +640,24 @@ export class Calcular{
     };
     let lances;
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, "<<", informacoes_xadrez.bitboard_casas_linha_8, "r", calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, "<<", informacoes_xadrez.casas_linha_8, "r", calculando_casas_atacadas);
     lances = retorno;
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, ">>", informacoes_xadrez.bitboard_casas_linha_1, "r", calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, ">>", informacoes_xadrez.casas_linha_1, "r", calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, "<<", informacoes_xadrez.bitboard_casas_coluna_H, "r", calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, "<<", informacoes_xadrez.casas_coluna_H, "r", calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, ">>", informacoes_xadrez.bitboard_casas_coluna_A, "r", calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, ">>", informacoes_xadrez.casas_coluna_A, "r", calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -679,24 +680,24 @@ export class Calcular{
     };
     let lances;
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, "<<", informacoes_xadrez.bitboard_casas_linha_8, "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, "<<", informacoes_xadrez.casas_linha_8, "q", calculando_casas_atacadas),
     lances = retorno;
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, ">>", informacoes_xadrez.bitboard_casas_linha_1, "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, ">>", informacoes_xadrez.casas_linha_1, "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, "<<", informacoes_xadrez.bitboard_casas_coluna_H, "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, "<<", informacoes_xadrez.casas_coluna_H, "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, ">>", informacoes_xadrez.bitboard_casas_coluna_A, "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, ">>", informacoes_xadrez.casas_coluna_A, "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -704,28 +705,28 @@ export class Calcular{
     };
 
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, "<<", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_8), "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, "<<", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8), "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, ">>", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_1), "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, ">>", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1), "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, "<<", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_8), "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, "<<", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8), "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, ">>", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_1), "q", calculando_casas_atacadas),
+    retorno = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, ">>", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1), "q", calculando_casas_atacadas),
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -751,56 +752,56 @@ export class Calcular{
     };
 
     
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, "<<", (informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, "<<", (informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
     
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, "<<", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, "<<", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
     
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, "<<", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_8), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, "<<", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
     
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, "<<", (informacoes_xadrez.bitboard_casas_coluna_H), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, "<<", (informacoes_xadrez.casas_coluna_H), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, ">>", (informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, ">>", (informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, ">>", (informacoes_xadrez.bitboard_casas_coluna_H | informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, ">>", (informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, ">>", (informacoes_xadrez.bitboard_casas_coluna_A | informacoes_xadrez.bitboard_casas_linha_1), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, ">>", (informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
       capturas: [...lances.capturas, ...retorno.capturas],
     };
 
-    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, ">>", (informacoes_xadrez.bitboard_casas_coluna_A), calculando_casas_atacadas);
+    retorno = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, ">>", (informacoes_xadrez.casas_coluna_A), calculando_casas_atacadas);
     lances = {
       todos: [...lances.todos, ...retorno.todos],
       movimentos: [...lances.movimentos, ...retorno.movimentos],
@@ -1068,7 +1069,7 @@ export function verificar_se_tem_promocao(jogando){
   // Brancas jogam
   if(jogando == "w"){
     // Entra caso tenha pião nas casas de promoção 
-    if((informacoes_xadrez.bitboard_casas_linha_8 & partida_virtual.bitboard_piao_branco) != 0n){
+    if((informacoes_xadrez.casas_linha_8 & partida_virtual.bitboard_piao_branco) != 0n){
       return true;
     }
     else{
@@ -1078,7 +1079,7 @@ export function verificar_se_tem_promocao(jogando){
   // Pretas jogam
   else{
     // Entra caso tenha pião nas casas de promoção 
-    if((informacoes_xadrez.bitboard_casas_linha_1 & partida_virtual.bitboard_piao_preto) != 0n){
+    if((informacoes_xadrez.casas_linha_1 & partida_virtual.bitboard_piao_preto) != 0n){
       return true;
     }
     else{

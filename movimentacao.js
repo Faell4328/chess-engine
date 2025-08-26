@@ -61,18 +61,18 @@ export function mover(origem, destino, promocao, movimentos = null){
 
   // Verificando se a casa atacada é da torre e se o status de roque é true (evitando que o bitboard de roque fique desatualizado, caso a torre seja capturada)
   if(partida.jogando == "w"){
-    if((destino == informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) && partida.status_roque_esquerda_preto == true){
+    if((destino == informacoes_xadrez.casa_inicial_torre_esquerda_preto) && partida.status_roque_esquerda_preto == true){
       partida.status_roque_esquerda_preto = false;
     }
-    else if((destino == informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) && partida.status_roque_direita_preto == true){
+    else if((destino == informacoes_xadrez.casa_inicial_torre_direita_preto) && partida.status_roque_direita_preto == true){
       partida.status_roque_direita_preto = false;
     }
   }
   else{
-    if((destino == informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) && partida.status_roque_esquerda_branco == true){
+    if((destino == informacoes_xadrez.casa_inicial_torre_esquerda_branca) && partida.status_roque_esquerda_branco == true){
       partida.status_roque_esquerda_branco = false;
     }
-    else if((destino == informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) && partida.status_roque_direita_branco == true){
+    else if((destino == informacoes_xadrez.casa_inicial_torre_direita_branca) && partida.status_roque_direita_branco == true){
       partida.status_roque_direita_branco = false;
     }
   }
@@ -421,8 +421,8 @@ export class Rei{
   static efetuar_roque_esquerda(){
     // Brancas jogam
     if(partida.jogando == "w"){
-      partida_virtual.bitboard_torre_branco = ((partida.bitboard_torre_branco ^ 0x0000000000000001n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco);
-      partida_virtual.bitboard_rei_branco = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco;
+      partida_virtual.bitboard_torre_branco = ((partida.bitboard_torre_branco ^ 0x0000000000000001n) | informacoes_xadrez.casa_destino_torre_roque_esquerda_branco);
+      partida_virtual.bitboard_rei_branco = informacoes_xadrez.casa_destino_rei_roque_esquerda_branco;
       partida_virtual.status_roque_esquerda_branco = false;
       partida_virtual.status_roque_direita_branco = false;
       atualizarTabuleiro();
@@ -431,8 +431,8 @@ export class Rei{
 
     // Pretas jogam
     else{
-      partida_virtual.bitboard_torre_preto= ((partida.bitboard_torre_preto ^ 0x0100000000000000n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto);
-      partida_virtual.bitboard_rei_preto = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto;
+      partida_virtual.bitboard_torre_preto= ((partida.bitboard_torre_preto ^ 0x0100000000000000n) | informacoes_xadrez.casa_destino_torre_roque_esquerda_preto);
+      partida_virtual.bitboard_rei_preto = informacoes_xadrez.casa_destino_rei_roque_esquerda_preto;
       partida_virtual.status_roque_esquerda_preto = false;
       partida_virtual.status_roque_direita_preto = false;
       atualizarTabuleiro();
@@ -444,8 +444,8 @@ export class Rei{
   static efetuar_roque_direita(){
     // Brancas jogam
     if(partida.jogando == "w"){
-      partida_virtual.bitboard_torre_branco = ((partida_virtual.bitboard_torre_branco ^ 0x0000000000000080n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_branco);
-      partida_virtual.bitboard_rei_branco = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_branco;
+      partida_virtual.bitboard_torre_branco = ((partida_virtual.bitboard_torre_branco ^ 0x0000000000000080n) | informacoes_xadrez.casa_destino_torre_roque_direita_branco);
+      partida_virtual.bitboard_rei_branco = informacoes_xadrez.casa_destino_rei_roque_direita_branco;
       partida_virtual.status_roque_esquerda_branco = false;
       partida_virtual.status_roque_direita_branco = false;
       atualizarTabuleiro();
@@ -454,8 +454,8 @@ export class Rei{
 
     // Pretas jogam
     else{
-      partida_virtual.bitboard_torre_preto = ((partida_virtual.bitboard_torre_preto ^ 0x8000000000000000n) | informacoes_xadrez.casa_onde_a_torre_vai_ficar_no_roque_direita_preto);
-      partida_virtual.bitboard_rei_preto = informacoes_xadrez.casa_onde_o_rei_vai_ficar_no_roque_direita_preto;
+      partida_virtual.bitboard_torre_preto = ((partida_virtual.bitboard_torre_preto ^ 0x8000000000000000n) | informacoes_xadrez.casa_destino_torre_roque_direita_preto);
+      partida_virtual.bitboard_rei_preto = informacoes_xadrez.casa_destino_rei_roque_direita_preto;
       partida_virtual.status_roque_esquerda_preto = false;
       partida_virtual.status_roque_direita_preto = false;
       atualizarTabuleiro();
@@ -485,10 +485,10 @@ export function efetuar_movimento(origem, destino, peca){
     // Realiza o movimento da torre
     else if(peca == "r"){
       // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco) != 0n){
+      if((origem & informacoes_xadrez.casa_inicial_torre_direita_branca) != 0n){
         partida_virtual.status_roque_direita_branco = false;
       }
-      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco) != 0n){
+      else if((origem & informacoes_xadrez.casa_inicial_torre_esquerda_branca) != 0n){
         partida_virtual.status_roque_esquerda_branco = false;
       }
 
@@ -532,10 +532,10 @@ export function efetuar_movimento(origem, destino, peca){
     // Realiza o movimento da torre
     else if(peca == "r"){
       // Caso a torre seja movida, vai desativar o roque do lado movido
-      if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto) != 0n){
+      if((origem & informacoes_xadrez.casa_inicial_torre_direita_preto) != 0n){
         partida_virtual.status_roque_direita_preto = false;
       }
-      else if((origem & informacoes_xadrez.casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto) != 0n){
+      else if((origem & informacoes_xadrez.casa_inicial_torre_esquerda_preto) != 0n){
         partida_virtual.status_roque_esquerda_preto = false;
       }
 
@@ -590,11 +590,11 @@ export function efetuar_captura(origem, destino, peca){
 
 export function atualizarTabuleiro(){
   // Atualizando o bitboard de todas as peças brancas
-  partida_virtual.bitboard_de_todas_pecas_brancas = partida_virtual.bitboard_piao_branco | partida_virtual.bitboard_cavalo_branco | partida_virtual.bitboard_bispo_branco | partida_virtual.bitboard_torre_branco | partida_virtual.bitboard_rainha_branco | partida_virtual.bitboard_rei_branco;
+  partida_virtual.bitboard_pecas_brancas = partida_virtual.bitboard_piao_branco | partida_virtual.bitboard_cavalo_branco | partida_virtual.bitboard_bispo_branco | partida_virtual.bitboard_torre_branco | partida_virtual.bitboard_rainha_branco | partida_virtual.bitboard_rei_branco;
 
   // Atualizando o bitboard de todas as peças pretas
-  partida_virtual.bitboard_de_todas_pecas_pretas = partida_virtual.bitboard_piao_preto | partida_virtual.bitboard_cavalo_preto | partida_virtual.bitboard_bispo_preto | partida_virtual.bitboard_torre_preto | partida_virtual.bitboard_rainha_preto | partida_virtual.bitboard_rei_preto;
+  partida_virtual.bitboard_pecas_pretas = partida_virtual.bitboard_piao_preto | partida_virtual.bitboard_cavalo_preto | partida_virtual.bitboard_bispo_preto | partida_virtual.bitboard_torre_preto | partida_virtual.bitboard_rainha_preto | partida_virtual.bitboard_rei_preto;
   
   // Atualizando o bitboard com todas as casas ocupadas
-  partida_virtual.bitboard_de_todas_as_pecas_do_tabuleiro = partida_virtual.bitboard_de_todas_pecas_brancas | partida_virtual.bitboard_de_todas_pecas_pretas;
+  partida_virtual.bitboard_tabuleiro_completo = partida_virtual.bitboard_pecas_brancas | partida_virtual.bitboard_pecas_pretas;
 }

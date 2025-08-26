@@ -3,51 +3,40 @@ export const informacoes_xadrez = {
   /** LIMITES DO TABULEIRO: COLUNA */
 
   // 00000011 00000011 00000011 00000011 00000011 00000011 00000011 00000011
-  bitboard_casas_coluna_canto_esquerdo: 0x0303030303030303n,
+  casas_coluna_A_e_B: 0x0303030303030303n,
 
   // 11000000 11000000 11000000 11000000 11000000 11000000 11000000 11000000
-  bitboard_casas_coluna_canto_direito: 0xC0C0C0C0C0C0C0C0n,
+  casas_coluna_G_e_H: 0xC0C0C0C0C0C0C0C0n,
 
   // 00000001 00000001 00000001 00000001 00000001 00000001 00000001 00000001
-  bitboard_casas_coluna_A: 0x101010101010101n,
-
-  // 00000010 00000010 00000010 00000010 00000010 00000010 00000010 00000010
-  bitboard_casas_coluna_B: 0x202020202020202n,
-
-  // 01000000 01000000 01000000 01000000 01000000 01000000 01000000 01000000
-  bitboard_casas_coluna_G: 0x4040404040404040n,
+  casas_coluna_A: 0x101010101010101n,
 
   // 10000000 10000000 10000000 10000000 10000000 10000000 10000000 10000000
-  bitboard_casas_coluna_H: 0x8080808080808080n,
+  casas_coluna_H: 0x8080808080808080n,
 
   /** LIMITES DO TABULEIRO: LINHA */
- 
-  bitboard_casas_linha_canto: 0xC3C3C3C3C3C3C3C3n,
 
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 11111111 
-  bitboard_casas_linha_1: 0x00000000000000FFn,
-
-  // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 00000000
-  bitboard_casas_linha_2: 0x000000000000FF00n,
-
-  // 00000000 11111111 00000000 00000000 00000000 00000000 00000000 00000000
-  bitboard_casas_linha_7: 0x00FF000000000000n,
+  casas_linha_1: 0x00000000000000FFn,
 
   // 11111111 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  bitboard_casas_linha_8: 0xFF00000000000000n,
+  casas_linha_8: 0xFF00000000000000n,
 
   /** PRÉ-MOVIMENTO DAS PEÇAS */
 
   movimento_piao: [8n, 16n],
-  movimento_captura_piao_esquerda: [7n],
-  movimento_captura_piao_direita: [9n],
+  captura_piao_esquerda: [7n],
+  captura_piao_direita: [9n],
+
   movimento_cavalo_direita: [10n, 17n],
   movimento_cavalo_esquerda: [6n, 15n],
-  movimento_cavalo: [6n, 10n, 15n, 17n],
+
   movimento_bispo_esquerda: [7n, 14n, 21n, 28n, 35n, 42n, 49n],
   movimento_bispo_direita: [9n, 18n, 27n, 36n, 45n, 54n, 63n],
+  
   movimento_torre_direita: [1n, 2n, 3n, 4n, 5n, 6n, 7n],
   movimento_torre_frente: [8n, 16n, 24n, 32n, 40n, 48n, 56n],
+
   movimento_rei_frente: [8n],
   movimento_rei_frente_direita: [9n],
   movimento_rei_frente_esquerda: [7n],
@@ -55,55 +44,67 @@ export const informacoes_xadrez = {
 
   /** CASAS INICIAS DO PIÃO */
 
-  movimento_duplo_piao_branco: 0x000000000000FF00n,
-  movimento_duplo_piao_preto: 0x00FF000000000000n,
+  casas_iniciais_piao_branco: 0x000000000000FF00n,
+  casas_iniciais_piao_preto: 0x00FF000000000000n,
 
   /** INFORMAÇÕES DAS CASAS NO ROQUE */
   
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001
-  casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_branco: 0x0000000000000001n,
+  casa_inicial_torre_esquerda_branca: 0x0000000000000001n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 10000000
-  casa_onde_a_torre_deve_estar_para_fazer_roque_direita_branco: 0x0000000000000080n,
+  casa_inicial_torre_direita_branca: 0x0000000000000080n,
 
   // 00000001 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_a_torre_deve_estar_para_fazer_roque_esquerda_preto: 0x0100000000000000n,
+  casa_inicial_torre_esquerda_preto: 0x0100000000000000n,
   // 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_a_torre_deve_estar_para_fazer_roque_direita_preto: 0x8000000000000000n,
+  casa_inicial_torre_direita_preto: 0x8000000000000000n,
+
+  // CASAS DE DESTINO DO REI E TORRE (brancas)
 
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000100
-  casa_onde_o_rei_vai_ficar_no_roque_esquerda_branco: 0x0000000000000004n,
+  casa_destino_rei_roque_esquerda_branco: 0x0000000000000004n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001000
-  casa_onde_a_torre_vai_ficar_no_roque_esquerda_branco: 0x0000000000000008n,
+  casa_destino_torre_roque_esquerda_branco: 0x0000000000000008n,
 
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000000
-  casa_onde_o_rei_vai_ficar_no_roque_direita_branco: 0x0000000000000040n,
+  casa_destino_rei_roque_direita_branco: 0x0000000000000040n,
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00100000
-  casa_onde_a_torre_vai_ficar_no_roque_direita_branco: 0x0000000000000020n,
+  casa_destino_torre_roque_direita_branco: 0x0000000000000020n,
 
-  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001110
-  casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_branco: 0x000000000000000En,
-  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01100000
-  casas_que_deve_estar_vazio_para_fazer_o_roque_direita_branco: 0x0000000000000060n,
-
-  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001100
-  casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_branco: 0x000000000000000Cn,
+  // CASAS DE DESTINO DO REI E TORRE (pretas)
 
   // 00000100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_o_rei_vai_ficar_no_roque_esquerda_preto: 0x0400000000000000n,
+  casa_destino_rei_roque_esquerda_preto: 0x0400000000000000n,
   // 00001000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_a_torre_vai_ficar_no_roque_esquerda_preto: 0x0800000000000000n,
+  casa_destino_torre_roque_esquerda_preto: 0x0800000000000000n,
   // 01000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_o_rei_vai_ficar_no_roque_direita_preto: 0x4000000000000000n,
+  casa_destino_rei_roque_direita_preto: 0x4000000000000000n,
   // 00100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casa_onde_a_torre_vai_ficar_no_roque_direita_preto: 0x2000000000000000n,
-  
-  // 01100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casas_que_deve_estar_vazio_para_fazer_o_roque_direita_preto: 0x6000000000000000n,
-  // 00001110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casas_que_deve_estar_vazio_para_fazer_o_roque_esquerda_preto: 0x0E00000000000000n,
+  casa_destino_torre_roque_direita_preto: 0x2000000000000000n,
 
+  // CASAS QUE DEVEM ESTAR VAZIAS NO ROQUE (sem peça aliada ou inimiga)
+
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001110
+  casas_vazias_roque_esquerda_branco: 0x000000000000000En,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01100000
+  casas_vazias_roque_direita_branco: 0x0000000000000060n,
+  
   // 00001110 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casas_que_nao_podem_estar_sendo_atacadas_para_fazer_o_roque_esquerda_preto: 0x0C00000000000000n,
+  casas_vazias_roque_esquerda_preto: 0x0E00000000000000n,
+  // 01100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_vazias_roque_direita_preto: 0x6000000000000000n,
+
+  // CASAS QUE NÃO PODEM ESTAR ATACADAS NO ROQUE
+
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00001100
+  casas_nao_atacadas_roque_esquerda_branco: 0x000000000000000Cn,
+  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01100000
+  casas_nao_atacadas_roque_direita_branco: 0x000000000000000Cn,
+  
+  // 00001100 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_nao_atacadas_roque_esquerda_preto: 0x0C00000000000000n,
+  // 01100000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+  casas_nao_atacadas_roque_direita_preto: 0x0C00000000000000n,
 
   /** INFORMAÇÕES DAS PEÇAS */
 
@@ -138,7 +139,7 @@ export const partida = {
   bitboard_rei_branco: 0x0000000000000010n,
   
   // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 11111111
-  bitboard_de_todas_pecas_brancas: 0x000000000000FFFFn,
+  bitboard_pecas_brancas: 0x000000000000FFFFn,
   
   /** PEÇAS PRETAS */
   
@@ -161,24 +162,24 @@ export const partida = {
   bitboard_rei_preto: 0x1000000000000000n,
 
   // 11111111 11111111 00000000 00000000 00000000 00000000 00000000 00000000
-  bitboard_de_todas_pecas_pretas: 0xFFFF000000000000n,
+  bitboard_pecas_pretas: 0xFFFF000000000000n,
   
   /** INFORMAÇÕES DO TABULEIRO E PARTIDA */
 
   // 11111111 11111111 00000000 00000000 00000000 00000000 11111111 11111111
-  bitboard_de_todas_as_pecas_do_tabuleiro: 0xFFFF00000000FFFFn,
+  bitboard_tabuleiro_completo: 0xFFFF00000000FFFFn,
 
   // Status se o rei está atacado
   rei_preto_em_ataque: false,
-  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casas_atacadas_pelas_pretas: 0n,
+  // 00000000 00000000 11111111 00000000 00000000 00000000 00000000 00000000
+  casas_atacadas_pelas_pretas: 0x0000FF0000000000n,
 
   // Status se o rei está atacado
   rei_branco_em_ataque: false,
-  // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-  casas_atacadas_pelas_brancas: 0n,
+  // 00000000 00000000 00000000 00000000 00000000 11111111 00000000 00000000
+  casas_atacadas_pelas_brancas: 0x0000000000FF0000n,
   
-  // w é brancas e p é pretas
+  // "w" é brancas e "p" é pretas
   jogando: "w",
   // Número de lances jogados na partida
   numero_lances_completo: 1,
@@ -221,9 +222,9 @@ export const partida_virtual = {
   
   /** PARTIDA */
 
-  bitboard_de_todas_as_pecas_do_tabuleiro: 0xFFFF00000000FFFFn,
-  bitboard_de_todas_pecas_brancas: 0x000000000000FFFFn,
-  bitboard_de_todas_pecas_pretas: 0xFFFF000000000000n,
+  bitboard_tabuleiro_completo: 0xFFFF00000000FFFFn,
+  bitboard_pecas_brancas: 0x000000000000FFFFn,
+  bitboard_pecas_pretas: 0xFFFF000000000000n,
 
   jogando: "w",
   numero_lances_completo: 1,
@@ -258,9 +259,9 @@ export function zerar(){
   partida.bitboard_rainha_preto = 0x0800000000000000n;
   partida.bitboard_rei_preto = 0x1000000000000000n;
   
-  partida.bitboard_de_todas_pecas_brancas = 0x000000000000FFFFn;
-  partida.bitboard_de_todas_pecas_pretas = 0xFFFF000000000000n;
-  partida.bitboard_de_todas_as_pecas_do_tabuleiro = 0xFFFF00000000FFFFn;
+  partida.bitboard_pecas_brancas = 0x000000000000FFFFn;
+  partida.bitboard_pecas_pretas = 0xFFFF000000000000n;
+  partida.bitboard_tabuleiro_completo = 0xFFFF00000000FFFFn;
 
   partida.rei_preto_em_ataque = false;
   partida.casas_atacadas_pelas_pretas = 0n;
@@ -297,9 +298,9 @@ export function sincronizar_simulado_com_estado(){
   partida_virtual.bitboard_rainha_preto = partida.bitboard_rainha_preto;
   partida_virtual.bitboard_rei_preto = partida.bitboard_rei_preto;
 
-  partida_virtual.bitboard_de_todas_as_pecas_do_tabuleiro = partida.bitboard_de_todas_as_pecas_do_tabuleiro;
-  partida_virtual.bitboard_de_todas_pecas_brancas = partida.bitboard_de_todas_pecas_brancas;
-  partida_virtual.bitboard_de_todas_pecas_pretas = partida.bitboard_de_todas_pecas_pretas;
+  partida_virtual.bitboard_tabuleiro_completo = partida.bitboard_tabuleiro_completo;
+  partida_virtual.bitboard_pecas_brancas = partida.bitboard_pecas_brancas;
+  partida_virtual.bitboard_pecas_pretas = partida.bitboard_pecas_pretas;
 
   partida_virtual.rei_preto_em_ataque = partida.rei_preto_em_ataque;
   partida_virtual.casas_atacadas_pelas_pretas = partida.casas_atacadas_pelas_pretas;
@@ -335,9 +336,9 @@ export function sincronizar_estado_com_simulado(){
   partida.bitboard_rainha_preto = partida_virtual.bitboard_rainha_preto;
   partida.bitboard_rei_preto = partida_virtual.bitboard_rei_preto;
 
-  partida.bitboard_de_todas_as_pecas_do_tabuleiro = partida_virtual.bitboard_de_todas_as_pecas_do_tabuleiro;
-  partida.bitboard_de_todas_pecas_brancas = partida_virtual.bitboard_de_todas_pecas_brancas;
-  partida.bitboard_de_todas_pecas_pretas = partida_virtual.bitboard_de_todas_pecas_pretas;
+  partida.bitboard_tabuleiro_completo = partida_virtual.bitboard_tabuleiro_completo;
+  partida.bitboard_pecas_brancas = partida_virtual.bitboard_pecas_brancas;
+  partida.bitboard_pecas_pretas = partida_virtual.bitboard_pecas_pretas;
 
   partida.rei_preto_em_ataque = partida_virtual.rei_preto_em_ataque;
   partida.casas_atacadas_pelas_pretas = partida_virtual.casas_atacadas_pelas_pretas;
