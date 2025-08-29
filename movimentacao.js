@@ -1,4 +1,5 @@
 import { Calcular } from './calcular.js';
+import { converterFEN } from './traducao.js';
 import { partida_real, partida_simulada, informacoes_xadrez, sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
@@ -74,6 +75,19 @@ export function mover(origem, destino, promocao, movimentos = null){
   partida_real.jogando = (partida_real.jogando == "w") ? "b" : "w";
 
   Calcular.se_rei_tem_escaptoria(partida_real.jogando);
+
+  // Verificando se foi feito um movimento repetido 3 vezes
+  let fen_atual = converterFEN().split(" ").splice(0, 4).join(" ");
+
+  let fen_repetido = partida_real.fen_jogados.filter((fen) => {
+    return converterFEN().split(" ").splice(0, 4).join(" ") == fen;
+  });
+
+  if(fen_repetido.length >= 2){
+    throw new Error("Empate por repetição");
+  }
+
+  partida_real.fen_jogados.push(fen_atual);
 }
 
 export function identificar_peca_movida(origem){

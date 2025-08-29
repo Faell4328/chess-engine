@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 import { mover } from './movimentacao.js';
 import { converter, converterFEN, desconverterFEN } from './traducao.js';
-import { sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real, zerar } from './variaveis.js';
+import { partida_real, sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real, zerar } from './variaveis.js';
 import { Calcular } from './calcular.js';
 
 const app = express();
@@ -56,7 +56,7 @@ app.post('/mover', (req, res) => {
     
     res.json(response);
     
-    if(error.message == "Xeque mate" || error.message == "Empate por afogamento"){
+    if(error.message == "Xeque mate" || error.message == "Empate por afogamento" || error.message == "Empate por repetição"){
       process.exit(0);
     }
 
@@ -71,11 +71,13 @@ app.post('/fen', (req, res) => {
 
     desconverterFEN(fen);
     sincronizar_partida_simulada_com_partida_real();
-    
+
     Calcular.casas_atacadas();
     Calcular.se_rei_atacado("w");
     Calcular.se_rei_atacado("b");
-    sincronizar_partida_real_com_partida_simulada()
+    sincronizar_partida_real_com_partida_simulada();
+
+    partida_real.fen_jogados.push(fen.split(" ").splice(0, 4).join(" "));
 
     const response = {
       status: "ok",

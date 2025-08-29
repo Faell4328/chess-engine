@@ -194,6 +194,8 @@ export const partida_real = {
   status_roque_esquerda_preto: true,
   // Status se é possível o roque
   status_roque_direita_preto: true,
+
+  fen_jogados: [],
 }
 
 export const partida_simulada = {
@@ -274,6 +276,8 @@ export function zerar(){
   partida_real.status_roque_direita_branco = true;
   partida_real.status_roque_esquerda_preto = true;
   partida_real.status_roque_direita_preto = true;
+  
+  partida_real.fen_jogados = [];
 
   sincronizar_partida_simulada_com_partida_real();
 }
