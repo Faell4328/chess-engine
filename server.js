@@ -11,6 +11,8 @@ const app = express();
 app.use(express.static(resolve('server', "public")));
 app.use(express.json());
 
+let fim_do_jogo = false;
+
 app.get("/", (req, res) => {
   res.sendFile(resolve('server', 'index.html'));
   return;
@@ -19,6 +21,17 @@ app.get("/", (req, res) => {
 app.post('/mover', (req, res) => {
 
   try{
+
+    if(fim_do_jogo == true){
+      const response = {
+        status: "Jogo finalizado",
+        fen: converterFEN()
+      }
+
+      res.json(response);
+      return;
+    }
+
     const origem = converter(req.body.origem.toUpperCase());
     const destino = converter(req.body.destino.toUpperCase());
     let promocao = req.body.promocao;
@@ -57,7 +70,7 @@ app.post('/mover', (req, res) => {
     res.json(response);
     
     if(error.message == "Xeque mate" || error.message == "Empate por afogamento" || error.message == "Empate por repetição"){
-      process.exit(0);
+      fim_do_jogo = true;
     }
 
     return;
@@ -84,6 +97,7 @@ app.post('/fen', (req, res) => {
       fen: converterFEN()
     }
 
+    fim_do_jogo = false;
     res.json(response);
     return;
   }
@@ -97,6 +111,7 @@ app.post('/fen', (req, res) => {
 });
 
 app.get("/resetar", (req, res) => {
+  fim_do_jogo = false;
   console.log("Jogo resetado");
   zerar();
   res.end();

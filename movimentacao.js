@@ -3,6 +3,8 @@ import { converterFEN } from './traducao.js';
 import { partida_real, partida_simulada, informacoes_xadrez, sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
+let captura = false;
+
 // Função orquestradora e que fica exporta (única).
 export function mover(origem, destino, promocao, movimentos = null){
 
@@ -88,6 +90,11 @@ export function mover(origem, destino, promocao, movimentos = null){
   }
 
   partida_real.fen_jogados.push(fen_atual);
+
+  if(captura == true){
+    captura = false;
+    throw new Error("Captura");
+  }
 }
 
 export function identificar_peca_movida(origem){
@@ -181,10 +188,12 @@ export class Piao{
     // Verificando se foi feito um en passant
     if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
       Piao.efetuar_en_passant(origem, destino);
+      captura = true;
     }
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "p");
+      captura = true;
     }
     // Feito um movimento
     else{
@@ -274,6 +283,7 @@ class Cavalo{
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "n");
+      captura = true;
     }
     // Feito um movimento
     else{
@@ -298,6 +308,7 @@ class Bispo{
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "b");
+      captura = true;
     }
     // Feito um movimento
     else{
@@ -322,6 +333,7 @@ class Torre{
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "r");
+      captura = true;
     }
     // Feito um movimento
     else{
@@ -346,6 +358,7 @@ class Dama{
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "q");
+      captura = true;
     }
     // Feito um movimento
     else{
@@ -377,6 +390,7 @@ export class Rei{
     // Verificando se foi feito uma captura
     else if((movimentos_possiveis.capturas.length > 0) && movimentos_possiveis.capturas.includes(destino)){
       efetuar_captura(origem, destino, "k");
+      captura = true;
     }
     // Feito um movimento
     else{

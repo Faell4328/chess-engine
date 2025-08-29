@@ -1,9 +1,11 @@
 <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" crossorigin="anonymous"></script>
-<div style="width: 700px" id="tabuleiro"></div><br />
+<div style="width: 700px; height: 700px" id="tabuleiro"></div><br />
 <input type="text" id="fen" placeholder="FEN personalizado" /><button style="margin-left: 5" onClick="fen_personalizado()">Usar FEN personalizado</button><br /><br />
 <button onclick="start()">Posição inicial</button><span style="margin-left: 5">Que é: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</span>
+<audio id="audio" src="#">
+</audio>
 <script>
 
   async function fen_personalizado(){
@@ -98,9 +100,37 @@
 
     if(retornoApi.status == "ok"){
       console.log(retornoApi.fen);
+      document.getElementById("audio").pause();
+      document.getElementById("audio").load();
+      document.getElementById("audio").src = "movendo.mp3";
+      document.getElementById("audio").play();
     }
-    else if(retornoApi.status == "Xeque mate" || retornoApi.status == "Empate por afogamento" || retornoApi.status == "Empate por repetição"){
+    else if(retornoApi.status == "Captura"){
+      document.getElementById("audio").pause();
+      document.getElementById("audio").load();
+      document.getElementById("audio").src = "captura.mp3";
+      document.getElementById("audio").play();
+      console.log(retornoApi.status);
+    }
+    else if(retornoApi.status == "Xeque mate"){
+      document.getElementById("audio").pause();
+      document.getElementById("audio").src = "xeque mate.mp3";
+      document.getElementById("audio").play();
       alert(retornoApi.status);
+    }
+    else if(retornoApi.status == "Empate por afogamento" || retornoApi.status == "Empate por repetição"){
+      document.getElementById("audio").pause();
+      document.getElementById("audio").load();
+      document.getElementById("audio").src = "empate.mp3";
+      document.getElementById("audio").play();
+      alert(retornoApi.status);
+    }
+    else if(retornoApi.status == "Xeque"){
+      document.getElementById("audio").pause();
+      document.getElementById("audio").load();
+      document.getElementById("audio").src = "xeque.mp3";
+      document.getElementById("audio").play();
+      console.log(retornoApi.status);
     }
     else{
       console.log(retornoApi.status);

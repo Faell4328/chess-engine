@@ -1117,7 +1117,7 @@ export class Calcular{
         }
         else{
           // Está em xeque
-          return true;
+          throw new Error("Xeque");
         }
       }
       else if(todos_possiveis_movimentos.quantidade <= 0){
@@ -1137,7 +1137,7 @@ export class Calcular{
         }
         else{
           // Está em xeque
-          return true;
+          throw new Error("Xeque");
         }
       }
       else if(todos_possiveis_movimentos.quantidade <= 0){
