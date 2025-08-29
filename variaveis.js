@@ -240,44 +240,42 @@ export const partida_simulada = {
 }
 
 export function zerar(){
-  partida_real.bitboard_piao_branco = 65280n,
-  partida_real.bitboard_cavalo_branco = 66n,
-  partida_real.bitboard_bispo_branco = 36n,
-  partida_real.bitboard_torre_branco = 129n,
-  partida_real.bitboard_rainha_branco = 8n,
-  partida_real.bitboard_rei_branco = 16n,
-  partida_real.bitboard_pecas_brancas = 65535n,
+  partida_real.bitboard_piao_branco = 65280n;
+  partida_real.bitboard_cavalo_branco = 66n;
+  partida_real.bitboard_bispo_branco = 36n;
+  partida_real.bitboard_torre_branco = 129n;
+  partida_real.bitboard_rainha_branco = 8n;
+  partida_real.bitboard_rei_branco = 16n;
+  partida_real.bitboard_pecas_brancas = 65535n;
   
-  /** PEÇAS PRETAS */
+  partida_real.bitboard_piao_preto = 71776119061217280n;
+  partida_real.bitboard_cavalo_preto = 4755801206503243776n;
+  partida_real.bitboard_bispo_preto = 2594073385365405696n;
+  partida_real.bitboard_torre_preto = 9295429630892703744n;
+  partida_real.bitboard_rainha_preto = 576460752303423488n;
+  partida_real.bitboard_rei_preto = 1152921504606846976n;
+  partida_real.bitboard_pecas_pretas = 18446462598732840960n;
+  
+  partida_real.bitboard_tabuleiro_completo = 18446462598732906495n;
 
-  partida_real.bitboard_piao_preto = 71776119061217280n,
-  partida_real.bitboard_cavalo_preto = 4755801206503243776n,
-  partida_real.bitboard_bispo_preto = 2594073385365405696n,
-  partida_real.bitboard_torre_preto = 9295429630892703744n,
-  partida_real.bitboard_rainha_preto = 576460752303423488n,
-  partida_real.bitboard_rei_preto = 1152921504606846976n,
-  partida_real.bitboard_pecas_pretas = 18446462598732840960n,
-  
-  /** INFORMAÇÕES DO TABULEIRO E PARTIDA */
-  partida_real.bitboard_tabuleiro_completo = 18446462598732906495n,
+  partida_real.jogando = "w";
+  partida_real.numero_lances_completo = 1;
 
   partida_real.rei_preto_em_ataque = false;
   partida_real.casas_atacadas_pelas_pretas = 0n;
 
   partida_real.rei_branco_em_ataque = false;
   partida_real.casas_atacadas_pelas_brancas = 0n;
-  
-  partida_real.jogando = "w";
-  partida_real.numero_lances_completo = 1;
-  
+
   partida_real.en_passant_brancas = 0n;
   partida_real.en_passant_pretas = 0n;
-  
+
   partida_real.status_roque_esquerda_branco = true;
   partida_real.status_roque_direita_branco = true;
-
   partida_real.status_roque_esquerda_preto = true;
   partida_real.status_roque_direita_preto = true;
+
+  sincronizar_partida_simulada_com_partida_real();
 }
 
 // Passar o valor de estado para simulado

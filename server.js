@@ -70,11 +70,12 @@ app.post('/fen', (req, res) => {
     const fen = req.body.fen;
 
     desconverterFEN(fen);
-
     sincronizar_partida_simulada_com_partida_real();
+    
     Calcular.casas_atacadas();
     Calcular.se_rei_atacado("w");
     Calcular.se_rei_atacado("b");
+    sincronizar_partida_real_com_partida_simulada()
 
     const response = {
       status: "ok",
