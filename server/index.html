@@ -99,8 +99,8 @@
     if(retornoApi.status == "ok"){
       console.log(retornoApi.fen);
     }
-    else if(retornoApi.status == "Xeque mate"){
-      alert("Xeque mate");
+    else if(retornoApi.status == "Xeque mate" || retornoApi.status == "Empate por afogamento"){
+      alert(retornoApi.status);
     }
     else{
       console.log(retornoApi.status);

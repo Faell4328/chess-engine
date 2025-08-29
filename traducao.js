@@ -1,5 +1,5 @@
 import { Calcular } from './calcular.js';
-import { partida, zerar } from './variaveis.js'
+import { partida_real, zerar } from './variaveis.js'
 import { visualizadeiro } from './visualizador.js';
 
 // Recebe a coordenada normal e converte para binário.
@@ -56,7 +56,7 @@ export function converterFEN(){
       potencia = (potencia == 0n ) ? 1n : (potencia * 2n);
       
       // Verificando se na casa tem peça
-      if((partida.bitboard_tabuleiro_completo & potencia) !== 0n){
+      if((partida_real.bitboard_tabuleiro_completo & potencia) !== 0n){
 
         // Verificando se tem alguma casa vazia
         if(casas_vazias != 0){
@@ -65,45 +65,45 @@ export function converterFEN(){
         }
 
         //Verificando se é uma peça preta
-        if(partida.bitboard_pecas_pretas & potencia){
+        if(partida_real.bitboard_pecas_pretas & potencia){
 
-          if(partida.bitboard_piao_preto & potencia){
+          if(partida_real.bitboard_piao_preto & potencia){
             fen += "p";
           }
-          else if(partida.bitboard_cavalo_preto & potencia){
+          else if(partida_real.bitboard_cavalo_preto & potencia){
             fen += "n";
           }
-          else if(partida.bitboard_bispo_preto & potencia){
+          else if(partida_real.bitboard_bispo_preto & potencia){
             fen += "b";
           }
-          else if(partida.bitboard_torre_preto & potencia){
+          else if(partida_real.bitboard_torre_preto & potencia){
             fen += "r";
           }
-          else if(partida.bitboard_rainha_preto & potencia){
+          else if(partida_real.bitboard_rainha_preto & potencia){
             fen += "q";
           }
-          else if(partida.bitboard_rei_preto & potencia){
+          else if(partida_real.bitboard_rei_preto & potencia){
             fen += "k";
           }
         }
         // Peça branca
         else{
-          if(partida.bitboard_piao_branco & potencia){
+          if(partida_real.bitboard_piao_branco & potencia){
             fen += "P";
           }
-          else if(partida.bitboard_cavalo_branco & potencia){
+          else if(partida_real.bitboard_cavalo_branco & potencia){
             fen += "N";
           }
-          else if(partida.bitboard_bispo_branco & potencia){
+          else if(partida_real.bitboard_bispo_branco & potencia){
             fen += "B";
           }
-          else if(partida.bitboard_torre_branco & potencia){
+          else if(partida_real.bitboard_torre_branco & potencia){
             fen += "R";
           }
-          else if(partida.bitboard_rainha_branco & potencia){
+          else if(partida_real.bitboard_rainha_branco & potencia){
             fen += "Q";
           }
-          else if(partida.bitboard_rei_branco & potencia){
+          else if(partida_real.bitboard_rei_branco & potencia){
             fen += "K";
           }
         }
@@ -130,18 +130,18 @@ export function converterFEN(){
   fen = fen.split("/").reverse().join("/");
 
   // FEN com quem está jogando
-  fen += ` ${partida.jogando}`;
+  fen += ` ${partida_real.jogando}`;
 
   // FEN com os roques
-  let roques = (partida.status_roque_direita_branco == true) ? "K" : "";
-  roques += (partida.status_roque_esquerda_branco == true) ? "Q" : "";
-  roques += (partida.status_roque_direita_preto == true) ? "k" : "";
-  roques += (partida.status_roque_esquerda_preto == true) ? "q" : "";
+  let roques = (partida_real.status_roque_direita_branco == true) ? "K" : "";
+  roques += (partida_real.status_roque_esquerda_branco == true) ? "Q" : "";
+  roques += (partida_real.status_roque_direita_preto == true) ? "k" : "";
+  roques += (partida_real.status_roque_esquerda_preto == true) ? "q" : "";
   fen += (roques == "") ? " -" : ` ${roques}`;
 
   // FEN com en passant
-  if((partida.en_passant_brancas | partida.en_passant_pretas) !== 0n){
-    fen += ` ${desconverter(partida.en_passant_pretas | partida.en_passant_brancas)}`;
+  if((partida_real.en_passant_brancas | partida_real.en_passant_pretas) !== 0n){
+    fen += ` ${desconverter(partida_real.en_passant_pretas | partida_real.en_passant_brancas)}`;
   }
   else {
     fen += " -";
@@ -151,7 +151,7 @@ export function converterFEN(){
   fen += " 0";
 
   // FEN com regra dos 50 lances (ainda não implementado)
-  fen += ` ${partida.numero_lances_completo}`
+  fen += ` ${partida_real.numero_lances_completo}`
 
   return fen;
 }
@@ -180,31 +180,31 @@ export function desconverterFEN(fen){
   let cont = 0;
 
   // Bitboard das peças
-  partida.bitboard_piao_branco = 0n;
-  partida.bitboard_piao_preto = 0n;
-  partida.bitboard_bispo_branco = 0n;
-  partida.bitboard_bispo_preto = 0n;
-  partida.bitboard_cavalo_branco = 0n;
-  partida.bitboard_cavalo_preto = 0n;
-  partida.bitboard_torre_branco = 0n;
-  partida.bitboard_torre_preto = 0n;
-  partida.bitboard_rainha_branco = 0n;
-  partida.bitboard_rainha_preto = 0n;
-  partida.bitboard_rei_branco = 0n;
-  partida.bitboard_rei_preto = 0n;
+  partida_real.bitboard_piao_branco = 0n;
+  partida_real.bitboard_piao_preto = 0n;
+  partida_real.bitboard_bispo_branco = 0n;
+  partida_real.bitboard_bispo_preto = 0n;
+  partida_real.bitboard_cavalo_branco = 0n;
+  partida_real.bitboard_cavalo_preto = 0n;
+  partida_real.bitboard_torre_branco = 0n;
+  partida_real.bitboard_torre_preto = 0n;
+  partida_real.bitboard_rainha_branco = 0n;
+  partida_real.bitboard_rainha_preto = 0n;
+  partida_real.bitboard_rei_branco = 0n;
+  partida_real.bitboard_rei_preto = 0n;
 
   // Bitboard de quem joga 
-  partida.jogando = fen_jogando;
-  partida.numero_lances_completo = fen_numero_movimento;
+  partida_real.jogando = fen_jogando;
+  partida_real.numero_lances_completo = fen_numero_movimento;
 
   // Bitboard do enpassant
-  partida.en_passant_brancas = (fen_jogando == "b" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
-  partida.en_passant_pretas = (fen_jogando == "w" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+  partida_real.en_passant_brancas = (fen_jogando == "b" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
+  partida_real.en_passant_pretas = (fen_jogando == "w" && fen_en_passant != "-") ? converter(fen_en_passant) : 0n;
 
-  partida.status_roque_esquerda_branco = (fen_roque.indexOf("K") != -1) ? true : false;
-  partida.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
-  partida.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
-  partida.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
+  partida_real.status_roque_esquerda_branco = (fen_roque.indexOf("K") != -1) ? true : false;
+  partida_real.status_roque_direita_branco = (fen_roque.indexOf("Q") != -1) ?  true : false;
+  partida_real.status_roque_esquerda_preto = (fen_roque.indexOf("k") != -1) ?  true : false;
+  partida_real.status_roque_direita_preto = (fen_roque.indexOf("q") != -1) ? true : false;
 
   for(let cont1 = 0; cont1 < 8; cont1++){
     const linha_atual = fen_pecas[cont1].split("");
@@ -216,41 +216,41 @@ export function desconverterFEN(fen){
 
       switch(linha_atual[cont2]){
         case "p":
-          partida.bitboard_piao_preto |= valor;
+          partida_real.bitboard_piao_preto |= valor;
           break;
         case "n":
-          partida.bitboard_cavalo_preto |= valor;
+          partida_real.bitboard_cavalo_preto |= valor;
           break;
         case "b":
-          partida.bitboard_bispo_preto |= valor;
+          partida_real.bitboard_bispo_preto |= valor;
           break;
         case "r":
-          partida.bitboard_torre_preto |= valor;
+          partida_real.bitboard_torre_preto |= valor;
           break;
         case "q":
-          partida.bitboard_rainha_preto |= valor;
+          partida_real.bitboard_rainha_preto |= valor;
           break;
         case "k":
-          partida.bitboard_rei_preto |= valor;
+          partida_real.bitboard_rei_preto |= valor;
           break;
 
         case "P":
-          partida.bitboard_piao_branco |= valor;
+          partida_real.bitboard_piao_branco |= valor;
           break;
         case "N":
-          partida.bitboard_cavalo_branco |= valor;
+          partida_real.bitboard_cavalo_branco |= valor;
           break;
         case "B":
-          partida.bitboard_bispo_branco |= valor;
+          partida_real.bitboard_bispo_branco |= valor;
           break;
         case "R":
-          partida.bitboard_torre_branco |= valor;
+          partida_real.bitboard_torre_branco |= valor;
           break;
         case "Q":
-          partida.bitboard_rainha_branco |= valor;
+          partida_real.bitboard_rainha_branco |= valor;
           break;
         case "K":
-          partida.bitboard_rei_branco |= valor;
+          partida_real.bitboard_rei_branco |= valor;
           break;
           
         default:
@@ -260,9 +260,9 @@ export function desconverterFEN(fen){
       
     }
   }
-  partida.bitboard_pecas_pretas = partida.bitboard_piao_preto | partida.bitboard_cavalo_preto | partida.bitboard_bispo_preto | partida.bitboard_torre_preto | partida.bitboard_rainha_preto | partida.bitboard_rei_preto;
-  partida.bitboard_pecas_brancas = partida.bitboard_piao_branco | partida.bitboard_cavalo_branco | partida.bitboard_bispo_branco | partida.bitboard_torre_branco | partida.bitboard_rainha_branco | partida.bitboard_rei_branco;
-  partida.bitboard_tabuleiro_completo = partida.bitboard_pecas_pretas | partida.bitboard_pecas_brancas;
+  partida_real.bitboard_pecas_pretas = partida_real.bitboard_piao_preto | partida_real.bitboard_cavalo_preto | partida_real.bitboard_bispo_preto | partida_real.bitboard_torre_preto | partida_real.bitboard_rainha_preto | partida_real.bitboard_rei_preto;
+  partida_real.bitboard_pecas_brancas = partida_real.bitboard_piao_branco | partida_real.bitboard_cavalo_branco | partida_real.bitboard_bispo_branco | partida_real.bitboard_torre_branco | partida_real.bitboard_rainha_branco | partida_real.bitboard_rei_branco;
+  partida_real.bitboard_tabuleiro_completo = partida_real.bitboard_pecas_pretas | partida_real.bitboard_pecas_brancas;
 
   return;  
 }

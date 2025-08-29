@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 import { mover } from './movimentacao.js';
 import { converter, converterFEN, desconverterFEN } from './traducao.js';
-import { sincronizar_estado_com_simulado, sincronizar_simulado_com_estado, zerar } from './variaveis.js';
+import { sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real, zerar } from './variaveis.js';
 import { Calcular } from './calcular.js';
 
 const app = express();
@@ -56,7 +56,7 @@ app.post('/mover', (req, res) => {
     
     res.json(response);
     
-    if(error.message == "Xeque mate"){
+    if(error.message == "Xeque mate" || error.message == "Empate por afogamento"){
       process.exit(0);
     }
 
@@ -70,10 +70,11 @@ app.post('/fen', (req, res) => {
     const fen = req.body.fen;
 
     desconverterFEN(fen);
-    sincronizar_simulado_com_estado();
-    Calcular.calcular_casas_atacadas();
-    Calcular.verificar_rei_atacado("w");
-    Calcular.verificar_rei_atacado("b");
+
+    sincronizar_partida_simulada_com_partida_real();
+    Calcular.casas_atacadas();
+    Calcular.se_rei_atacado("w");
+    Calcular.se_rei_atacado("b");
 
     const response = {
       status: "ok",
