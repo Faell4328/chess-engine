@@ -1,9 +1,5 @@
-import { Calcular } from './calcular.js';
-import { partida_real, zerar } from './variaveis.js'
-import { visualizadeiro } from './visualizador.js';
-
 // Recebe a coordenada normal e converte para binário.
-export function converter(valor){
+function converter(valor){
   let potencia = 0;
   let binario = 0n;
   potencia = Number((valor[1])-1) * 8;
@@ -23,7 +19,7 @@ export function converter(valor){
 }
 
 // Recebe o binário e converte para coordenada normal
-export function desconverter(valor){
+function desconverter(valor){
   let log2 = (valor.toString(2).length -1);
   let linhas = 0;
   let colunas = 0;
@@ -45,7 +41,7 @@ export function desconverter(valor){
 }
 
 // Gera o FEN com base nos bitboards e outra variáveis de controle do jogo
-export function converterFEN(){
+function converterFEN(){
 
   let fen = "";
   let casas_vazias = 0;
@@ -67,7 +63,7 @@ export function converterFEN(){
         //Verificando se é uma peça preta
         if(partida_real.bitboard_pecas_pretas & potencia){
 
-          if(partida_real.bitboard_piao_preto & potencia){
+          if(partida_real.bitboard_peao_preto & potencia){
             fen += "p";
           }
           else if(partida_real.bitboard_cavalo_preto & potencia){
@@ -88,7 +84,7 @@ export function converterFEN(){
         }
         // Peça branca
         else{
-          if(partida_real.bitboard_piao_branco & potencia){
+          if(partida_real.bitboard_peao_branco & potencia){
             fen += "P";
           }
           else if(partida_real.bitboard_cavalo_branco & potencia){
@@ -157,7 +153,7 @@ export function converterFEN(){
 }
 
 // Gera os bitboards com base no FEN (já salvando no simulado)
-export function desconverterFEN(fen){
+function desconverterFEN(fen){
 
   zerar();
 
@@ -180,8 +176,8 @@ export function desconverterFEN(fen){
   let cont = 0;
 
   // Bitboard das peças
-  partida_real.bitboard_piao_branco = 0n;
-  partida_real.bitboard_piao_preto = 0n;
+  partida_real.bitboard_peao_branco = 0n;
+  partida_real.bitboard_peao_preto = 0n;
   partida_real.bitboard_bispo_branco = 0n;
   partida_real.bitboard_bispo_preto = 0n;
   partida_real.bitboard_cavalo_branco = 0n;
@@ -216,7 +212,7 @@ export function desconverterFEN(fen){
 
       switch(linha_atual[cont2]){
         case "p":
-          partida_real.bitboard_piao_preto |= valor;
+          partida_real.bitboard_peao_preto |= valor;
           break;
         case "n":
           partida_real.bitboard_cavalo_preto |= valor;
@@ -235,7 +231,7 @@ export function desconverterFEN(fen){
           break;
 
         case "P":
-          partida_real.bitboard_piao_branco |= valor;
+          partida_real.bitboard_peao_branco |= valor;
           break;
         case "N":
           partida_real.bitboard_cavalo_branco |= valor;
@@ -260,8 +256,8 @@ export function desconverterFEN(fen){
       
     }
   }
-  partida_real.bitboard_pecas_pretas = partida_real.bitboard_piao_preto | partida_real.bitboard_cavalo_preto | partida_real.bitboard_bispo_preto | partida_real.bitboard_torre_preto | partida_real.bitboard_rainha_preto | partida_real.bitboard_rei_preto;
-  partida_real.bitboard_pecas_brancas = partida_real.bitboard_piao_branco | partida_real.bitboard_cavalo_branco | partida_real.bitboard_bispo_branco | partida_real.bitboard_torre_branco | partida_real.bitboard_rainha_branco | partida_real.bitboard_rei_branco;
+  partida_real.bitboard_pecas_pretas = partida_real.bitboard_peao_preto | partida_real.bitboard_cavalo_preto | partida_real.bitboard_bispo_preto | partida_real.bitboard_torre_preto | partida_real.bitboard_rainha_preto | partida_real.bitboard_rei_preto;
+  partida_real.bitboard_pecas_brancas = partida_real.bitboard_peao_branco | partida_real.bitboard_cavalo_branco | partida_real.bitboard_bispo_branco | partida_real.bitboard_torre_branco | partida_real.bitboard_rainha_branco | partida_real.bitboard_rei_branco;
   partida_real.bitboard_tabuleiro_completo = partida_real.bitboard_pecas_pretas | partida_real.bitboard_pecas_brancas;
 
   return;  

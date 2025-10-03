@@ -1,4 +1,4 @@
-export const informacoes_xadrez = {
+const informacoes_xadrez = {
 
   /** LIMITES DO TABULEIRO: COLUNA */
 
@@ -24,9 +24,9 @@ export const informacoes_xadrez = {
 
   /** PRÉ-MOVIMENTO DAS PEÇAS */
 
-  movimento_piao: [8n, 16n],
-  captura_piao_esquerda: [7n],
-  captura_piao_direita: [9n],
+  movimento_peao: [8n, 16n],
+  captura_peao_esquerda: [7n],
+  captura_peao_direita: [9n],
 
   movimento_cavalo_direita: [10n, 17n],
   movimento_cavalo_esquerda: [6n, 15n],
@@ -44,8 +44,8 @@ export const informacoes_xadrez = {
 
   /** CASAS INICIAS DO PIÃO */
 
-  casas_iniciais_piao_branco: 65280n,
-  casas_iniciais_piao_preto: 71776119061217280n,
+  casas_iniciais_peao_branco: 65280n,
+  casas_iniciais_peao_preto: 71776119061217280n,
 
   /** INFORMAÇÕES DAS CASAS NO ROQUE */
   
@@ -104,7 +104,7 @@ export const informacoes_xadrez = {
 
   /** INFORMAÇÕES DAS PEÇAS */
 
-  piao: "p",
+  peao: "p",
   cavalo: "n",
   bispo: "b",
   torre: "r",
@@ -112,12 +112,12 @@ export const informacoes_xadrez = {
   rei: "k"
 }
 
-export const partida_real = {
+const partida_real = {
 
   /** PEÇAS BRANÇAS */
 
   // 00000000 00000000 00000000 00000000 00000000 00000000 11111111 00000000
-  bitboard_piao_branco: 65280n,
+  bitboard_peao_branco: 65280n,
   
   // 00000000 00000000 00000000 00000000 00000000 00000000 00000000 01000010
   bitboard_cavalo_branco: 66n,
@@ -140,7 +140,7 @@ export const partida_real = {
   /** PEÇAS PRETAS */
   
   // 00000000 11111111 00000000 00000000 00000000 00000000 00000000 00000000
-  bitboard_piao_preto: 71776119061217280n,
+  bitboard_peao_preto: 71776119061217280n,
   
   // 01000010 00000000 00000000 00000000 00000000 00000000 00000000 00000000
   bitboard_cavalo_preto: 4755801206503243776n,
@@ -198,11 +198,11 @@ export const partida_real = {
   fen_jogados: [],
 }
 
-export const partida_simulada = {
+const partida_simulada = {
 
   /** PEÇAS BRANCAS */
 
-  bitboard_piao_branco: 65280n,
+  bitboard_peao_branco: 65280n,
   bitboard_cavalo_branco: 66n,
   bitboard_bispo_branco: 36n,
   bitboard_torre_branco: 129n,
@@ -212,7 +212,7 @@ export const partida_simulada = {
   
   /** PEÇAS PRETAS */
 
-  bitboard_piao_preto: 71776119061217280n,
+  bitboard_peao_preto: 71776119061217280n,
   bitboard_cavalo_preto: 4755801206503243776n,
   bitboard_bispo_preto: 2594073385365405696n,
   bitboard_torre_preto: 9295429630892703744n,
@@ -241,8 +241,8 @@ export const partida_simulada = {
   status_roque_direita_preto: true,
 }
 
-export function zerar(){
-  partida_real.bitboard_piao_branco = 65280n;
+function zerar(){
+  partida_real.bitboard_peao_branco = 65280n;
   partida_real.bitboard_cavalo_branco = 66n;
   partida_real.bitboard_bispo_branco = 36n;
   partida_real.bitboard_torre_branco = 129n;
@@ -250,7 +250,7 @@ export function zerar(){
   partida_real.bitboard_rei_branco = 16n;
   partida_real.bitboard_pecas_brancas = 65535n;
   
-  partida_real.bitboard_piao_preto = 71776119061217280n;
+  partida_real.bitboard_peao_preto = 71776119061217280n;
   partida_real.bitboard_cavalo_preto = 4755801206503243776n;
   partida_real.bitboard_bispo_preto = 2594073385365405696n;
   partida_real.bitboard_torre_preto = 9295429630892703744n;
@@ -283,15 +283,15 @@ export function zerar(){
 }
 
 // Passar o valor de estado para simulado
-export function sincronizar_partida_simulada_com_partida_real(){
-  partida_simulada.bitboard_piao_branco = partida_real.bitboard_piao_branco;
+function sincronizar_partida_simulada_com_partida_real(){
+  partida_simulada.bitboard_peao_branco = partida_real.bitboard_peao_branco;
   partida_simulada.bitboard_cavalo_branco = partida_real.bitboard_cavalo_branco;
   partida_simulada.bitboard_bispo_branco = partida_real.bitboard_bispo_branco;
   partida_simulada.bitboard_torre_branco = partida_real.bitboard_torre_branco;
   partida_simulada.bitboard_rainha_branco = partida_real.bitboard_rainha_branco;
   partida_simulada.bitboard_rei_branco = partida_real.bitboard_rei_branco;
 
-  partida_simulada.bitboard_piao_preto = partida_real.bitboard_piao_preto;
+  partida_simulada.bitboard_peao_preto = partida_real.bitboard_peao_preto;
   partida_simulada.bitboard_cavalo_preto = partida_real.bitboard_cavalo_preto;
   partida_simulada.bitboard_bispo_preto = partida_real.bitboard_bispo_preto;
   partida_simulada.bitboard_torre_preto = partida_real.bitboard_torre_preto;
@@ -321,15 +321,15 @@ export function sincronizar_partida_simulada_com_partida_real(){
 }
 
 // Passar o valor de simulado para estado
-export function sincronizar_partida_real_com_partida_simulada(){
-  partida_real.bitboard_piao_branco = partida_simulada.bitboard_piao_branco;
+function sincronizar_partida_real_com_partida_simulada(){
+  partida_real.bitboard_peao_branco = partida_simulada.bitboard_peao_branco;
   partida_real.bitboard_cavalo_branco = partida_simulada.bitboard_cavalo_branco;
   partida_real.bitboard_bispo_branco = partida_simulada.bitboard_bispo_branco;
   partida_real.bitboard_torre_branco = partida_simulada.bitboard_torre_branco;
   partida_real.bitboard_rainha_branco = partida_simulada.bitboard_rainha_branco;
   partida_real.bitboard_rei_branco = partida_simulada.bitboard_rei_branco;
 
-  partida_real.bitboard_piao_preto = partida_simulada.bitboard_piao_preto;
+  partida_real.bitboard_peao_preto = partida_simulada.bitboard_peao_preto;
   partida_real.bitboard_cavalo_preto = partida_simulada.bitboard_cavalo_preto;
   partida_real.bitboard_bispo_preto = partida_simulada.bitboard_bispo_preto;
   partida_real.bitboard_torre_preto = partida_simulada.bitboard_torre_preto;

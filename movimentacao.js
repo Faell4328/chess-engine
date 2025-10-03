@@ -1,12 +1,7 @@
-import { Calcular } from './calcular.js';
-import { converterFEN } from './traducao.js';
-import { partida_real, partida_simulada, informacoes_xadrez, sincronizar_partida_real_com_partida_simulada, sincronizar_partida_simulada_com_partida_real } from './variaveis.js'
-import { visualizadeiro } from './visualizador.js';
-
 let captura = false;
 
 // Função orquestradora e que fica exporta (única).
-export function mover(origem, destino, promocao, movimentos = null){
+function mover(origem, destino, promocao, movimentos = null){
 
   // Zerando os en passant caso tenha
   if(partida_real.jogando == "b" && partida_real.en_passant_pretas !== 0n){
@@ -24,7 +19,7 @@ export function mover(origem, destino, promocao, movimentos = null){
   // Chamando a função principal da peça movida
   switch(peca_movida){
     case "p":
-      Piao.validador(origem, destino, promocao, movimentos);
+      Peao.validador(origem, destino, promocao, movimentos);
       break;
     case "n":
       Cavalo.validador(origem, destino, movimentos);
@@ -97,11 +92,11 @@ export function mover(origem, destino, promocao, movimentos = null){
   }
 }
 
-export function identificar_peca_movida(origem){
+function identificar_peca_movida(origem){
   // Brancas jogam
   if(partida_real.jogando == "w"){
     // Verificando se a peça movida é um pião das brancas
-    if(partida_real.bitboard_piao_branco & origem){
+    if(partida_real.bitboard_peao_branco & origem){
       return "p";
     }
 
@@ -138,7 +133,7 @@ export function identificar_peca_movida(origem){
   // Pretas joga,
   else{
     // Verificando se a peça movida é um pião das pretas
-    if(partida_real.bitboard_piao_preto & origem){
+    if(partida_real.bitboard_peao_preto & origem){
       return "p";
     }
 
@@ -174,11 +169,11 @@ export function identificar_peca_movida(origem){
   }
 }
 
-export class Piao{
+class Peao{
   // Método principal, responsável por verificar se o movimento é válido, se for efetivar
   static validador(origem, destino, promocao){
     // Calculandos os movimentos legais da peça
-    let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_piao(partida_real.jogando, origem);
+    let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_peao(partida_real.jogando, origem);
     
     // Verificando se o lance feito é um lance inválido
     if(movimentos_possiveis.todos.includes(destino) == false){
@@ -187,7 +182,7 @@ export class Piao{
 
     // Verificando se foi feito um en passant
     if((movimentos_possiveis.en_passant.length > 0) && movimentos_possiveis.en_passant.includes(destino)){
-      Piao.efetuar_en_passant(origem, destino);
+      Peao.efetuar_en_passant(origem, destino);
       captura = true;
     }
     // Verificando se foi feito uma captura
@@ -197,12 +192,12 @@ export class Piao{
     }
     // Feito um movimento
     else{
-      const destino_esperado_duplo = (partida_real.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[1] : origem >> informacoes_xadrez.movimento_piao[1];
-      const bitboard_piao_adversario = (partida_real.jogando == "w") ? partida_simulada.bitboard_piao_preto : partida_simulada.bitboard_piao_branco;
-      const bitboard_com_en_passant = (partida_real.jogando == "w") ? origem << informacoes_xadrez.movimento_piao[0] : origem >> informacoes_xadrez.movimento_piao[0];
+      const destino_esperado_duplo = (partida_real.jogando == "w") ? origem << informacoes_xadrez.movimento_peao[1] : origem >> informacoes_xadrez.movimento_peao[1];
+      const bitboard_peao_adversario = (partida_real.jogando == "w") ? partida_simulada.bitboard_peao_preto : partida_simulada.bitboard_peao_branco;
+      const bitboard_com_en_passant = (partida_real.jogando == "w") ? origem << informacoes_xadrez.movimento_peao[0] : origem >> informacoes_xadrez.movimento_peao[0];
       
       // Verificando se foi feito um movimento duplo AND se tem inimigo ao lado. Se for feito vai atualizar o bitboard de en passant.
-      if((destino_esperado_duplo == destino) && (((destino << 1n) | (destino >> 1n) & bitboard_piao_adversario) != 0n)){
+      if((destino_esperado_duplo == destino) && (((destino << 1n) | (destino >> 1n) & bitboard_peao_adversario) != 0n)){
         if(partida_real.jogando == "w"){
           partida_simulada.en_passant_brancas = bitboard_com_en_passant;
         }
@@ -217,35 +212,35 @@ export class Piao{
     if(Calcular.se_tem_promocao(partida_real.jogando)){
       if(partida_real.jogando == "w"){
         if(promocao == "r"){
-          partida_simulada.bitboard_torre_branco ^= partida_simulada.bitboard_piao_branco & destino;
+          partida_simulada.bitboard_torre_branco ^= partida_simulada.bitboard_peao_branco & destino;
         }
         else if(promocao == "b"){
-          partida_simulada.bitboard_bispo_branco ^= partida_simulada.bitboard_piao_branco & destino;
+          partida_simulada.bitboard_bispo_branco ^= partida_simulada.bitboard_peao_branco & destino;
         }
         else if(promocao == "n"){
-          partida_simulada.bitboard_cavalo_branco ^= partida_simulada.bitboard_piao_branco & destino;
+          partida_simulada.bitboard_cavalo_branco ^= partida_simulada.bitboard_peao_branco & destino;
         }
         else{
-          partida_simulada.bitboard_rainha_branco ^= partida_simulada.bitboard_piao_branco & destino;
+          partida_simulada.bitboard_rainha_branco ^= partida_simulada.bitboard_peao_branco & destino;
         }
 
-        partida_simulada.bitboard_piao_branco ^= partida_simulada.bitboard_piao_branco & destino;
+        partida_simulada.bitboard_peao_branco ^= partida_simulada.bitboard_peao_branco & destino;
       }
       else{
         if(promocao == "r"){
-          partida_simulada.bitboard_torre_preto ^= partida_simulada.bitboard_piao_preto & destino;
+          partida_simulada.bitboard_torre_preto ^= partida_simulada.bitboard_peao_preto & destino;
         }
         else if(promocao == "b"){
-          partida_simulada.bitboard_bispo_preto ^= partida_simulada.bitboard_piao_preto & destino;
+          partida_simulada.bitboard_bispo_preto ^= partida_simulada.bitboard_peao_preto & destino;
         }
         else if(promocao == "n"){
-          partida_simulada.bitboard_cavalo_preto ^= partida_simulada.bitboard_piao_preto & destino;
+          partida_simulada.bitboard_cavalo_preto ^= partida_simulada.bitboard_peao_preto & destino;
         }
         else{
-          partida_simulada.bitboard_rainha_preto ^= partida_simulada.bitboard_piao_preto & destino;
+          partida_simulada.bitboard_rainha_preto ^= partida_simulada.bitboard_peao_preto & destino;
         }
 
-        partida_simulada.bitboard_piao_preto ^= partida_simulada.bitboard_piao_preto & destino;
+        partida_simulada.bitboard_peao_preto ^= partida_simulada.bitboard_peao_preto & destino;
       }
     }
 
@@ -255,12 +250,12 @@ export class Piao{
   static efetuar_en_passant(origem, destino){
     // Brancas jogam
     if(partida_real.jogando == "w"){
-      partida_simulada.bitboard_piao_preto ^= (partida_simulada.en_passant_pretas >> informacoes_xadrez.movimento_piao[0]) 
+      partida_simulada.bitboard_peao_preto ^= (partida_simulada.en_passant_pretas >> informacoes_xadrez.movimento_peao[0]) 
       partida_simulada.en_passant_pretas = 0n;
     }
     // Pretas jogam
     else{
-      partida_simulada.bitboard_piao_branco ^= (partida_simulada.en_passant_brancas << informacoes_xadrez.movimento_piao[0]) 
+      partida_simulada.bitboard_peao_branco ^= (partida_simulada.en_passant_brancas << informacoes_xadrez.movimento_peao[0]) 
       partida_simulada.en_passant_brancas = 0n;
     }
 
@@ -369,7 +364,7 @@ class Dama{
   }
 }
 
-export class Rei{
+class Rei{
   // Método principal, responsável por verificar se o movimento é válido, se for efetivar
   static validador(origem, destino){
     // Calculandos os movimentos legais da peça
@@ -446,13 +441,13 @@ export class Rei{
   }
 }
 
-export function efetuar_movimento(origem, destino, peca){
+function efetuar_movimento(origem, destino, peca){
   // Brancas jogam
   if(partida_real.jogando == "w"){
     // Realiza o movimento do pião
     if(peca == "p"){
-      partida_simulada.bitboard_piao_branco ^= origem;
-      partida_simulada.bitboard_piao_branco |= destino;
+      partida_simulada.bitboard_peao_branco ^= origem;
+      partida_simulada.bitboard_peao_branco |= destino;
     }
     // Realiza o movimento do cavalo
     else if(peca == "n"){
@@ -498,8 +493,8 @@ export function efetuar_movimento(origem, destino, peca){
   else{
     // Realiza o movimento do pião
     if(peca == "p"){
-      partida_simulada.bitboard_piao_preto ^= origem;
-      partida_simulada.bitboard_piao_preto |= destino;
+      partida_simulada.bitboard_peao_preto ^= origem;
+      partida_simulada.bitboard_peao_preto |= destino;
     }
     // Realiza o movimento do cavalo
     else if(peca == "n"){
@@ -546,11 +541,11 @@ export function efetuar_movimento(origem, destino, peca){
   return;
 }
 
-export function efetuar_captura(origem, destino, peca){
+function efetuar_captura(origem, destino, peca){
   // Brancas jogam
   if(partida_real.jogando == "w"){
     //  Atualizando o bitboard das pretas (capturando a peça)
-    partida_simulada.bitboard_piao_preto ^= (partida_simulada.bitboard_piao_preto & destino);
+    partida_simulada.bitboard_peao_preto ^= (partida_simulada.bitboard_peao_preto & destino);
     partida_simulada.bitboard_cavalo_preto ^= (partida_simulada.bitboard_cavalo_preto & destino);
     partida_simulada.bitboard_bispo_preto ^= (partida_simulada.bitboard_bispo_preto & destino);
     partida_simulada.bitboard_torre_preto ^= (partida_simulada.bitboard_torre_preto & destino);
@@ -559,7 +554,7 @@ export function efetuar_captura(origem, destino, peca){
   // Pretas jogam
   else{
     //  Atualizando o bitboard das brancas (capturando a peça)
-    partida_simulada.bitboard_piao_branco ^= (partida_simulada.bitboard_piao_branco & destino);
+    partida_simulada.bitboard_peao_branco ^= (partida_simulada.bitboard_peao_branco & destino);
     partida_simulada.bitboard_cavalo_branco ^= (partida_simulada.bitboard_cavalo_branco & destino);
     partida_simulada.bitboard_bispo_branco ^= (partida_simulada.bitboard_bispo_branco & destino);
     partida_simulada.bitboard_torre_branco ^= (partida_simulada.bitboard_torre_branco & destino);
@@ -570,12 +565,12 @@ export function efetuar_captura(origem, destino, peca){
   return;
 }
 
-export function atualizarTabuleiro(){
+function atualizarTabuleiro(){
   // Atualizando o bitboard de todas as peças brancas
-  partida_simulada.bitboard_pecas_brancas = partida_simulada.bitboard_piao_branco | partida_simulada.bitboard_cavalo_branco | partida_simulada.bitboard_bispo_branco | partida_simulada.bitboard_torre_branco | partida_simulada.bitboard_rainha_branco | partida_simulada.bitboard_rei_branco;
+  partida_simulada.bitboard_pecas_brancas = partida_simulada.bitboard_peao_branco | partida_simulada.bitboard_cavalo_branco | partida_simulada.bitboard_bispo_branco | partida_simulada.bitboard_torre_branco | partida_simulada.bitboard_rainha_branco | partida_simulada.bitboard_rei_branco;
 
   // Atualizando o bitboard de todas as peças pretas
-  partida_simulada.bitboard_pecas_pretas = partida_simulada.bitboard_piao_preto | partida_simulada.bitboard_cavalo_preto | partida_simulada.bitboard_bispo_preto | partida_simulada.bitboard_torre_preto | partida_simulada.bitboard_rainha_preto | partida_simulada.bitboard_rei_preto;
+  partida_simulada.bitboard_pecas_pretas = partida_simulada.bitboard_peao_preto | partida_simulada.bitboard_cavalo_preto | partida_simulada.bitboard_bispo_preto | partida_simulada.bitboard_torre_preto | partida_simulada.bitboard_rainha_preto | partida_simulada.bitboard_rei_preto;
   
   // Atualizando o bitboard com todas as casas ocupadas
   partida_simulada.bitboard_tabuleiro_completo = partida_simulada.bitboard_pecas_brancas | partida_simulada.bitboard_pecas_pretas;

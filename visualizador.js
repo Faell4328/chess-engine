@@ -1,4 +1,4 @@
-export function visualizadeiro(bitboard){
+function visualizadeiro(bitboard){
   const rows = bitboard.toString(2).padStart(64, "0").match(new RegExp('.{1,' + 8 + '}', 'g'));
   let tabuleiro = "";
 
