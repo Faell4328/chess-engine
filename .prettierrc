@@ -1,0 +1,17 @@
+{
+  "overrides": [
+    {
+      "files": "*.js",
+      "options": {
+        "printWidth": 9999,
+        "semi": true,
+        "singleQuote": true,
+        "tabWidth": 4,
+        "bracketSpacing": true,
+        "arrowParens": "always",
+        "quoteProps": "consistent",
+        "embeddedLanguageFormatting": "off"
+      }
+    }
+  ]
+}

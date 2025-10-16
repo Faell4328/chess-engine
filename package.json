@@ -1,0 +1,22 @@
+{
+  "name": "chess-engine",
+  "version": "0.8.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write .",
+    "check": "prettier --check ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Faell4328/chess-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Faell4328/chess-engine/issues"
+  },
+  "homepage": "https://github.com/Faell4328/chess-engine#readme"
+}
