@@ -30,6 +30,86 @@
   <p id="aviso"></p>
 </div>
 
+<div style="padding-top: 10px">
+  <hr />
+  <h3 id="titulo_relatorio">Relatórios</h3>
+</div>
+<div style="padding: 0px 10px 20px 10px">
+
+  <div>
+    <h4>Movimentos possíveis</h4>
+    <details open id="container_movimentos_peao">
+      <summary>Peão</summary>
+      <p id="movimentos_peao"></p>
+    </details>
+    <details open id="container_movimentos_cavalo">
+      <summary>Cavalo</summary>
+      <p id="movimentos_cavalo"></p>
+    </details>
+    <details open id="container_movimentos_bispo">
+      <summary>Bispo</summary>
+      <p id="movimentos_bispo"></p>
+    </details>
+    <details open id="container_movimentos_torre">
+      <summary>Torre</summary>
+      <p id="movimentos_torre"></p>
+    </details>
+    <details open id="container_movimentos_rainha">
+      <summary>Rainha</summary>
+      <p id="movimentos_rainha"></p>
+    </details>
+    <details open id="container_movimentos_rei">
+      <summary>Rei</summary>
+      <p id="movimentos_rei"></p>
+    </details>
+  </div>
+
+  <hr />
+
+  <div>
+    <h4>Capturas possíveis</h4>
+    <details open id="container_capturas_peao">
+      <summary>Peão</summary>
+      <p id="capturas_peao"></p>
+    </details>
+    <details open id="container_capturas_cavalo">
+      <summary>Cavalo</summary>
+      <p id="capturas_cavalo"></p>
+    </details>
+    <details open id="container_capturas_bispo">
+      <summary>Bispo</summary>
+      <p id="capturas_bispo"></p>
+    </details>
+    <details open id="container_capturas_torre">
+      <summary>Torre</summary>
+      <p id="capturas_torre"></p>
+    </details>
+    <details open id="container_capturas_rainha">
+      <summary>Rainha</summary>
+      <p id="capturas_rainha"></p>
+    </details>
+    <details open id="container_capturas_rei">
+      <summary>Rei</summary>
+      <p id="capturas_rei"></p>
+    </details>
+  </div>
+
+  <hr />
+
+  <div>
+    <h4>Movimentos especiais possíveis (en passant e roque)</h4>
+    <details open id="container_en_passant">
+      <summary>En passant</summary>
+      <p id="en_passant"></p>
+    </details>
+    <details open id="container_roque">
+      <summary>Roque</summary>
+      <p id="roque"></p>
+    </details>
+  </div>
+</div>
+
+
 <script>
   const board = Chessboard("tabuleiro", {
     position: "start",
@@ -39,4 +119,8 @@
       board.position(gerarFenDaPosicao());
     },
   });
+
+  gerarRelatorioMovimento();
+  gerarRelatorioCaptura();
+  gerarRelatorioMovimentoEspecial();
 </script>

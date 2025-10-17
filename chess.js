@@ -73,6 +73,9 @@ class Chess {
             Calcular.se_rei_tem_escaptoria(partida_real.jogando);
 
             verificarRepticaoFen();
+            gerarRelatorioMovimento();
+            gerarRelatorioCaptura();
+            gerarRelatorioMovimentoEspecial();
 
             return;
         } catch (error) {
@@ -593,6 +596,10 @@ function carregarFenPersonalizado() {
 
     board.position(gerarFenDaPosicao());
     campo_input_fen_personalizado.value = '';
+
+    gerarRelatorioMovimento();
+    gerarRelatorioCaptura();
+    gerarRelatorioMovimentoEspecial();
 
     return;
 }

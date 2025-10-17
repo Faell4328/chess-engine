@@ -50,15 +50,15 @@ function converterCoordenadaParaBinario(valor) {
 }
 
 function converteBinarioParaCoordenada(valor) {
-    let log2 = valor.toString(2).length - 1;
+    let quantidade_casas = valor.toString(2).length - 1;
     let linhas = 0;
     let colunas = 0;
     while (true) {
-        if (log2 > 8) {
-            log2 -= 8;
+        if (quantidade_casas >= 8) {
+            quantidade_casas -= 8;
             linhas++;
         } else {
-            colunas = log2;
+            colunas = quantidade_casas;
             break;
         }
     }
@@ -172,4 +172,269 @@ function validarFen(fen) {
         aviso('O sexto campo do FEN está incorreto, não começa em "0" e sim em "1"', 'Erro');
         throw new Error('O sexto campo do FEN está incorreto, não começa em "0" e sim em "1"');
     }
+}
+
+function limparTextoRelatorioMovimento(){
+    document.getElementById("movimentos_peao").innerHTML = "";
+    document.getElementById("movimentos_cavalo").innerHTML = "";
+    document.getElementById("movimentos_bispo").innerHTML = "";
+    document.getElementById("movimentos_torre").innerHTML = "";
+    document.getElementById("movimentos_rainha").innerHTML = "";
+    document.getElementById("movimentos_rei").innerHTML = "";
+}
+
+function gerarRelatorioMovimento(){
+    limparTextoRelatorioMovimento();
+
+    document.getElementById("titulo_relatorio").textContent = (partida_real.jogando == "w") ? "Relatório das brancas" : "Relatório das pretas";
+    
+    // Todos os movimentos estão em binário (por isso está sendo utilizando o "converteBinarioParaCoordenada")
+    const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+    const elementoRelatorioPeao = document.getElementById("movimentos_peao");
+    let estaVazio = true;
+
+    todosMovimentosECaptura.peao.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioPeao.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_movimentos_peao").style = "display: none" : document.getElementById("container_movimentos_peao").style = ""
+
+
+    const elementoRelatorioCavalo = document.getElementById("movimentos_cavalo");
+    estaVazio = true;
+
+    todosMovimentosECaptura.cavalo.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioCavalo.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_movimentos_cavalo").style = "display: none" : document.getElementById("container_movimentos_cavalo").style = ""
+  
+
+    document.getElementById("container_movimentos_bispo").style = ""
+
+    const elementoRelatorioBispo = document.getElementById("movimentos_bispo");
+    estaVazio = true;
+
+    todosMovimentosECaptura.bispo.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioBispo.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_movimentos_bispo").style = "display: none" : document.getElementById("container_movimentos_bispo").style = ""
+
+
+    const elementoRelatorioTorre = document.getElementById("movimentos_torre");
+    estaVazio = true;
+
+    todosMovimentosECaptura.torre.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioTorre.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+   
+    (estaVazio == true) ? document.getElementById("container_movimentos_torre").style = "display: none" : document.getElementById("container_movimentos_torre").style = ""
+
+
+    const elementoRelatorioRainha = document.getElementById("movimentos_rainha");
+    estaVazio = true;
+
+    todosMovimentosECaptura.rainha.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRainha.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+   
+    (estaVazio == true) ? document.getElementById("container_movimentos_rainha").style = "display: none" : document.getElementById("container_movimentos_rainha").style = ""
+
+
+    const elementoRelatorioRei = document.getElementById("movimentos_rei");
+    estaVazio = true;
+
+    todosMovimentosECaptura.rei.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.movimentos.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRei.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_movimentos_rei").style = "display: none" : document.getElementById("container_movimentos_rei").style = ""
+}
+
+function limparTextoRelatorioCaptura(){
+    document.getElementById("capturas_peao").innerHTML = "";
+    document.getElementById("capturas_cavalo").innerHTML = "";
+    document.getElementById("capturas_bispo").innerHTML = "";
+    document.getElementById("capturas_torre").innerHTML = "";
+    document.getElementById("capturas_rainha").innerHTML = "";
+    document.getElementById("capturas_rei").innerHTML = "";
+}
+
+function gerarRelatorioCaptura(){
+    limparTextoRelatorioCaptura();
+
+    document.getElementById("titulo_relatorio").textContent = (partida_real.jogando == "w") ? "Relatório das brancas" : "Relatório das pretas";
+
+    // Todos as capturas estão em binário (por isso está sendo utilizando o "converteBinarioParaCoordenada")
+    const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+    const elementoRelatorioPeao = document.getElementById("capturas_peao");
+    let estaVazio = true;
+
+    todosMovimentosECaptura.peao.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioPeao.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_capturas_peao").style = "display: none" : document.getElementById("container_capturas_peao").style = ""
+
+    
+    const elementoRelatorioCavalo = document.getElementById("capturas_cavalo");
+    estaVazio = true;
+
+    todosMovimentosECaptura.cavalo.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioCavalo.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_capturas_cavalo").style = "display: none" : document.getElementById("container_capturas_cavalo").style = ""
+  
+
+    document.getElementById("container_capturas_bispo").style = ""
+
+    const elementoRelatorioBispo = document.getElementById("capturas_bispo");
+    estaVazio = true;
+
+    todosMovimentosECaptura.bispo.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioBispo.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_capturas_bispo").style = "display: none" : document.getElementById("container_capturas_bispo").style = ""
+
+
+    const elementoRelatorioTorre = document.getElementById("capturas_torre");
+    estaVazio = true;
+
+    todosMovimentosECaptura.torre.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioTorre.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+   
+    (estaVazio == true) ? document.getElementById("container_capturas_torre").style = "display: none" : document.getElementById("container_capturas_torre").style = ""
+
+
+    const elementoRelatorioRainha = document.getElementById("capturas_rainha");
+    estaVazio = true;
+
+    todosMovimentosECaptura.rainha.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRainha.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+   
+    (estaVazio == true) ? document.getElementById("container_capturas_rainha").style = "display: none" : document.getElementById("container_capturas_rainha").style = ""
+
+
+    const elementoRelatorioRei = document.getElementById("capturas_rei");
+    estaVazio = true;
+
+    todosMovimentosECaptura.rei.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.capturas.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRei.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_capturas_rei").style = "display: none" : document.getElementById("container_capturas_rei").style = ""
+}
+
+function limparTextoRelatorioMovimentoEspecial(){
+    document.getElementById("en_passant").innerHTML = "";
+    document.getElementById("roque").innerHTML = "";
+}
+
+function gerarRelatorioMovimentoEspecial(){
+    limparTextoRelatorioMovimentoEspecial();
+
+    document.getElementById("titulo_relatorio").textContent = (partida_real.jogando == "w") ? "Relatório das brancas" : "Relatório das pretas";
+
+    // Todos as capturas estão em binário (por isso está sendo utilizando o "converteBinarioParaCoordenada")
+    const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+    const elementoRelatorioPeao = document.getElementById("en_passant");
+    let estaVazio = true;
+
+    todosMovimentosECaptura.peao.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        const destino = movimento.destino.en_passant.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioPeao.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_en_passant").style = "display: none" : document.getElementById("container_en_passant").style = ""
+
+    
+    const elementoRelatorioRei = document.getElementById("roque");
+    estaVazio = true;
+
+    todosMovimentosECaptura.rei.map((movimento) => {
+        const origem = converteBinarioParaCoordenada(movimento.origem);
+        let destino = movimento.destino.roque_direita.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRei.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+
+        destino = movimento.destino.roque_esquerda.map((movimento_destino) => { return converteBinarioParaCoordenada(movimento_destino); }).join(", ")
+        if(destino){
+            elementoRelatorioRei.innerHTML += `${origem} -> ${destino}<br />`
+            estaVazio = false;
+        }
+    });
+
+    (estaVazio == true) ? document.getElementById("container_roque").style = "display: none" : document.getElementById("container_roque").style = ""
+  
 }
