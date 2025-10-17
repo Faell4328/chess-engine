@@ -73,9 +73,12 @@ class Chess {
             Calcular.se_rei_tem_escaptoria(partida_real.jogando);
 
             verificarRepticaoFen();
-            gerarRelatorioMovimento();
-            gerarRelatorioCaptura();
-            gerarRelatorioMovimentoEspecial();
+
+            document.getElementById('titulo_relatorio').textContent = partida_real.jogando == 'w' ? 'Relatório das brancas' : 'Relatório das pretas';
+            const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+            gerarRelatorioMovimento(todosMovimentosECaptura);
+            gerarRelatorioCaptura(todosMovimentosECaptura);
+            gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
 
             return;
         } catch (error) {
@@ -597,9 +600,11 @@ function carregarFenPersonalizado() {
     board.position(gerarFenDaPosicao());
     campo_input_fen_personalizado.value = '';
 
-    gerarRelatorioMovimento();
-    gerarRelatorioCaptura();
-    gerarRelatorioMovimentoEspecial();
+    document.getElementById('titulo_relatorio').textContent = partida_real.jogando == 'w' ? 'Relatório das brancas' : 'Relatório das pretas';
+    const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+    gerarRelatorioMovimento(todosMovimentosECaptura);
+    gerarRelatorioCaptura(todosMovimentosECaptura);
+    gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
 
     return;
 }
