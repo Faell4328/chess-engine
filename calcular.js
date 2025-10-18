@@ -994,7 +994,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true));
                 }
@@ -1007,7 +1007,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true));
                 }
@@ -1020,7 +1020,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true));
                 }
@@ -1033,7 +1033,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true));
                 }
@@ -1046,7 +1046,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true));
                 }
@@ -1059,7 +1059,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
                     casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true));
                 }
@@ -1072,7 +1072,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true));
                 }
@@ -1085,7 +1085,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true));
                 }
@@ -1098,7 +1098,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true));
                 }
@@ -1111,7 +1111,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true));
                 }
@@ -1124,7 +1124,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true));
                 }
@@ -1137,7 +1137,7 @@ class Calcular {
                     for (let casa_atacada of retorno_casas_atacadas) {
                         soma_casas_atacadas |= casa_atacada;
                     }
-                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                    vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
                     casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true));
                 }
@@ -1167,12 +1167,12 @@ class Calcular {
             casas_atacada_brancas.map((movimento) => {
                 casas_atacadas_pelas_brancas |= movimento;
             });
-            vizualizadeiroCasasAtacadas(null, casas_atacadas_pelas_brancas);
+            vizualizadeiroCasasAtacadas(null, 'w', casas_atacadas_pelas_brancas);
 
             casas_atacada_pretas.map((movimento) => {
                 casas_atacadas_pelas_pretas |= movimento;
             });
-            vizualizadeiroCasasAtacadas(null, casas_atacadas_pelas_pretas);
+            vizualizadeiroCasasAtacadas(null, 'b', casas_atacadas_pelas_pretas);
         }
     }
 

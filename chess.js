@@ -79,7 +79,7 @@ class Chess {
             gerarRelatorioMovimento(todosMovimentosECaptura);
             gerarRelatorioCaptura(todosMovimentosECaptura);
             gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
-            console.clear();
+            limparTextoRelatorioAtacados();
             Calcular.casas_atacadas(true);
 
             return;

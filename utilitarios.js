@@ -298,7 +298,7 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
     estaVazio == true ? (document.getElementById('container_roque').style = 'display: none') : (document.getElementById('container_roque').style = '');
 }
 
-function vizualizadeiroCasasAtacadas(bitboard_origem, bitboard_casas_atacadas) {
+function vizualizadeiroCasasAtacadas(bitboard_origem, cor, bitboard_casas_atacadas) {
     let casas_tabuleiro = [64];
 
     let casa_origem = '';
@@ -330,16 +330,18 @@ function vizualizadeiroCasasAtacadas(bitboard_origem, bitboard_casas_atacadas) {
                 tabuleiro += `Casas atacadas pelo rei de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
                 break;
         }
-        if (partida_real.jogando == 'b') {
-            peca_origem = peca_origem.toUpperCase();
-        }
     } else {
-        peca_origem = partida_real.jogando == 'w' ? 'Todas as casas atacadas pelas brancas' : 'Todas as casas atacadas pelas pretas';
+        peca_origem = 'todas';
+        tabuleiro += cor == 'w' ? 'Todas as casas atacadas pelas brancas\n\n' : 'Todas as casas atacadas pelas pretas\n\n';
     }
 
     for (let contador = 0; contador < 64; contador++) {
         if (casa_origem[contador] == '1') {
-            casas_tabuleiro[contador] = peca_origem;
+            if (cor == 'w') {
+                casas_tabuleiro[contador] = peca_origem.toUpperCase();
+            } else {
+                casas_tabuleiro[contador] = peca_origem;
+            }
         } else if (casas_atacadas[contador] == '1') {
             casas_tabuleiro[contador] = 'X';
         } else {
@@ -347,11 +349,31 @@ function vizualizadeiroCasasAtacadas(bitboard_origem, bitboard_casas_atacadas) {
         }
     }
 
-    tabuleiro += '    +-------------------------+\n';
+    tabuleiro += '   +-----------------+\n';
     for (let contador = 7; contador >= 0; contador--) {
-        tabuleiro += `${contador + 1}   | ${casas_tabuleiro[contador * 8]}  ${casas_tabuleiro[contador * 8 + 1]}  ${casas_tabuleiro[contador * 8 + 2]}  ${casas_tabuleiro[contador * 8 + 3]}  ${casas_tabuleiro[contador * 8 + 4]}  ${casas_tabuleiro[contador * 8 + 5]}  ${casas_tabuleiro[contador * 8 + 6]}  ${casas_tabuleiro[contador * 8 + 7]}  |\n`;
+        tabuleiro += `${contador + 1}  | ${casas_tabuleiro[contador * 8]} ${casas_tabuleiro[contador * 8 + 1]} ${casas_tabuleiro[contador * 8 + 2]} ${casas_tabuleiro[contador * 8 + 3]} ${casas_tabuleiro[contador * 8 + 4]} ${casas_tabuleiro[contador * 8 + 5]} ${casas_tabuleiro[contador * 8 + 6]} ${casas_tabuleiro[contador * 8 + 7]} |\n`;
     }
-    tabuleiro += '    +-------------------------+\n';
-    tabuleiro += '      a  b  c  d  e  f  g  h   \n';
-    console.log(tabuleiro);
+    tabuleiro += '   +-----------------+\n';
+    tabuleiro += '     a b c d e f g h  \n';
+
+    gerarRelatorioAtacados(peca_origem, tabuleiro);
+}
+
+function limparTextoRelatorioAtacados() {
+    let elementos = ['p', 'n', 'b', 'r', 'q', 'k', 'todas'];
+    for (let peca of elementos) {
+        const elementoRelatorio = document.getElementById(`container_atacando_${peca}`);
+        elementoRelatorio.innerHTML = '';
+    }
+}
+function gerarRelatorioAtacados(peca, conteudo) {
+    const elementoRelatorio = document.getElementById(`container_atacando_${peca}`);
+
+    let elemento_criado = document.createElement('span');
+    elemento_criado.style.border = '1px solid #000';
+    elemento_criado.style.padding = '30px';
+    elemento_criado.style.fontFamily = 'monospace';
+    elemento_criado.style.whiteSpace = 'pre';
+    elemento_criado.textContent = conteudo;
+    elementoRelatorio.appendChild(elemento_criado);
 }

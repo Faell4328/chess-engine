@@ -108,6 +108,75 @@
   </div>
 </div>
 
+<div style="padding-top: 10px">
+  <hr />
+  <h3>Casas atacadas</h3>
+</div>
+<div style="padding: 0px 10px 20px 10px">
+  <details style="padding: 10px">
+    <summary>Peao</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_p"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Cavalo</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_n"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Bispo</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_b"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Torre</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_r"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Rainha</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_q"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Rei</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_k"
+    ></div>
+  </details>
+
+  <details style="padding: 10px">
+    <summary>Todas</summary>
+    <div
+      style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+      open
+      id="container_atacando_todas"
+    ></div>
+  </details>
+</div>
+
 <script>
   const board = Chessboard("tabuleiro", {
     position: "start",
@@ -127,5 +196,6 @@
   gerarRelatorioMovimento(todosMovimentosECaptura);
   gerarRelatorioCaptura(todosMovimentosECaptura);
   gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
+  limparTextoRelatorioAtacados();
   Calcular.casas_atacadas(true);
 </script>
