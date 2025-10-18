@@ -297,3 +297,61 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
 
     estaVazio == true ? (document.getElementById('container_roque').style = 'display: none') : (document.getElementById('container_roque').style = '');
 }
+
+function vizualizadeiroCasasAtacadas(bitboard_origem, bitboard_casas_atacadas) {
+    let casas_tabuleiro = [64];
+
+    let casa_origem = '';
+    let casas_atacadas = bitboard_casas_atacadas.toString(2).padStart(64, '0').split('').reverse().join('');
+    let tabuleiro = '';
+    let peca_origem = '';
+
+    if (bitboard_origem != null) {
+        casa_origem = bitboard_origem.toString(2).padStart(64, '0').split('').reverse().join('');
+        peca_origem = identificarPecaMovida(bitboard_origem);
+
+        switch (peca_origem) {
+            case 'p':
+                tabuleiro += `Casas atacadas pelo peão de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+            case 'n':
+                tabuleiro += `Casas atacadas pelo cavalo de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+            case 'b':
+                tabuleiro += `Casas atacadas pelo bispo de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+            case 'r':
+                tabuleiro += `Casas atacadas pela torre de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+            case 'q':
+                tabuleiro += `Casas atacadas pela rainha de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+            case 'k':
+                tabuleiro += `Casas atacadas pelo rei de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                break;
+        }
+        if (partida_real.jogando == 'b') {
+            peca_origem = peca_origem.toUpperCase();
+        }
+    } else {
+        peca_origem = partida_real.jogando == 'w' ? 'Todas as casas atacadas pelas brancas' : 'Todas as casas atacadas pelas pretas';
+    }
+
+    for (let contador = 0; contador < 64; contador++) {
+        if (casa_origem[contador] == '1') {
+            casas_tabuleiro[contador] = peca_origem;
+        } else if (casas_atacadas[contador] == '1') {
+            casas_tabuleiro[contador] = 'X';
+        } else {
+            casas_tabuleiro[contador] = '-';
+        }
+    }
+
+    tabuleiro += '    +-------------------------+\n';
+    for (let contador = 7; contador >= 0; contador--) {
+        tabuleiro += `${contador + 1}   | ${casas_tabuleiro[contador * 8]}  ${casas_tabuleiro[contador * 8 + 1]}  ${casas_tabuleiro[contador * 8 + 2]}  ${casas_tabuleiro[contador * 8 + 3]}  ${casas_tabuleiro[contador * 8 + 4]}  ${casas_tabuleiro[contador * 8 + 5]}  ${casas_tabuleiro[contador * 8 + 6]}  ${casas_tabuleiro[contador * 8 + 7]}  |\n`;
+    }
+    tabuleiro += '    +-------------------------+\n';
+    tabuleiro += '      a  b  c  d  e  f  g  h   \n';
+    console.log(tabuleiro);
+}

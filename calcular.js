@@ -954,7 +954,7 @@ class Calcular {
     }
 
     // Essa funçao é responsável por calcular todas as casas que estão sendo atacadas pelas pretas e brancas.
-    static casas_atacadas() {
+    static casas_atacadas(relatorio = false) {
         let casas_atacada_peao_brancas = [];
         let casas_atacada_cavalo_brancas = [];
         let casas_atacada_bispo_brancas = [];
@@ -985,31 +985,162 @@ class Calcular {
                 break;
             }
 
-            // Verificando se é um pião das brancas
             if ((origem & partida_simulada.bitboard_peao_branco) !== 0n) {
-                casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true);
+                    casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_cavalo_branco) !== 0n) {
-                casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true);
+                    casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_bispo_branco) !== 0n) {
-                casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true);
+                    casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_torre_branco) !== 0n) {
-                casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true);
+                    casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_rainha_branco) !== 0n) {
-                casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true);
+                    casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_rei_branco) !== 0n) {
-                casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true);
+                    casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_peao_preto) !== 0n) {
-                casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true);
+                    casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_cavalo_preto) !== 0n) {
-                casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true);
+                    casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_bispo_preto) !== 0n) {
-                casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true);
+                    casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_torre_preto) !== 0n) {
-                casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true);
+                    casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_rainha_preto) !== 0n) {
-                casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true);
+                    casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true));
+                }
             } else if ((origem & partida_simulada.bitboard_rei_preto) !== 0n) {
-                casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true));
+                // Vai entrar caso senha "true" no parâmetro de relatório
+                if (relatorio == true) {
+                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true);
+                    casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(retorno_casas_atacadas);
+                    let soma_casas_atacadas = 0n;
+                    for (let casa_atacada of retorno_casas_atacadas) {
+                        soma_casas_atacadas |= casa_atacada;
+                    }
+                    vizualizadeiroCasasAtacadas(origem, soma_casas_atacadas);
+                } else {
+                    casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true));
+                }
             }
 
             // Atualizando a variável com o restante do bitboard
@@ -1019,15 +1150,30 @@ class Calcular {
         casas_atacada_brancas = [...casas_atacada_peao_brancas, ...casas_atacada_cavalo_brancas, ...casas_atacada_bispo_brancas, ...casas_atacada_torre_brancas, ...casas_atacada_rainha_brancas, ...casas_atacada_rei_brancas];
         casas_atacada_pretas = [...casas_atacada_peao_pretas, ...casas_atacada_cavalo_pretas, ...casas_atacada_bispo_pretas, ...casas_atacada_torre_pretas, ...casas_atacada_rainha_pretas, ...casas_atacada_rei_pretas];
 
-        partida_simulada.casas_atacadas_pelas_brancas = 0n;
-        partida_simulada.casas_atacadas_pelas_pretas = 0n;
+        if (relatorio == false) {
+            partida_simulada.casas_atacadas_pelas_brancas = 0n;
+            partida_simulada.casas_atacadas_pelas_pretas = 0n;
 
-        casas_atacada_brancas.map((movimento) => {
-            partida_simulada.casas_atacadas_pelas_brancas |= movimento;
-        });
-        casas_atacada_pretas.map((movimento) => {
-            partida_simulada.casas_atacadas_pelas_pretas |= movimento;
-        });
+            casas_atacada_brancas.map((movimento) => {
+                partida_simulada.casas_atacadas_pelas_brancas |= movimento;
+            });
+            casas_atacada_pretas.map((movimento) => {
+                partida_simulada.casas_atacadas_pelas_pretas |= movimento;
+            });
+        } else {
+            let casas_atacadas_pelas_brancas = 0n;
+            let casas_atacadas_pelas_pretas = 0n;
+
+            casas_atacada_brancas.map((movimento) => {
+                casas_atacadas_pelas_brancas |= movimento;
+            });
+            vizualizadeiroCasasAtacadas(null, casas_atacadas_pelas_brancas);
+
+            casas_atacada_pretas.map((movimento) => {
+                casas_atacadas_pelas_pretas |= movimento;
+            });
+            vizualizadeiroCasasAtacadas(null, casas_atacadas_pelas_pretas);
+        }
     }
 
     static se_rei_atacado(jogando) {
