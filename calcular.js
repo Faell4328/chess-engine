@@ -284,7 +284,11 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
         }
         // Verifica se a casa está atacada por alguma peça inimiga
         else if ((destino & casas_atacadas_inimigos) !== 0n) {
-            break;
+            if (calculando_casas_atacadas == false) {
+                break;
+            } else {
+                capturas.push(destino);
+            }
         }
         // Verificiando se a casa está ocupada por um inimigo e se não está na borda
         else if ((destino & pecas_inimigas) !== 0n && (destino & borda) !== 0n) {
@@ -725,6 +729,9 @@ class Calcular {
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
+
+        console.log('Frente');
+        console.log(movimentos_retornado);
 
         movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
         movimentos_possiveis = {

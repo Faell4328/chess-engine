@@ -592,8 +592,9 @@ function carregarFenPersonalizado() {
     partida_real.bitboard_tabuleiro_completo = partida_real.bitboard_pecas_pretas | partida_real.bitboard_pecas_brancas;
 
     sincronizar_partida_simulada_com_partida_real();
-
     Calcular.casas_atacadas();
+    sincronizar_partida_real_com_partida_simulada();
+
     Calcular.se_rei_tem_escaptoria('w');
     Calcular.se_rei_tem_escaptoria('b');
 
@@ -607,6 +608,8 @@ function carregarFenPersonalizado() {
     gerarRelatorioMovimento(todosMovimentosECaptura);
     gerarRelatorioCaptura(todosMovimentosECaptura);
     gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
+    limparTextoRelatorioAtacados();
+    Calcular.casas_atacadas(true);
 
     return;
 }
@@ -651,6 +654,7 @@ function identificarPecaMovida(origem) {
     }
 }
 
+// Arumar isso, para retornar apenas a cor e não fazer a verificação completa
 function verificarVezJogando(origem) {
     if (partida_real.jogando == 'w' && (partida_real.bitboard_pecas_pretas & origem) !== 0n) {
         aviso('Vez do adversário', 'Erro');
