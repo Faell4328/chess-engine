@@ -1,5 +1,5 @@
 // Função para calcular todos movimentos e capturas válido do pião
-function calcular_ataque_e_movimento_pecas_peao(jogando, origem, deslocamento, operador, isMovimentoPeao, borda, calculando_casas_atacadas = false) {
+function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operador, isMovimentoPeao, borda, calculando_casas_atacadas = false) {
     let pecas_aliadas = jogando == 'w' ? partida_simulada.bitboard_pecas_brancas : partida_simulada.bitboard_pecas_pretas;
     let pecas_inimigas = jogando == 'w' ? partida_simulada.bitboard_pecas_pretas : partida_simulada.bitboard_pecas_brancas;
     let en_passant_inimigo = jogando == 'w' ? partida_simulada.en_passant_pretas : partida_simulada.en_passant_brancas;
@@ -36,9 +36,9 @@ function calcular_ataque_e_movimento_pecas_peao(jogando, origem, deslocamento, o
         // Verificando se casa está ocupada por um inimigo (captura)
         else if (isMovimentoPeao == false && (destino & pecas_inimigas) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, 'p');
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, 'p');
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -50,9 +50,9 @@ function calcular_ataque_e_movimento_pecas_peao(jogando, origem, deslocamento, o
         // Verificando se um en passant é válido
         else if (isMovimentoPeao == false && (destino & en_passant_inimigo) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                Peao.efetuar_en_passant(origem, destino);
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                Peao.efetuarEnPassant(origem, destino);
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     en_passant.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -68,9 +68,9 @@ function calcular_ataque_e_movimento_pecas_peao(jogando, origem, deslocamento, o
 
         // Verificando se é um movimento e não é um cálculo de casas atacadas
         if (isMovimentoPeao == true && calculando_casas_atacadas == false) {
-            efetuar_movimento(origem, destino, 'p');
-            Calcular.casas_atacadas();
-            if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+            efetuarMovimento(origem, destino, 'p');
+            Calcular.casasAtacadas();
+            if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                 movimentos.push(destino);
             }
             sincronizar_partida_simulada_com_partida_real();
@@ -97,7 +97,7 @@ function calcular_ataque_e_movimento_pecas_peao(jogando, origem, deslocamento, o
 }
 
 // Função para calcular todos movimentos e capturas válido do cavalo
-function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocamento, operador, calculando_casas_atacadas = false) {
+function calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, deslocamento, operador, calculando_casas_atacadas = false) {
     let pecas_aliadas = jogando == 'w' ? partida_simulada.bitboard_pecas_brancas : partida_simulada.bitboard_pecas_pretas;
     let pecas_inimigas = jogando == 'w' ? partida_simulada.bitboard_pecas_pretas : partida_simulada.bitboard_pecas_brancas;
 
@@ -122,9 +122,9 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
         // Verificiando se a casa está ocupada por um inimigo
         else if ((destino & pecas_inimigas) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, 'n');
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, 'n');
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -139,9 +139,9 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
         }
 
         if (calculando_casas_atacadas == false) {
-            efetuar_movimento(origem, destino, 'n');
-            Calcular.casas_atacadas();
-            if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+            efetuarMovimento(origem, destino, 'n');
+            Calcular.casasAtacadas();
+            if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                 movimentos.push(destino);
             }
             sincronizar_partida_simulada_com_partida_real();
@@ -166,7 +166,7 @@ function calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, deslocam
 }
 
 // Função para calcular todos movimentos e capturas das peças válido do: Bispo, Torre e Dama
-function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocamento, operador, borda, peca = null, calculando_casas_atacadas = false) {
+function calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, deslocamento, operador, borda, peca = null, calculando_casas_atacadas = false) {
     let pecas_aliadas = jogando == 'w' ? partida_simulada.bitboard_pecas_brancas : partida_simulada.bitboard_pecas_pretas;
     let pecas_inimigas = jogando == 'w' ? partida_simulada.bitboard_pecas_pretas : partida_simulada.bitboard_pecas_brancas;
 
@@ -188,9 +188,9 @@ function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocam
         // Verificiando se a casa está ocupada por um inimigo e se não está na borda
         else if ((destino & pecas_inimigas) !== 0n && (destino & borda) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, peca);
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, peca);
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -203,9 +203,9 @@ function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocam
         // Verificiando se a casa está ocupada por um inimigo
         else if ((destino & pecas_inimigas) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, peca);
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, peca);
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -222,9 +222,9 @@ function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocam
         // Verificando se a peça está na borda
         else if ((destino & borda) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_movimento(origem, destino, peca);
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarMovimento(origem, destino, peca);
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     movimentos.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -236,9 +236,9 @@ function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocam
         }
 
         if (calculando_casas_atacadas == false) {
-            efetuar_movimento(origem, destino, peca);
-            Calcular.casas_atacadas();
-            if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+            efetuarMovimento(origem, destino, peca);
+            Calcular.casasAtacadas();
+            if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                 movimentos.push(destino);
             }
             sincronizar_partida_simulada_com_partida_real();
@@ -262,7 +262,7 @@ function calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, deslocam
 }
 
 // Função para calcular todos movimentos e capturas das peças válido do Rei
-function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, operador, borda, calculando_casas_atacadas = false) {
+function calcularAtaqueEMovimentoPecaRei(jogando, origem, deslocamento, operador, borda, calculando_casas_atacadas = false) {
     let pecas_aliadas = jogando == 'w' ? partida_simulada.bitboard_pecas_brancas : partida_simulada.bitboard_pecas_pretas;
     let pecas_inimigas = jogando == 'w' ? partida_simulada.bitboard_pecas_pretas : partida_simulada.bitboard_pecas_brancas;
     let casas_atacadas_inimigos = jogando == 'w' ? partida_simulada.casas_atacadas_pelas_pretas : partida_simulada.casas_atacadas_pelas_brancas;
@@ -293,9 +293,9 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
         // Verificiando se a casa está ocupada por um inimigo e se não está na borda
         else if ((destino & pecas_inimigas) !== 0n && (destino & borda) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, 'k');
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, 'k');
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -306,9 +306,9 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
         // Verificiando se a casa está ocupada por um inimigo
         else if ((destino & pecas_inimigas) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_captura(origem, destino, 'k');
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarCaptura(origem, destino, 'k');
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     capturas.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -324,9 +324,9 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
         // Verificando se a peça está na borda
         else if ((destino & borda) !== 0n) {
             if (calculando_casas_atacadas == false) {
-                efetuar_movimento(origem, destino, 'k');
-                Calcular.casas_atacadas();
-                if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+                efetuarMovimento(origem, destino, 'k');
+                Calcular.casasAtacadas();
+                if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                     movimentos.push(destino);
                 }
                 sincronizar_partida_simulada_com_partida_real();
@@ -338,9 +338,9 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
         }
 
         if (calculando_casas_atacadas == false) {
-            efetuar_movimento(origem, destino, 'k');
-            Calcular.casas_atacadas();
-            if (Calcular.se_rei_atacado(partida_real.jogando) == false) {
+            efetuarMovimento(origem, destino, 'k');
+            Calcular.casasAtacadas();
+            if (Calcular.seReiAtacado(partida_real.jogando) == false) {
                 movimentos.push(destino);
             }
             sincronizar_partida_simulada_com_partida_real();
@@ -364,7 +364,7 @@ function calcular_ataque_e_movimento_peca_rei(jogando, origem, deslocamento, ope
 }
 
 // Função para calcular se é possível fazer roque para a esquerda
-function calcular_roque_peca_rei_esquerda(jogando) {
+function calcularRoquePecaReiEsquerda(jogando) {
     let torre_aliada = jogando == 'w' ? partida_simulada.bitboard_torre_branco : partida_simulada.bitboard_torre_preto;
     let tabuleiro_completo = partida_simulada.bitboard_tabuleiro_completo;
 
@@ -418,7 +418,7 @@ function calcular_roque_peca_rei_esquerda(jogando) {
 }
 
 // Função para calcular se é possível fazer roque para a direita
-function calcular_roque_peca_rei_direita(jogando) {
+function calcularRoquePecaReiDireita(jogando) {
     let torre_aliada = jogando == 'w' ? partida_simulada.bitboard_torre_branco : partida_simulada.bitboard_torre_preto;
     let tabuleiro_completo = partida_simulada.bitboard_pecas_brancas | partida_simulada.bitboard_pecas_pretas;
 
@@ -471,7 +471,7 @@ function calcular_roque_peca_rei_direita(jogando) {
 }
 
 class Calcular {
-    static todos_ataques_e_movimentos_do_peao(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDoPeao(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_possiveis = {
             todos: [],
             movimentos: [],
@@ -482,10 +482,10 @@ class Calcular {
 
         // Brancas jogam
         if (jogando == 'w') {
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.captura_peao_esquerda, '<<', false, informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.captura_peao_esquerda, '<<', false, informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
             movimentos_possiveis = movimentos_retornado;
 
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.captura_peao_direita, '<<', false, informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.captura_peao_direita, '<<', false, informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
             movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -493,7 +493,7 @@ class Calcular {
                 en_passant: [...movimentos_possiveis.en_passant, ...movimentos_retornado.en_passant],
             };
 
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.movimento_peao, '<<', true, informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.movimento_peao, '<<', true, informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
             movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -503,10 +503,10 @@ class Calcular {
         }
         // Pretas jogam
         else {
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.captura_peao_esquerda, '>>', false, informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.captura_peao_esquerda, '>>', false, informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
             movimentos_possiveis = movimentos_retornado;
 
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.captura_peao_direita, '>>', false, informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.captura_peao_direita, '>>', false, informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
             movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -514,7 +514,7 @@ class Calcular {
                 en_passant: [...movimentos_possiveis.en_passant, ...movimentos_retornado.en_passant],
             };
 
-            movimentos_retornado = calcular_ataque_e_movimento_pecas_peao(jogando, origem, informacoes_xadrez.movimento_peao, '>>', true, informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+            movimentos_retornado = calcularAtaqueEMovimentoPecaPeao(jogando, origem, informacoes_xadrez.movimento_peao, '>>', true, informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
             movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -532,7 +532,7 @@ class Calcular {
         }
     }
 
-    static todos_ataques_e_movimentos_do_cavalo(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDoCavalo(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_retornado = {
             todos: [],
             movimentos: [],
@@ -540,23 +540,23 @@ class Calcular {
         };
         let movimentos_possiveis;
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, informacoes_xadrez.movimento_cavalo_esquerda, '<<', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, informacoes_xadrez.movimento_cavalo_esquerda, '<<', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, informacoes_xadrez.movimento_cavalo_direita, '<<', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, informacoes_xadrez.movimento_cavalo_direita, '<<', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        movimentos_retornado = calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, informacoes_xadrez.movimento_cavalo_esquerda, '>>', calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, informacoes_xadrez.movimento_cavalo_esquerda, '>>', calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_saltitantes(jogando, origem, informacoes_xadrez.movimento_cavalo_direita, '>>', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, informacoes_xadrez.movimento_cavalo_direita, '>>', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -570,7 +570,7 @@ class Calcular {
         }
     }
 
-    static todos_ataques_e_movimentos_do_bispo(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDoBispo(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_retornado = {
             todos: [],
             movimentos: [],
@@ -578,23 +578,23 @@ class Calcular {
         };
         let movimentos_possiveis;
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, 'b', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, 'b', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, 'b', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, 'b', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, 'b', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, 'b', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, 'b', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, 'b', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -608,7 +608,7 @@ class Calcular {
         }
     }
 
-    static todos_ataques_e_movimentos_do_torre(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDaTorre(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_retornado = {
             todos: [],
             movimentos: [],
@@ -616,24 +616,24 @@ class Calcular {
         };
         let movimentos_possiveis;
 
-        movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, '<<', informacoes_xadrez.casas_linha_8, 'r', calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_frente, '<<', informacoes_xadrez.casas_linha_8, 'r', calculando_casas_atacadas);
         movimentos_possiveis = movimentos_retornado;
 
-        movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, '>>', informacoes_xadrez.casas_linha_1, 'r', calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_frente, '>>', informacoes_xadrez.casas_linha_1, 'r', calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, '<<', informacoes_xadrez.casas_coluna_H, 'r', calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_direita, '<<', informacoes_xadrez.casas_coluna_H, 'r', calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, '>>', informacoes_xadrez.casas_coluna_A, 'r', calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_direita, '>>', informacoes_xadrez.casas_coluna_A, 'r', calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -647,7 +647,7 @@ class Calcular {
         }
     }
 
-    static todos_ataques_e_movimentos_do_rainha(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDaRainha(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_retornado = {
             todos: [],
             movimentos: [],
@@ -655,51 +655,51 @@ class Calcular {
         };
         let movimentos_possiveis;
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, '<<', informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_frente, '<<', informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)), (movimentos_possiveis = movimentos_retornado));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_frente, '>>', informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_frente, '>>', informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, '<<', informacoes_xadrez.casas_coluna_H, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_direita, '<<', informacoes_xadrez.casas_coluna_H, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_torre_direita, '>>', informacoes_xadrez.casas_coluna_A, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_torre_direita, '>>', informacoes_xadrez.casas_coluna_A, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
                 capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
             }));
 
-        ((movimentos_retornado = calcular_ataque_e_movimento_pecas_deslizantes(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
+        ((movimentos_retornado = calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, informacoes_xadrez.movimento_bispo_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, 'q', calculando_casas_atacadas)),
             (movimentos_possiveis = {
                 todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
                 movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
@@ -713,7 +713,7 @@ class Calcular {
         }
     }
 
-    static todos_ataques_e_movimentos_do_rei(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
+    static todosAtaquesEMovimentosDoRei(jogando, origem, simplificar_retorno = false, calculando_casas_atacadas = false) {
         let movimentos_retornado;
         let movimentos_possiveis = {
             todos: [],
@@ -723,66 +723,63 @@ class Calcular {
             roque_direita: [],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, '<<', informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente, '<<', informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        console.log('Frente');
-        console.log(movimentos_retornado);
-
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, '<<', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, '<<', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_8, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, '<<', informacoes_xadrez.casas_coluna_H, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_direita, '<<', informacoes_xadrez.casas_coluna_H, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente, '>>', informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente, '>>', informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente_esquerda, '>>', informacoes_xadrez.casas_coluna_H | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_frente_direita, '>>', informacoes_xadrez.casas_coluna_A | informacoes_xadrez.casas_linha_1, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_ataque_e_movimento_peca_rei(jogando, origem, informacoes_xadrez.movimento_rei_direita, '>>', informacoes_xadrez.casas_coluna_A, calculando_casas_atacadas);
+        movimentos_retornado = calcularAtaqueEMovimentoPecaRei(jogando, origem, informacoes_xadrez.movimento_rei_direita, '>>', informacoes_xadrez.casas_coluna_A, calculando_casas_atacadas);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.todos],
             movimentos: [...movimentos_possiveis.movimentos, ...movimentos_retornado.movimentos],
             capturas: [...movimentos_possiveis.capturas, ...movimentos_retornado.capturas],
         };
 
-        movimentos_retornado = calcular_roque_peca_rei_esquerda(jogando);
+        movimentos_retornado = calcularRoquePecaReiEsquerda(jogando);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.roque_esquerda],
             movimentos: [...movimentos_possiveis.movimentos],
@@ -790,7 +787,7 @@ class Calcular {
             roque_esquerda: [...movimentos_retornado.roque_esquerda],
         };
 
-        movimentos_retornado = calcular_roque_peca_rei_direita(jogando);
+        movimentos_retornado = calcularRoquePecaReiDireita(jogando);
         movimentos_possiveis = {
             todos: [...movimentos_possiveis.todos, ...movimentos_retornado.roque_direita],
             movimentos: [...movimentos_possiveis.movimentos],
@@ -807,7 +804,7 @@ class Calcular {
     }
 
     // Essa função é responsável por calcular todos os movimentos de todas as peças das brancas ou das pretas (dependendo do parâmetro)
-    static todos_possiveis_movimentos_de_todas_pecas(jogando) {
+    static todosPossiveisMovimentosDeTodasPecas(jogando) {
         let movimentos_possiveis_peao = [];
         let movimentos_possiveis_cavalo = [];
         let movimentos_possiveis_bispo = [];
@@ -834,42 +831,42 @@ class Calcular {
 
                 // Verificando se é um pião das brancas
                 if ((origem & partida_simulada.bitboard_peao_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_peao('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoPeao('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_peao = movimentos_possiveis_peao.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um cavalo das brancas
                 else if ((origem & partida_simulada.bitboard_cavalo_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoCavalo('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_cavalo = movimentos_possiveis_cavalo.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um bispo das brancas
                 else if ((origem & partida_simulada.bitboard_bispo_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_bispo('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoBispo('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_bispo = movimentos_possiveis_bispo.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é uma torre das brancas
                 else if ((origem & partida_simulada.bitboard_torre_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_torre('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDaTorre('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_torre = movimentos_possiveis_torre.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é uma rainha das brancas
                 else if ((origem & partida_simulada.bitboard_rainha_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_rainha('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDaRainha('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_rainha = movimentos_possiveis_rainha.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um rei das brancas
                 else if ((origem & partida_simulada.bitboard_rei_branco) !== 0n && jogando == 'w') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_rei('w', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoRei('w', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_rei = movimentos_possiveis_rei.concat({ origem: origem, destino: movimentos_retornado });
@@ -887,7 +884,6 @@ class Calcular {
             bitboard_todas_pecas = partida_simulada.bitboard_peao_preto | partida_simulada.bitboard_cavalo_preto | partida_simulada.bitboard_bispo_preto | partida_simulada.bitboard_torre_preto | partida_simulada.bitboard_rainha_preto | partida_simulada.bitboard_rei_preto;
 
             let bitboard_restante = bitboard_todas_pecas;
-
             // Algoritmo Brian Kernighan
             for (let cont = 0; cont < 16; cont++) {
                 let origem = bitboard_restante ^ (bitboard_restante & (bitboard_restante - 1n));
@@ -898,42 +894,42 @@ class Calcular {
 
                 // Verifica se é um pião das pretas
                 if ((origem & partida_simulada.bitboard_peao_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_peao('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoPeao('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_peao = movimentos_possiveis_peao.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um cavalo das pretas
                 else if ((origem & partida_simulada.bitboard_cavalo_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoCavalo('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_cavalo = movimentos_possiveis_cavalo.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um bispo das pretas
                 else if ((origem & partida_simulada.bitboard_bispo_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_bispo('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoBispo('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_bispo = movimentos_possiveis_bispo.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é uma torre das pretas
                 else if ((origem & partida_simulada.bitboard_torre_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_torre('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDaTorre('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_torre = movimentos_possiveis_torre.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é uma rainha das pretas
                 else if ((origem & partida_simulada.bitboard_rainha_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_rainha('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDaRainha('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_rainha = movimentos_possiveis_rainha.concat({ origem: origem, destino: movimentos_retornado });
                 }
                 // Verifica se é um rei das pretas
                 else if ((origem & partida_simulada.bitboard_rei_preto) !== 0n && jogando == 'b') {
-                    let movimentos_retornado = Calcular.todos_ataques_e_movimentos_do_rei('b', origem);
+                    let movimentos_retornado = Calcular.todosAtaquesEMovimentosDoRei('b', origem);
                     quantidade_movimentos_possiveis += movimentos_retornado.todos.length;
 
                     movimentos_possiveis_rei = movimentos_possiveis_rei.concat({ origem: origem, destino: movimentos_retornado });
@@ -961,7 +957,7 @@ class Calcular {
     }
 
     // Essa funçao é responsável por calcular todas as casas que estão sendo atacadas pelas pretas e brancas.
-    static casas_atacadas(relatorio = false) {
+    static casasAtacadas(relatorio = false) {
         let casas_atacada_peao_brancas = [];
         let casas_atacada_cavalo_brancas = [];
         let casas_atacada_bispo_brancas = [];
@@ -995,7 +991,7 @@ class Calcular {
             if ((origem & partida_simulada.bitboard_peao_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoPeao('w', origem, true, true);
                     casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1003,12 +999,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(Calcular.todos_ataques_e_movimentos_do_peao('w', origem, true, true));
+                    casas_atacada_peao_brancas = casas_atacada_peao_brancas.concat(Calcular.todosAtaquesEMovimentosDoPeao('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_cavalo_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoCavalo('w', origem, true, true);
                     casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1016,12 +1012,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('w', origem, true, true));
+                    casas_atacada_cavalo_brancas = casas_atacada_cavalo_brancas.concat(Calcular.todosAtaquesEMovimentosDoCavalo('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_bispo_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoBispo('w', origem, true, true);
                     casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1029,12 +1025,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('w', origem, true, true));
+                    casas_atacada_bispo_brancas = casas_atacada_bispo_brancas.concat(Calcular.todosAtaquesEMovimentosDoBispo('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_torre_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDaTorre('w', origem, true, true);
                     casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1042,12 +1038,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(Calcular.todos_ataques_e_movimentos_do_torre('w', origem, true, true));
+                    casas_atacada_torre_brancas = casas_atacada_torre_brancas.concat(Calcular.todosAtaquesEMovimentosDaTorre('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_rainha_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDaRainha('w', origem, true, true);
                     casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1055,12 +1051,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('w', origem, true, true));
+                    casas_atacada_rainha_brancas = casas_atacada_rainha_brancas.concat(Calcular.todosAtaquesEMovimentosDaRainha('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_rei_branco) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoRei('w', origem, true, true);
                     casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1068,12 +1064,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'w', soma_casas_atacadas);
                 } else {
-                    casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(Calcular.todos_ataques_e_movimentos_do_rei('w', origem, true, true));
+                    casas_atacada_rei_brancas = casas_atacada_rei_brancas.concat(Calcular.todosAtaquesEMovimentosDoRei('w', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_peao_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoPeao('b', origem, true, true);
                     casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1081,12 +1077,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(Calcular.todos_ataques_e_movimentos_do_peao('b', origem, true, true));
+                    casas_atacada_peao_pretas = casas_atacada_peao_pretas.concat(Calcular.todosAtaquesEMovimentosDoPeao('b', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_cavalo_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoCavalo('b', origem, true, true);
                     casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1094,12 +1090,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_cavalo('b', origem, true, true));
+                    casas_atacada_cavalo_pretas = casas_atacada_cavalo_pretas.concat(Calcular.todosAtaquesEMovimentosDoCavalo('b', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_bispo_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoBispo('b', origem, true, true);
                     casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1107,12 +1103,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(Calcular.todos_ataques_e_movimentos_do_bispo('b', origem, true, true));
+                    casas_atacada_bispo_pretas = casas_atacada_bispo_pretas.concat(Calcular.todosAtaquesEMovimentosDoBispo('b', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_torre_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDaTorre('b', origem, true, true);
                     casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1120,12 +1116,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(Calcular.todos_ataques_e_movimentos_do_torre('b', origem, true, true));
+                    casas_atacada_torre_pretas = casas_atacada_torre_pretas.concat(Calcular.todosAtaquesEMovimentosDaTorre('b', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_rainha_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDaRainha('b', origem, true, true);
                     casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1133,12 +1129,12 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rainha('b', origem, true, true));
+                    casas_atacada_rainha_pretas = casas_atacada_rainha_pretas.concat(Calcular.todosAtaquesEMovimentosDaRainha('b', origem, true, true));
                 }
             } else if ((origem & partida_simulada.bitboard_rei_preto) !== 0n) {
                 // Vai entrar caso senha "true" no parâmetro de relatório
                 if (relatorio == true) {
-                    const retorno_casas_atacadas = Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true);
+                    const retorno_casas_atacadas = Calcular.todosAtaquesEMovimentosDoRei('b', origem, true, true);
                     casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(retorno_casas_atacadas);
                     let soma_casas_atacadas = 0n;
                     for (let casa_atacada of retorno_casas_atacadas) {
@@ -1146,7 +1142,7 @@ class Calcular {
                     }
                     vizualizadeiroCasasAtacadas(origem, 'b', soma_casas_atacadas);
                 } else {
-                    casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(Calcular.todos_ataques_e_movimentos_do_rei('b', origem, true, true));
+                    casas_atacada_rei_pretas = casas_atacada_rei_pretas.concat(Calcular.todosAtaquesEMovimentosDoRei('b', origem, true, true));
                 }
             }
 
@@ -1183,7 +1179,7 @@ class Calcular {
         }
     }
 
-    static se_rei_atacado(jogando) {
+    static seReiAtacado(jogando) {
         // Brancas jogam
         if (jogando == 'w') {
             if ((partida_simulada.bitboard_rei_branco & partida_simulada.casas_atacadas_pelas_pretas) !== 0n) {
@@ -1207,12 +1203,12 @@ class Calcular {
         }
     }
 
-    // Função responsável por verificar se o rei está em xeque (depende da função "Calcular.se_rei_atacado")
-    static se_rei_tem_escaptoria(jogando) {
+    // Função responsável por verificar se o rei está em xeque (depende da função "Calcular.seReiAtacado")
+    static seReiTemEscaptaria(jogando) {
         // Brancas jogam
         if (jogando == 'w') {
-            const rei_atacado = Calcular.se_rei_atacado('w');
-            const todos_possiveis_movimentos = Calcular.todos_possiveis_movimentos_de_todas_pecas(jogando);
+            const rei_atacado = Calcular.seReiAtacado('w');
+            const todos_possiveis_movimentos = Calcular.todosPossiveisMovimentosDeTodasPecas(jogando);
 
             if (rei_atacado) {
                 if (todos_possiveis_movimentos.quantidade == 0) {
@@ -1237,8 +1233,8 @@ class Calcular {
         }
         // Pretas jogam
         else {
-            const rei_atacado = Calcular.se_rei_atacado('b');
-            const todos_possiveis_movimentos = Calcular.todos_possiveis_movimentos_de_todas_pecas(jogando);
+            const rei_atacado = Calcular.seReiAtacado('b');
+            const todos_possiveis_movimentos = Calcular.todosPossiveisMovimentosDeTodasPecas(jogando);
 
             if (rei_atacado) {
                 if (todos_possiveis_movimentos.quantidade == 0) {
@@ -1264,7 +1260,7 @@ class Calcular {
     }
 
     // Função responsável por verificar se é possível fazer a promoção do pião
-    static se_tem_promocao(jogando) {
+    static seTemPromocao(jogando) {
         // Brancas jogam
         if (jogando == 'w') {
             // Entra caso tenha pião nas casas de promoção

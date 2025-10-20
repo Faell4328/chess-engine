@@ -53,10 +53,10 @@ class Chess {
             }
 
             // Atualizando as casas atacadas depois de ter válidado e realizado o movimento
-            Calcular.casas_atacadas();
+            Calcular.casasAtacadas();
             // Verificando se os reis estão atacados (atualizando o status)
-            Calcular.se_rei_atacado('w');
-            Calcular.se_rei_atacado('b');
+            Calcular.seReiAtacado('w');
+            Calcular.seReiAtacado('b');
 
             sincronizar_partida_real_com_partida_simulada();
 
@@ -70,20 +70,22 @@ class Chess {
             // Invertendo a vez de jodar
             partida_real.jogando = partida_real.jogando == 'w' ? 'b' : 'w';
 
-            Calcular.se_rei_tem_escaptoria(partida_real.jogando);
+            Calcular.seReiTemEscaptaria(partida_real.jogando);
 
             verificarRepticaoFen();
 
             document.getElementById('titulo_relatorio').textContent = partida_real.jogando == 'w' ? 'Relatório das brancas' : 'Relatório das pretas';
-            const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+            const todosMovimentosECaptura = Calcular.todosPossiveisMovimentosDeTodasPecas(partida_real.jogando);
             gerarRelatorioMovimento(todosMovimentosECaptura);
             gerarRelatorioCaptura(todosMovimentosECaptura);
             gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
             limparTextoRelatorioAtacados();
-            Calcular.casas_atacadas(true);
+            Calcular.casasAtacadas(true);
 
             return;
         } catch (error) {
+            console.error('Ocorreu algum erro ao tentar realizar o movimento');
+            console.error(error);
             aviso(error.message, 'Erro');
             return 'snapback';
         }
@@ -94,7 +96,7 @@ class Peao {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino, promocao) {
         // Calculandos os movimentos legais da peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_peao(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDoPeao(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -105,13 +107,13 @@ class Peao {
 
         // Verificando se foi feito um en passant
         if (movimentos_possiveis.en_passant.length > 0 && movimentos_possiveis.en_passant.includes(destino)) {
-            Peao.efetuar_en_passant(origem, destino);
+            Peao.efetuarEnPassant(origem, destino);
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'p');
+            efetuarCaptura(origem, destino, 'p');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
@@ -129,13 +131,13 @@ class Peao {
                     partida_simulada.en_passant_pretas = bitboard_com_en_passant;
                 }
             }
-            efetuar_movimento(origem, destino, 'p');
+            efetuarMovimento(origem, destino, 'p');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
 
         // Entra se tiver promocao
-        if (Calcular.se_tem_promocao(partida_real.jogando)) {
+        if (Calcular.seTemPromocao(partida_real.jogando)) {
             if (partida_real.jogando == 'w') {
                 if (promocao == 'r') {
                     partida_simulada.bitboard_torre_branco ^= partida_simulada.bitboard_peao_branco & destino;
@@ -166,7 +168,7 @@ class Peao {
         return;
     }
 
-    static efetuar_en_passant(origem, destino) {
+    static efetuarEnPassant(origem, destino) {
         // Brancas jogam
         if (partida_real.jogando == 'w') {
             partida_simulada.bitboard_peao_preto ^= partida_simulada.en_passant_pretas >> informacoes_xadrez.movimento_peao[0];
@@ -178,7 +180,7 @@ class Peao {
             partida_simulada.en_passant_brancas = 0n;
         }
 
-        efetuar_movimento(origem, destino, 'p');
+        efetuarMovimento(origem, destino, 'p');
         Chess.status = 'movimento';
         iniciarSom('movimento');
         return;
@@ -189,7 +191,7 @@ class Cavalo {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino) {
         // Calculandos os movimentos legais da peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_cavalo(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDoCavalo(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -198,13 +200,13 @@ class Cavalo {
 
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'n');
+            efetuarCaptura(origem, destino, 'n');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Feito um movimento
         else {
-            efetuar_movimento(origem, destino, 'n');
+            efetuarMovimento(origem, destino, 'n');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
@@ -217,7 +219,7 @@ class Bispo {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino) {
         // Calculandos os movimentos possiveis referente a peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_bispo(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDoBispo(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -226,13 +228,13 @@ class Bispo {
 
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'b');
+            efetuarCaptura(origem, destino, 'b');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Feito um movimento
         else {
-            efetuar_movimento(origem, destino, 'b');
+            efetuarMovimento(origem, destino, 'b');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
@@ -245,7 +247,7 @@ class Torre {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino) {
         // Calculandos os movimentos possiveis referente a peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_torre(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDaTorre(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -254,13 +256,13 @@ class Torre {
 
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'r');
+            efetuarCaptura(origem, destino, 'r');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Feito um movimento
         else {
-            efetuar_movimento(origem, destino, 'r');
+            efetuarMovimento(origem, destino, 'r');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
@@ -273,7 +275,7 @@ class Dama {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino) {
         // Calculandos os movimentos legais da peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_rainha(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDaRainha(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -282,13 +284,13 @@ class Dama {
 
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'q');
+            efetuarCaptura(origem, destino, 'q');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Feito um movimento
         else {
-            efetuar_movimento(origem, destino, 'q');
+            efetuarMovimento(origem, destino, 'q');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
@@ -301,7 +303,7 @@ class Rei {
     // Método principal, responsável por verificar se o movimento é válido, se for efetivar
     static validar(origem, destino) {
         // Calculandos os movimentos legais da peça
-        let movimentos_possiveis = Calcular.todos_ataques_e_movimentos_do_rei(partida_real.jogando, origem);
+        let movimentos_possiveis = Calcular.todosAtaquesEMovimentosDoRei(partida_real.jogando, origem);
 
         // Verificando se o lance feito é um lance inválido
         if (movimentos_possiveis.todos.includes(destino) == false) {
@@ -309,21 +311,21 @@ class Rei {
         }
         // Verificando se foi feito roque para esquerda
         else if (movimentos_possiveis.roque_esquerda.length > 0 && movimentos_possiveis.roque_esquerda.includes(destino)) {
-            Rei.efetuar_roque_esquerda(origem, destino);
+            Rei.efetuarRoqueEsquerda(origem, destino);
         }
         // Verificando se foi feito roque para direita
         else if (movimentos_possiveis.roque_direita.length > 0 && movimentos_possiveis.roque_direita.includes(destino)) {
-            Rei.efetuar_roque_direita(origem, destino);
+            Rei.efetuarRoqueDireita(origem, destino);
         }
         // Verificando se foi feito uma captura
         else if (movimentos_possiveis.capturas.length > 0 && movimentos_possiveis.capturas.includes(destino)) {
-            efetuar_captura(origem, destino, 'k');
+            efetuarCaptura(origem, destino, 'k');
             Chess.status = 'captura';
             iniciarSom('captura');
         }
         // Feito um movimento
         else {
-            efetuar_movimento(origem, destino, 'k');
+            efetuarMovimento(origem, destino, 'k');
             Chess.status = 'movimento';
             iniciarSom('movimento');
         }
@@ -331,7 +333,7 @@ class Rei {
         return;
     }
 
-    static efetuar_roque_esquerda() {
+    static efetuarRoqueEsquerda() {
         // Brancas jogam
         if (partida_real.jogando == 'w') {
             partida_simulada.bitboard_torre_branco = (partida_real.bitboard_torre_branco ^ 0x0000000000000001n) | informacoes_xadrez.casa_destino_torre_roque_esquerda_branco;
@@ -357,7 +359,7 @@ class Rei {
         }
     }
 
-    static efetuar_roque_direita() {
+    static efetuarRoqueDireita() {
         // Brancas jogam
         if (partida_real.jogando == 'w') {
             partida_simulada.bitboard_torre_branco = (partida_simulada.bitboard_torre_branco ^ 0x0000000000000080n) | informacoes_xadrez.casa_destino_torre_roque_direita_branco;
@@ -592,11 +594,11 @@ function carregarFenPersonalizado() {
     partida_real.bitboard_tabuleiro_completo = partida_real.bitboard_pecas_pretas | partida_real.bitboard_pecas_brancas;
 
     sincronizar_partida_simulada_com_partida_real();
-    Calcular.casas_atacadas();
+    Calcular.casasAtacadas();
     sincronizar_partida_real_com_partida_simulada();
 
-    Calcular.se_rei_tem_escaptoria('w');
-    Calcular.se_rei_tem_escaptoria('b');
+    Calcular.seReiTemEscaptaria('w');
+    Calcular.seReiTemEscaptaria('b');
 
     partida_real.fen_jogados = [campo_input_fen_personalizado.value.split(' ').splice(0, 4).join(' ')];
 
@@ -604,12 +606,12 @@ function carregarFenPersonalizado() {
     campo_input_fen_personalizado.value = '';
 
     document.getElementById('titulo_relatorio').textContent = partida_real.jogando == 'w' ? 'Relatório das brancas' : 'Relatório das pretas';
-    const todosMovimentosECaptura = Calcular.todos_possiveis_movimentos_de_todas_pecas(partida_real.jogando);
+    const todosMovimentosECaptura = Calcular.todosPossiveisMovimentosDeTodasPecas(partida_real.jogando);
     gerarRelatorioMovimento(todosMovimentosECaptura);
     gerarRelatorioCaptura(todosMovimentosECaptura);
     gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
     limparTextoRelatorioAtacados();
-    Calcular.casas_atacadas(true);
+    Calcular.casasAtacadas(true);
 
     return;
 }
@@ -700,7 +702,7 @@ function verificarRepticaoFen() {
     partida_real.fen_jogados.push(fen_atual);
 }
 
-function efetuar_movimento(origem, destino, peca) {
+function efetuarMovimento(origem, destino, peca) {
     // Brancas jogam
     if (partida_real.jogando == 'w') {
         // Realiza o movimento do pião
@@ -798,7 +800,7 @@ function efetuar_movimento(origem, destino, peca) {
     return;
 }
 
-function efetuar_captura(origem, destino, peca) {
+function efetuarCaptura(origem, destino, peca) {
     // Brancas jogam
     if (partida_real.jogando == 'w') {
         //  Atualizando o bitboard das pretas (capturando a peça)
@@ -818,7 +820,7 @@ function efetuar_captura(origem, destino, peca) {
         partida_simulada.bitboard_rainha_branco ^= partida_simulada.bitboard_rainha_branco & destino;
     }
 
-    efetuar_movimento(origem, destino, peca);
+    efetuarMovimento(origem, destino, peca);
     return;
 }
 
