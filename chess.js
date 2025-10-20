@@ -80,7 +80,7 @@ class Chess {
             gerarRelatorioCaptura(todosMovimentosECaptura);
             gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
             limparTextoRelatorioAtacados();
-            Calcular.casasAtacadas(true);
+            Calcular.casasAtacadas(relatorio = true);
 
             return;
         } catch (error) {
@@ -611,7 +611,7 @@ function carregarFenPersonalizado() {
     gerarRelatorioCaptura(todosMovimentosECaptura);
     gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
     limparTextoRelatorioAtacados();
-    Calcular.casasAtacadas(true);
+    Calcular.casasAtacadas(relatorio = true);
 
     return;
 }

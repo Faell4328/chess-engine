@@ -83,6 +83,12 @@ function validarFen(fen) {
 
     // VERIFICANDO A PRIMEIRA CAMPO DO FEN (peças no tabuleiro)
 
+    // Verificando se o primeiro campo do FEN não possui mais de dois reis
+    if(fen_separado[0].match(/[k]/gi).length !== 2){
+        aviso('O primeiro campo do FEN está incorreto, o FEN tem que ter 2 reis, nem menos e nem mais', 'Erro');
+        throw new Error('O primeiro campo do FEN está incorreto, o FEN tem que ter 2 reis, nem menos e nem mais');
+    }
+
     const primeiro_campo_fen = fen_separado[0].split('/');
 
     // Verificando se o primeiro campo do FEN está válido
@@ -90,6 +96,7 @@ function validarFen(fen) {
         aviso(`O primeiro campo do FEN está incorreto, esperado é 8 e o fornecido tem ${primeiro_campo_fen.length}`, 'Erro');
         throw new Error(`O primeiro campo do FEN está incorreto, esperado é 8 e o fornecido tem ${primeiro_campo_fen.length}`);
     }
+
 
     // Verificando se existe alguma letra ou número inválido (válidos: "r", "n", "b", "q", "k", "p", "R", "N", "B", "Q", "K", "P", "/", 1, 2, 3, 4, 5, 6, 7, 8)
     if (fen_separado[0].match(/[^r|n|b|q|k|p|/|1-8]/gi) !== null) {
@@ -174,160 +181,37 @@ function validarFen(fen) {
     }
 }
 
-function limparTextoRelatorio(campo) {
-    const elementos = ['peao', 'cavalo', 'bispo', 'torre', 'rainha', 'rei'];
-
-    elementos.map((elemento) => {
-        document.getElementById(`${campo}_${elemento}`).innerHTML = '';
-    });
-}
-
-function gerarRelatorioMovimento(movimentos) {
-    limparTextoRelatorio('movimentos');
-
-    const elementos = ['peao', 'cavalo', 'bispo', 'torre', 'rainha', 'rei'];
-    const todosMovimentosDaPeca = [movimentos.peao, movimentos.cavalo, movimentos.bispo, movimentos.torre, movimentos.rainha, movimentos.rei];
-
-    for (let cont = 0; cont < elementos.length; cont++) {
-        const elementoRelatorio = document.getElementById(`movimentos_${elementos[cont]}`);
-        let estaVazio = true;
-
-        todosMovimentosDaPeca[cont].map((movimento) => {
-            const origem = converteBinarioParaCoordenada(movimento.origem);
-            const destino = movimento.destino.movimentos
-                .map((movimento_destino) => {
-                    return converteBinarioParaCoordenada(movimento_destino);
-                })
-                .join(', ');
-            if (destino) {
-                elementoRelatorio.innerHTML += `${origem} -> ${destino}<br />`;
-                estaVazio = false;
-            }
-        });
-
-        // Verificando se foi adicionado algum relatório, caso não tenha, o elemento fica oculto
-        if (estaVazio == true) {
-            document.getElementById(`container_movimentos_${elementos[cont]}`).style = 'display: none';
-        } else {
-            document.getElementById(`container_movimentos_${elementos[cont]}`).style = '';
-        }
-    }
-}
-
-function gerarRelatorioCaptura(capturas) {
-    limparTextoRelatorio('capturas');
-
-    const elementos = ['peao', 'cavalo', 'bispo', 'torre', 'rainha', 'rei'];
-    const todasCapturasDaPeca = [capturas.peao, capturas.cavalo, capturas.bispo, capturas.torre, capturas.rainha, capturas.rei];
-
-    for (let cont = 0; cont < elementos.length; cont++) {
-        const elementoRelatorio = document.getElementById(`capturas_${elementos[cont]}`);
-        let estaVazio = true;
-
-        todasCapturasDaPeca[cont].map((movimento) => {
-            const origem = converteBinarioParaCoordenada(movimento.origem);
-            const destino = movimento.destino.capturas
-                .map((movimento_destino) => {
-                    return converteBinarioParaCoordenada(movimento_destino);
-                })
-                .join(', ');
-            if (destino) {
-                elementoRelatorio.innerHTML += `${origem} -> ${destino}<br />`;
-                estaVazio = false;
-            }
-        });
-
-        // Verificando se foi adicionado algum relatório, caso não tenha, o elemento fica oculto
-        if (estaVazio == true) {
-            document.getElementById(`container_capturas_${elementos[cont]}`).style = 'display: none';
-        } else {
-            document.getElementById(`container_capturas_${elementos[cont]}`).style = '';
-        }
-    }
-}
-
-function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
-    // Limpando relatórios antigos
-    document.getElementById('en_passant').innerHTML = '';
-    document.getElementById('roque').innerHTML = '';
-
-    const elementoRelatorioEnPassant = document.getElementById('en_passant');
-    let estaVazio = true;
-
-    movimentos_especiais.peao.map((movimento) => {
-        const origem = converteBinarioParaCoordenada(movimento.origem);
-        const destino = movimento.destino.en_passant
-            .map((movimento_destino) => {
-                return converteBinarioParaCoordenada(movimento_destino);
-            })
-            .join(', ');
-        if (destino) {
-            elementoRelatorioEnPassant.innerHTML += `${origem} -> ${destino}<br />`;
-            estaVazio = false;
-        }
-    });
-
-    estaVazio == true ? (document.getElementById('container_en_passant').style = 'display: none') : (document.getElementById('container_en_passant').style = '');
-
-    const elementoRelatorioRoque = document.getElementById('roque');
-    estaVazio = true;
-
-    movimentos_especiais.rei.map((movimento) => {
-        const origem = converteBinarioParaCoordenada(movimento.origem);
-        let destino = movimento.destino.roque_direita
-            .map((movimento_destino) => {
-                return converteBinarioParaCoordenada(movimento_destino);
-            })
-            .join(', ');
-        if (destino) {
-            elementoRelatorioRoque.innerHTML += `${origem} -> ${destino}<br />`;
-            estaVazio = false;
-        }
-
-        destino = movimento.destino.roque_esquerda
-            .map((movimento_destino) => {
-                return converteBinarioParaCoordenada(movimento_destino);
-            })
-            .join(', ');
-        if (destino) {
-            elementoRelatorioRoque.innerHTML += `${origem} -> ${destino}<br />`;
-            estaVazio = false;
-        }
-    });
-
-    estaVazio == true ? (document.getElementById('container_roque').style = 'display: none') : (document.getElementById('container_roque').style = '');
-}
-
-function vizualizadeiroCasasAtacadas(bitboard_origem, cor, bitboard_casas_atacadas) {
+function geradorTabuleiroASCII(bitboard_origem, cor, bitboard_casas_possiveis) {
     let casas_tabuleiro = [64];
 
-    let casa_origem = '';
-    let casas_atacadas = bitboard_casas_atacadas.toString(2).padStart(64, '0').split('').reverse().join('');
     let tabuleiro = '';
+    let casa_origem = '';
     let peca_origem = '';
+    let casas_possiveis = bitboard_casas_possiveis.toString(2).padStart(64, '0').split('').reverse().join('');
 
+    // Verificando se é alguma peça especifica
     if (bitboard_origem != null) {
         casa_origem = bitboard_origem.toString(2).padStart(64, '0').split('').reverse().join('');
         peca_origem = identificarPecaMovida(bitboard_origem);
 
         switch (peca_origem) {
             case 'p':
-                tabuleiro += `Casas atacadas pelo peão de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Peão de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
             case 'n':
-                tabuleiro += `Casas atacadas pelo cavalo de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Cavalo de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
             case 'b':
-                tabuleiro += `Casas atacadas pelo bispo de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Bispo de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
             case 'r':
-                tabuleiro += `Casas atacadas pela torre de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Torre de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
             case 'q':
-                tabuleiro += `Casas atacadas pela rainha de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Rainha de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
             case 'k':
-                tabuleiro += `Casas atacadas pelo rei de ${converteBinarioParaCoordenada(bitboard_origem)}\n\n`;
+                tabuleiro += `<p style="text-align: center; padding: 0px; margin: 0px">Rei de ${converteBinarioParaCoordenada(bitboard_origem)}</p>\n\n`;
                 break;
         }
     } else {
@@ -342,7 +226,7 @@ function vizualizadeiroCasasAtacadas(bitboard_origem, cor, bitboard_casas_atacad
             } else {
                 casas_tabuleiro[contador] = peca_origem;
             }
-        } else if (casas_atacadas[contador] == '1') {
+        } else if (casas_possiveis[contador] == '1') {
             casas_tabuleiro[contador] = 'X';
         } else {
             casas_tabuleiro[contador] = '-';
@@ -356,7 +240,152 @@ function vizualizadeiroCasasAtacadas(bitboard_origem, cor, bitboard_casas_atacad
     tabuleiro += '   +-----------------+\n';
     tabuleiro += '     a b c d e f g h  \n';
 
-    gerarRelatorioAtacados(peca_origem, tabuleiro);
+    //gerarRelatorioAtacados(peca_origem, tabuleiro);
+    return tabuleiro;
+}
+
+function limparTextoRelatorio(campo) {
+    let elementos = ['p', 'n', 'b', 'r', 'q', 'k'];
+    for (let peca of elementos) {
+        const elementoRelatorio = document.getElementById(`container_${campo}_${peca}`);
+        elementoRelatorio.innerHTML = '';
+    }
+}
+
+function gerarRelatorioMovimento(movimentos) {
+    limparTextoRelatorio('movimentos');
+
+    let tabuleiro = "";
+    const elementos = ['p', 'n', 'b', 'r', 'q', 'k'];
+    const todosMovimentosDaPeca = [movimentos.peao, movimentos.cavalo, movimentos.bispo, movimentos.torre, movimentos.rainha, movimentos.rei];
+    
+    for (let cont = 0; cont < elementos.length; cont++) {
+        const elementoRelatorio = document.getElementById(`container_movimentos_${elementos[cont]}`);
+
+        todosMovimentosDaPeca[cont].map((movimento) => {
+            let bitboard_movimentos_possiveis = 0n;
+
+            for(destino of movimento.destino.movimentos){
+                bitboard_movimentos_possiveis |= destino;
+            }
+            
+            tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
+
+            let elemento_criado = document.createElement('span');
+            elemento_criado.style.border = '1px solid #000';
+            elemento_criado.style.padding = '30px';
+            elemento_criado.style.fontFamily = 'monospace';
+            elemento_criado.style.whiteSpace = 'pre';
+            elemento_criado.innerHTML = tabuleiro;
+            elementoRelatorio.appendChild(elemento_criado);
+        });
+   }
+}
+
+function gerarRelatorioCaptura(capturas) {
+    limparTextoRelatorio('capturas');
+
+    const elementos = ['p', 'n', 'b', 'r', 'q', 'k'];
+    const todasCapturasDaPeca = [capturas.peao, capturas.cavalo, capturas.bispo, capturas.torre, capturas.rainha, capturas.rei];
+
+    for (let cont = 0; cont < elementos.length; cont++) {
+        const elementoRelatorio = document.getElementById(`container_capturas_${elementos[cont]}`);
+
+        todasCapturasDaPeca[cont].map((movimento) => {
+            let bitboard_movimentos_possiveis = 0n;
+
+            for(destino of movimento.destino.capturas){
+                bitboard_movimentos_possiveis |= destino;
+            }
+            
+            tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
+
+            let elemento_criado = document.createElement('span');
+            elemento_criado.style.border = '1px solid #000';
+            elemento_criado.style.padding = '30px';
+            elemento_criado.style.fontFamily = 'monospace';
+            elemento_criado.style.whiteSpace = 'pre';
+            elemento_criado.innerHTML = tabuleiro;
+            elementoRelatorio.appendChild(elemento_criado);
+        });
+   }
+}
+
+function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
+    // Limpando relatórios antigos
+    document.getElementById('container_en_passant').innerHTML = '';
+    document.getElementById('container_roque').innerHTML = '';
+
+    const elementos = ['en_passant', 'roque'];
+    const todasCapturasDaPeca = [capturas.peao, capturas.cavalo, capturas.bispo, capturas.torre, capturas.rainha, capturas.rei];
+
+    for (let cont = 0; cont < elementos.length; cont++) {
+        const elementoRelatorio = document.getElementById(`container_capturas_${elementos[cont]}`);
+
+        todasCapturasDaPeca[cont].map((movimento) => {
+            let bitboard_movimentos_possiveis = 0n;
+
+            for(destino of movimento.destino.capturas){
+                bitboard_movimentos_possiveis |= destino;
+            }
+            
+            tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
+
+            let elemento_criado = document.createElement('span');
+            elemento_criado.style.border = '1px solid #000';
+            elemento_criado.style.padding = '30px';
+            elemento_criado.style.fontFamily = 'monospace';
+            elemento_criado.style.whiteSpace = 'pre';
+            elemento_criado.innerHTML = tabuleiro;
+            elementoRelatorio.appendChild(elemento_criado);
+        });
+   }
+}
+
+function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
+    // Limpando relatórios antigos
+    document.getElementById('container_en_passant').innerHTML = '';
+    document.getElementById('container_roque').innerHTML = '';
+
+    movimentos_especiais.peao.map((movimento) => {
+        let bitboard_movimentos_possiveis = 0n;
+
+        if(movimento.destino.en_passant[0] !== undefined){
+            tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, movimento.destino.en_passant[0]);
+
+            let elemento_criado = document.createElement('span');
+            elemento_criado.style.border = '1px solid #000';
+            elemento_criado.style.padding = '30px';
+            elemento_criado.style.fontFamily = 'monospace';
+            elemento_criado.style.whiteSpace = 'pre';
+            elemento_criado.innerHTML = tabuleiro;
+            document.getElementById('container_en_passant').appendChild(elemento_criado);
+        }
+    });
+
+    if(movimentos_especiais.rei[0].destino.roque_esquerda[0] !== undefined){
+        tabuleiro = geradorTabuleiroASCII(movimentos_especiais.rei[0].origem, partida_real.jogando, movimentos_especiais.rei[0].destino.roque_esquerda[0]);
+
+        let elemento_criado = document.createElement('span');
+        elemento_criado.style.border = '1px solid #000';
+        elemento_criado.style.padding = '30px';
+        elemento_criado.style.fontFamily = 'monospace';
+        elemento_criado.style.whiteSpace = 'pre';
+        elemento_criado.innerHTML = tabuleiro;
+        document.getElementById('container_roque').appendChild(elemento_criado);
+    }
+
+    if(movimentos_especiais.rei[0].destino.roque_direita[0] !== undefined){
+        tabuleiro = geradorTabuleiroASCII(movimentos_especiais.rei[0].origem, partida_real.jogando, movimentos_especiais.rei[0].destino.roque_direita[0]);
+
+        let elemento_criado = document.createElement('span');
+        elemento_criado.style.border = '1px solid #000';
+        elemento_criado.style.padding = '30px';
+        elemento_criado.style.fontFamily = 'monospace';
+        elemento_criado.style.whiteSpace = 'pre';
+        elemento_criado.innerHTML = tabuleiro;
+        document.getElementById('container_roque').appendChild(elemento_criado);
+    }
 }
 
 function limparTextoRelatorioAtacados() {
@@ -366,14 +395,23 @@ function limparTextoRelatorioAtacados() {
         elementoRelatorio.innerHTML = '';
     }
 }
-function gerarRelatorioAtacados(peca, conteudo) {
-    const elementoRelatorio = document.getElementById(`container_atacando_${peca}`);
+function gerarRelatorioAtacados(bitboard_origem, cor, bitboard_casas_atacadas) {
+    let elementoRelatorio
+    
+    if(bitboard_origem == null){
+        elementoRelatorio = document.getElementById(`container_atacando_todas`);
+    }
+    else{
+        elementoRelatorio = document.getElementById(`container_atacando_${identificarPecaMovida(bitboard_origem)}`);
+    }
+
+    const tabuleiro = geradorTabuleiroASCII(bitboard_origem, cor, bitboard_casas_atacadas);
 
     let elemento_criado = document.createElement('span');
     elemento_criado.style.border = '1px solid #000';
     elemento_criado.style.padding = '30px';
     elemento_criado.style.fontFamily = 'monospace';
     elemento_criado.style.whiteSpace = 'pre';
-    elemento_criado.textContent = conteudo;
+    elemento_criado.innerHTML = tabuleiro;
     elementoRelatorio.appendChild(elemento_criado);
 }

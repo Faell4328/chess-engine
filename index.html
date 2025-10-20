@@ -34,32 +34,51 @@
   <hr />
   <h3 id="titulo_relatorio">Relatórios</h3>
 </div>
+
 <div style="padding: 0px 10px 20px 10px">
   <div>
     <h4>Movimentos possíveis</h4>
-    <details id="container_movimentos_peao">
-      <summary>Peão</summary>
-      <p id="movimentos_peao"></p>
+    <details style="padding: 10px">
+      <summary>Peao</summary>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_p"
+      ></div>
     </details>
-    <details id="container_movimentos_cavalo">
+    <details style="padding: 10px">
       <summary>Cavalo</summary>
-      <p id="movimentos_cavalo"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_n"
+      ></div>
     </details>
-    <details id="container_movimentos_bispo">
+    <details style="padding: 10px">
       <summary>Bispo</summary>
-      <p id="movimentos_bispo"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_b"
+      ></div>
     </details>
-    <details id="container_movimentos_torre">
+    <details style="padding: 10px">
       <summary>Torre</summary>
-      <p id="movimentos_torre"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_r"
+      ></div>
     </details>
-    <details id="container_movimentos_rainha">
+    <details style="padding: 10px">
       <summary>Rainha</summary>
-      <p id="movimentos_rainha"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_q"
+      ></div>
     </details>
-    <details id="container_movimentos_rei">
+    <details style="padding: 10px">
       <summary>Rei</summary>
-      <p id="movimentos_rei"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_movimentos_k"
+      ></div>
     </details>
   </div>
 
@@ -67,43 +86,67 @@
 
   <div>
     <h4>Capturas possíveis</h4>
-    <details id="container_capturas_peao">
-      <summary>Peão</summary>
-      <p id="capturas_peao"></p>
+    <details style="padding: 10px">
+      <summary>Peao</summary>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_p"
+      ></div>
     </details>
-    <details id="container_capturas_cavalo">
+    <details style="padding: 10px">
       <summary>Cavalo</summary>
-      <p id="capturas_cavalo"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_n"
+      ></div>
     </details>
-    <details id="container_capturas_bispo">
+    <details style="padding: 10px">
       <summary>Bispo</summary>
-      <p id="capturas_bispo"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_b"
+      ></div>
     </details>
-    <details id="container_capturas_torre">
+    <details style="padding: 10px">
       <summary>Torre</summary>
-      <p id="capturas_torre"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_r"
+      ></div>
     </details>
-    <details id="container_capturas_rainha">
+    <details style="padding: 10px">
       <summary>Rainha</summary>
-      <p id="capturas_rainha"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_q"
+      ></div>
     </details>
-    <details id="container_capturas_rei">
+    <details style="padding: 10px">
       <summary>Rei</summary>
-      <p id="capturas_rei"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_capturas_k"
+      ></div>
     </details>
-  </div>
+ </div>
 
   <hr />
 
   <div>
     <h4>Movimentos especiais possíveis (en passant e roque)</h4>
-    <details id="container_en_passant">
+    <details style="padding: 10px">
       <summary>En passant</summary>
-      <p id="en_passant"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_en_passant"
+      ></div>
     </details>
-    <details id="container_roque">
+    <details style="padding: 10px">
       <summary>Roque</summary>
-      <p id="roque"></p>
+      <div
+        style="display: flex; max-width: 100vw; flex-wrap: wrap; gap: 20px"
+        id="container_roque"
+      ></div>
     </details>
   </div>
 </div>
@@ -190,5 +233,5 @@
   gerarRelatorioMovimento(todosMovimentosECaptura);
   gerarRelatorioCaptura(todosMovimentosECaptura);
   gerarRelatorioMovimentoEspecial(todosMovimentosECaptura);
-  Calcular.casasAtacadas(true);
+  Calcular.casasAtacadas(relatorio = true);
 </script>
