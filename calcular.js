@@ -63,7 +63,11 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
         }
         // Verificando se casa está ocupada por um aliado
         else if ((destino & pecas_aliadas) !== 0n) {
-            break;
+            if (calculando_casas_atacadas == false) {
+                break;
+            } else {
+                en_passant.push(destino);
+            }
         }
 
         // Verificando se é um movimento e não é um cálculo de casas atacadas
@@ -135,7 +139,11 @@ function calcularAtaqueEMovimentoPecasSaltitante(jogando, origem, deslocamento, 
         }
         // Verificando se a casa está ocupada por um aliado
         else if ((destino & pecas_aliadas) !== 0n) {
-            continue;
+            if (calculando_casas_atacadas == false) {
+                continue;
+            } else {
+                movimentos.push(destino);
+            }
         }
 
         if (calculando_casas_atacadas == false) {
@@ -217,7 +225,12 @@ function calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, deslocamento, 
         }
         // Verificando se a casa está ocupada por um aliado e se não está na borda
         else if ((destino & pecas_aliadas) !== 0n) {
-            break;
+            if (calculando_casas_atacadas == false) {
+                continue;
+            } else {
+                movimentos.push(destino);
+                break;
+            }
         }
         // Verificando se a peça está na borda
         else if ((destino & borda) !== 0n) {
@@ -319,7 +332,12 @@ function calcularAtaqueEMovimentoPecaRei(jogando, origem, deslocamento, operador
         }
         // Verificando se a casa está ocupada por um aliado e se não está na borda
         else if ((destino & pecas_aliadas) !== 0n) {
-            break;
+            if (calculando_casas_atacadas == false) {
+                continue;
+            } else {
+                movimentos.push(destino);
+                break;
+            }
         }
         // Verificando se a peça está na borda
         else if ((destino & borda) !== 0n) {
