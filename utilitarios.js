@@ -84,7 +84,7 @@ function validarFen(fen) {
     // VERIFICANDO A PRIMEIRA CAMPO DO FEN (peças no tabuleiro)
 
     // Verificando se o primeiro campo do FEN não possui mais de dois reis
-    if(fen_separado[0].match(/[k]/gi).length !== 2){
+    if (fen_separado[0].match(/[k]/gi).length !== 2) {
         aviso('O primeiro campo do FEN está incorreto, o FEN tem que ter 2 reis, nem menos e nem mais', 'Erro');
         throw new Error('O primeiro campo do FEN está incorreto, o FEN tem que ter 2 reis, nem menos e nem mais');
     }
@@ -96,7 +96,6 @@ function validarFen(fen) {
         aviso(`O primeiro campo do FEN está incorreto, esperado é 8 e o fornecido tem ${primeiro_campo_fen.length}`, 'Erro');
         throw new Error(`O primeiro campo do FEN está incorreto, esperado é 8 e o fornecido tem ${primeiro_campo_fen.length}`);
     }
-
 
     // Verificando se existe alguma letra ou número inválido (válidos: "r", "n", "b", "q", "k", "p", "R", "N", "B", "Q", "K", "P", "/", 1, 2, 3, 4, 5, 6, 7, 8)
     if (fen_separado[0].match(/[^r|n|b|q|k|p|/|1-8]/gi) !== null) {
@@ -255,20 +254,20 @@ function limparTextoRelatorio(campo) {
 function gerarRelatorioMovimento(movimentos) {
     limparTextoRelatorio('movimentos');
 
-    let tabuleiro = "";
+    let tabuleiro = '';
     const elementos = ['p', 'n', 'b', 'r', 'q', 'k'];
     const todosMovimentosDaPeca = [movimentos.peao, movimentos.cavalo, movimentos.bispo, movimentos.torre, movimentos.rainha, movimentos.rei];
-    
+
     for (let cont = 0; cont < elementos.length; cont++) {
         const elementoRelatorio = document.getElementById(`container_movimentos_${elementos[cont]}`);
 
         todosMovimentosDaPeca[cont].map((movimento) => {
             let bitboard_movimentos_possiveis = 0n;
 
-            for(destino of movimento.destino.movimentos){
+            for (destino of movimento.destino.movimentos) {
                 bitboard_movimentos_possiveis |= destino;
             }
-            
+
             tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
 
             let elemento_criado = document.createElement('span');
@@ -279,7 +278,7 @@ function gerarRelatorioMovimento(movimentos) {
             elemento_criado.innerHTML = tabuleiro;
             elementoRelatorio.appendChild(elemento_criado);
         });
-   }
+    }
 }
 
 function gerarRelatorioCaptura(capturas) {
@@ -294,10 +293,10 @@ function gerarRelatorioCaptura(capturas) {
         todasCapturasDaPeca[cont].map((movimento) => {
             let bitboard_movimentos_possiveis = 0n;
 
-            for(destino of movimento.destino.capturas){
+            for (destino of movimento.destino.capturas) {
                 bitboard_movimentos_possiveis |= destino;
             }
-            
+
             tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
 
             let elemento_criado = document.createElement('span');
@@ -308,7 +307,7 @@ function gerarRelatorioCaptura(capturas) {
             elemento_criado.innerHTML = tabuleiro;
             elementoRelatorio.appendChild(elemento_criado);
         });
-   }
+    }
 }
 
 function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
@@ -325,10 +324,10 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
         todasCapturasDaPeca[cont].map((movimento) => {
             let bitboard_movimentos_possiveis = 0n;
 
-            for(destino of movimento.destino.capturas){
+            for (destino of movimento.destino.capturas) {
                 bitboard_movimentos_possiveis |= destino;
             }
-            
+
             tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, bitboard_movimentos_possiveis);
 
             let elemento_criado = document.createElement('span');
@@ -339,7 +338,7 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
             elemento_criado.innerHTML = tabuleiro;
             elementoRelatorio.appendChild(elemento_criado);
         });
-   }
+    }
 }
 
 function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
@@ -350,7 +349,7 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
     movimentos_especiais.peao.map((movimento) => {
         let bitboard_movimentos_possiveis = 0n;
 
-        if(movimento.destino.en_passant[0] !== undefined){
+        if (movimento.destino.en_passant[0] !== undefined) {
             tabuleiro = geradorTabuleiroASCII(movimento.origem, partida_real.jogando, movimento.destino.en_passant[0]);
 
             let elemento_criado = document.createElement('span');
@@ -363,7 +362,7 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
         }
     });
 
-    if(movimentos_especiais.rei[0].destino.roque_esquerda[0] !== undefined){
+    if (movimentos_especiais.rei[0].destino.roque_esquerda[0] !== undefined) {
         tabuleiro = geradorTabuleiroASCII(movimentos_especiais.rei[0].origem, partida_real.jogando, movimentos_especiais.rei[0].destino.roque_esquerda[0]);
 
         let elemento_criado = document.createElement('span');
@@ -375,7 +374,7 @@ function gerarRelatorioMovimentoEspecial(movimentos_especiais) {
         document.getElementById('container_roque').appendChild(elemento_criado);
     }
 
-    if(movimentos_especiais.rei[0].destino.roque_direita[0] !== undefined){
+    if (movimentos_especiais.rei[0].destino.roque_direita[0] !== undefined) {
         tabuleiro = geradorTabuleiroASCII(movimentos_especiais.rei[0].origem, partida_real.jogando, movimentos_especiais.rei[0].destino.roque_direita[0]);
 
         let elemento_criado = document.createElement('span');
@@ -396,12 +395,11 @@ function limparTextoRelatorioAtacados() {
     }
 }
 function gerarRelatorioAtacados(bitboard_origem, cor, bitboard_casas_atacadas) {
-    let elementoRelatorio
-    
-    if(bitboard_origem == null){
+    let elementoRelatorio;
+
+    if (bitboard_origem == null) {
         elementoRelatorio = document.getElementById(`container_atacando_todas`);
-    }
-    else{
+    } else {
         elementoRelatorio = document.getElementById(`container_atacando_${identificarPecaMovida(bitboard_origem)}`);
     }
 

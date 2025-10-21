@@ -1,5 +1,5 @@
 // Função para calcular todos movimentos e capturas válido do pião
-function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operador, isMovimentoPeao, borda, calculando_casas_atacadas = false) {
+function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operador, movimento_peao, borda, calculando_casas_atacadas = false) {
     let pecas_aliadas = jogando == 'w' ? partida_simulada.bitboard_pecas_brancas : partida_simulada.bitboard_pecas_pretas;
     let pecas_inimigas = jogando == 'w' ? partida_simulada.bitboard_pecas_pretas : partida_simulada.bitboard_pecas_brancas;
     let en_passant_inimigo = jogando == 'w' ? partida_simulada.en_passant_pretas : partida_simulada.en_passant_brancas;
@@ -14,7 +14,7 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
         return { todos: [], movimentos: [], capturas: [], en_passant: [] };
     }
     // Verificando se foi feito um movimento na contagem de casas atacadas
-    else if (isMovimentoPeao == true && calculando_casas_atacadas == true) {
+    else if (movimento_peao == true && calculando_casas_atacadas == true) {
         return { todos: [], movimentos: [], capturas: [], en_passant: [] };
     }
 
@@ -26,15 +26,15 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
             break;
         }
         // Verificando se é um movimento e na casa de destino não tenha peça adversária
-        else if (isMovimentoPeao == true && (destino & pecas_inimigas) !== 0n) {
+        else if (movimento_peao == true && (destino & pecas_inimigas) !== 0n) {
             break;
         }
         // Verificando se é um movimento duplo e se é válido
         else if (deslocamento[cont] == informacoes_xadrez.movimento_peao[1] && (origem & casas_iniciais_peao_aliado) == 0n) {
             break;
         }
-        // Verificando se casa está ocupada por um inimigo (captura)
-        else if (isMovimentoPeao == false && (destino & pecas_inimigas) !== 0n) {
+        // Verificando se não é um movimento e se a casa de destino possui peça inimiga (captura)
+        else if (movimento_peao == false && (destino & pecas_inimigas) !== 0n) {
             if (calculando_casas_atacadas == false) {
                 efetuarCaptura(origem, destino, 'p');
                 Calcular.casasAtacadas();
@@ -47,8 +47,8 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
             }
             break;
         }
-        // Verificando se um en passant é válido
-        else if (isMovimentoPeao == false && (destino & en_passant_inimigo) !== 0n) {
+        // Verificando se não é um movimento e se tem en passant
+        else if (movimento_peao == false && (destino & en_passant_inimigo) !== 0n) {
             if (calculando_casas_atacadas == false) {
                 Peao.efetuarEnPassant(origem, destino);
                 Calcular.casasAtacadas();
@@ -66,12 +66,12 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
             if (calculando_casas_atacadas == false) {
                 break;
             } else {
-                en_passant.push(destino);
+                movimentos.push(destino);
             }
         }
 
-        // Verificando se é um movimento e não é um cálculo de casas atacadas
-        if (isMovimentoPeao == true && calculando_casas_atacadas == false) {
+        // Verificando se é um movimento e também se não está calculando as casas atacadas
+        if (movimento_peao == true && calculando_casas_atacadas == false) {
             efetuarMovimento(origem, destino, 'p');
             Calcular.casasAtacadas();
             if (Calcular.seReiAtacado(partida_real.jogando) == false) {
@@ -79,8 +79,8 @@ function calcularAtaqueEMovimentoPecaPeao(jogando, origem, deslocamento, operado
             }
             sincronizar_partida_simulada_com_partida_real();
         }
-        // Verificando se é um calculo de casas atacadas e não é um movimento
-        else if (isMovimentoPeao == false && calculando_casas_atacadas == true) {
+        // Verificando se está calculando as casas atacadas e não é um movimento
+        else if (movimento_peao == false && calculando_casas_atacadas == true) {
             capturas.push(destino);
         }
     }
@@ -225,12 +225,10 @@ function calcularAtaqueEMovimentoPecasDeslizante(jogando, origem, deslocamento, 
         }
         // Verificando se a casa está ocupada por um aliado e se não está na borda
         else if ((destino & pecas_aliadas) !== 0n) {
-            if (calculando_casas_atacadas == false) {
-                continue;
-            } else {
+            if (calculando_casas_atacadas == true) {
                 movimentos.push(destino);
-                break;
             }
+            break;
         }
         // Verificando se a peça está na borda
         else if ((destino & borda) !== 0n) {
